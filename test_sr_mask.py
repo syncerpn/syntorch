@@ -48,7 +48,6 @@ def test(epoch):
         
         perf_f = evaluation.calculate(args, yf, yt) #calculate baseline psnr here, of the core network without mask
         perf_m = evaluation.calculate(args, yq, yt) #calculate psnr of the core network when masks applied
-        print(perf_m)
 
         #keep track of psnr to compare later
         perf_fs.append(perf_f.cpu())
