@@ -19,15 +19,15 @@ class IDAG_M3_parasitic_v3(nn.Module):
 
         for l in self.target_layer_index:
             if l == 1:
-                self.agent_list[l] = module.unit_agent_uni_1x1_nobias(64, 32, 0, immc)
+                self.agent_list[l] = module.unit_agent_uni_1x1(64, 32, 0, immc)
             elif l == 6:
-                self.agent_list[l] = module.unit_agent_uni_1x1_nobias(32, 64, 0, immc)
+                self.agent_list[l] = module.unit_agent_uni_1x1(32, 64, 0, immc)
             else:
-                self.agent_list[l] = module.unit_agent_mix_1x1_3x3_nobias(32, 32, 0, immc)
+                self.agent_list[l] = module.unit_agent_mix_1x1_3x3(32, 32, 0, immc)
 
     def load_state_dict(self, state_dict):
         for l in self.target_layer_index:
-            agent_list[l].load_state_dict(state_dict[l])
+            self.agent_list[l].load_state_dict(state_dict[l])
 
     def forward(self, input_dict):
         #forward method for getting the masks

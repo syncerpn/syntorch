@@ -27,7 +27,7 @@ class IDAG_M3E_parasitic_v1(nn.Module):
 
     def load_state_dict(self, state_dict):
         for l in self.target_layer_index:
-            agent_list[l].load_state_dict(state_dict[l])
+            self.agent_list[l].load_state_dict(state_dict[l])
 
     def forward(self, input_dict):
         #forward method for getting the masks
