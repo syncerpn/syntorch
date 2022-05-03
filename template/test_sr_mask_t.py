@@ -29,6 +29,18 @@ def set_template(args):
 		args.agent='IDAG_M3_parasitic_v3-4'
 		args.mask_type='sigmoid'
 
+	elif args.template == 'IDAG_M3_parasitic_v1':
+		print('[INFO] Template found')
+		args.style='Y'
+		args.testset_tag='Set14B'
+		args.testset_dir='/home/dataset/set14_dnb/2x/'
+		args.rgb_range=1.0
+		args.scale=2
+		args.core='IDAG_M3'
+		args.target_layer_index='1,2,3,4,5,6'
+		args.agent='IDAG_M3_parasitic_v1-4'
+		args.mask_type='sigmoid'
+
 	elif args.template == 'SVDSR_10_parasitic_v0-4':
 		print('[INFO] Template found')
 		args.style='Y'

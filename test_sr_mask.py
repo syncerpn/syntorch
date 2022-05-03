@@ -97,6 +97,7 @@ print('[INFO] policy network generates masks for layers: ', (core.target_layer_i
 
 # create and load policy model
 agent = magent.config(args, core)
+agent.save_params()
 
 # cuda config
 core.eval().cuda()
