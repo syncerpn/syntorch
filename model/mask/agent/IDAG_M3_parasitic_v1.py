@@ -47,63 +47,63 @@ class IDAG_M3_parasitic_v1(nn.Module):
 
         return all_params
 
-    def save_params(self):
-        file_prefix = 'agent_'
-        for l in self.target_layer_index:
-            if l == 1:
-                i = 0
-                file_name = file_prefix + str(l) + '_' + str(i)
-                with open(file_name, 'w') as f:
-                    bias = self.agent_list[l].conv[i].bias.data.numpy()
-                    weight = self.agent_list[l].conv[i].weight.data.numpy().flatten()
-                    data = np.concatenate((bias, weight))
-                    data.tofile(f)
+    # def save_params(self):
+    #     file_prefix = 'agent_'
+    #     for l in self.target_layer_index:
+    #         if l == 1:
+    #             i = 0
+    #             file_name = file_prefix + str(l) + '_' + str(i)
+    #             with open(file_name, 'w') as f:
+    #                 bias = self.agent_list[l].conv[i].bias.data.numpy()
+    #                 weight = self.agent_list[l].conv[i].weight.data.numpy().flatten()
+    #                 data = np.concatenate((bias, weight))
+    #                 data.tofile(f)
 
-                i = i+1
-                file_name = file_prefix + str(l) + '_' + str(i)
-                with open(file_name, 'w') as f:
-                    bias = self.agent_list[l].conv[i].bias.data.numpy()
-                    weight = self.agent_list[l].conv[i].weight.data.numpy().flatten()
-                    data = np.concatenate((bias, weight))
-                    data.tofile(f)
+    #             i = i+1
+    #             file_name = file_prefix + str(l) + '_' + str(i)
+    #             with open(file_name, 'w') as f:
+    #                 bias = self.agent_list[l].conv[i].bias.data.numpy()
+    #                 weight = self.agent_list[l].conv[i].weight.data.numpy().flatten()
+    #                 data = np.concatenate((bias, weight))
+    #                 data.tofile(f)
 
-            elif l == 6:
-                i = 0
-                file_name = file_prefix + str(l) + '_' + str(i)
-                with open(file_name, 'w') as f:
-                    bias = self.agent_list[l].conv[i].bias.data.numpy()
-                    weight = self.agent_list[l].conv[i].weight.data.numpy().flatten()
-                    data = np.concatenate((bias, weight))
-                    data.tofile(f)
+    #         elif l == 6:
+    #             i = 0
+    #             file_name = file_prefix + str(l) + '_' + str(i)
+    #             with open(file_name, 'w') as f:
+    #                 bias = self.agent_list[l].conv[i].bias.data.numpy()
+    #                 weight = self.agent_list[l].conv[i].weight.data.numpy().flatten()
+    #                 data = np.concatenate((bias, weight))
+    #                 data.tofile(f)
 
-                i = i+1
-                file_name = file_prefix + str(l) + '_' + str(i)
-                with open(file_name, 'w') as f:
-                    bias = self.agent_list[l].conv[i].bias.data.numpy()
-                    weight = self.agent_list[l].conv[i].weight.data.numpy().flatten()
-                    data = np.concatenate((bias, weight))
-                    data.tofile(f)
-            else:
-                i = 0
-                file_name = file_prefix + str(l) + '_' + str(i)
-                with open(file_name, 'w') as f:
-                    bias = self.agent_list[l].conv[i].bias.data.numpy()
-                    weight = self.agent_list[l].conv[i].weight.data.numpy().flatten()
-                    data = np.concatenate((bias, weight))
-                    data.tofile(f)
+    #             i = i+1
+    #             file_name = file_prefix + str(l) + '_' + str(i)
+    #             with open(file_name, 'w') as f:
+    #                 bias = self.agent_list[l].conv[i].bias.data.numpy()
+    #                 weight = self.agent_list[l].conv[i].weight.data.numpy().flatten()
+    #                 data = np.concatenate((bias, weight))
+    #                 data.tofile(f)
+    #         else:
+    #             i = 0
+    #             file_name = file_prefix + str(l) + '_' + str(i)
+    #             with open(file_name, 'w') as f:
+    #                 bias = self.agent_list[l].conv[i].bias.data.numpy()
+    #                 weight = self.agent_list[l].conv[i].weight.data.numpy().flatten()
+    #                 data = np.concatenate((bias, weight))
+    #                 data.tofile(f)
 
-                i = i+1
-                file_name = file_prefix + str(l) + '_' + str(i)
-                with open(file_name, 'w') as f:
-                    bias = self.agent_list[l].conv[i].bias.data.numpy()
-                    weight = self.agent_list[l].conv[i].weight.data.numpy().flatten()
-                    data = np.concatenate((bias, weight))
-                    data.tofile(f)
+    #             i = i+1
+    #             file_name = file_prefix + str(l) + '_' + str(i)
+    #             with open(file_name, 'w') as f:
+    #                 bias = self.agent_list[l].conv[i].bias.data.numpy()
+    #                 weight = self.agent_list[l].conv[i].weight.data.numpy().flatten()
+    #                 data = np.concatenate((bias, weight))
+    #                 data.tofile(f)
 
-                i = i+1
-                file_name = file_prefix + str(l) + '_' + str(i)
-                with open(file_name, 'w') as f:
-                    bias = self.agent_list[l].conv[i].bias.data.numpy()
-                    weight = self.agent_list[l].conv[i].weight.data.numpy().flatten()
-                    data = np.concatenate((bias, weight))
-                    data.tofile(f)
+    #             i = i+1
+    #             file_name = file_prefix + str(l) + '_' + str(i)
+    #             with open(file_name, 'w') as f:
+    #                 bias = self.agent_list[l].conv[i].bias.data.numpy()
+    #                 weight = self.agent_list[l].conv[i].weight.data.numpy().flatten()
+    #                 data = np.concatenate((bias, weight))
+    #                 data.tofile(f)
