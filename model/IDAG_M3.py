@@ -30,15 +30,36 @@ class IDAG_M3(nn.Module): #hardcode
             self.conv[i].bias.data.fill_(0.01)
             nn.init.xavier_uniform_(self.conv[i].weight)
 
-    def forward(self, x):
-        z = x
-        for i in range(7): # exclude the last layer
-            z = F.relu(self.conv[i](z))
+    def forward(self, x, kd_train=False):
+        if kd_train:
+            feas = []
+            z = x
+            for i in range(7): # exclude the last layer
+                z = F.relu(self.conv[i](z))
+                # 4 block learning
+                # if i >= 2 and i <= 5:
+                #     feas.append(z)
+                # 4 block learning
 
-        z = self.conv[7](z)
+                # 2 block learning
+                if i == 3 and i == 5:
+                    feas.append(z)
+                # 2 block learning
 
-        y = residual_stack(z, x, self.scale)
-        return y
+            z = self.conv[7](z)
+
+            y = residual_stack(z, x, self.scale)
+            return y, feas
+
+        else:
+            z = x
+            for i in range(7): # exclude the last layer
+                z = F.relu(self.conv[i](z))
+
+            z = self.conv[7](z)
+
+            y = residual_stack(z, x, self.scale)
+            return y
 
     # def save_dn_module(self, file_prefix):
     #     I = list(range(len(self.conv)))
