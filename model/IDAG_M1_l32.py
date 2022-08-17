@@ -5,6 +5,7 @@
 import torch.nn as nn
 import torch.nn.functional as F
 from model.common import residual_stack
+import numpy as np
 
 class IDAG_M1_l32(nn.Module): #hardcode
     def __init__(self, scale=2):
@@ -38,3 +39,15 @@ class IDAG_M1_l32(nn.Module): #hardcode
 
         y = residual_stack(z, x, self.scale)
         return y
+
+    def save_dn_module(self, file_prefix):
+        I = list(range(len(self.conv)))
+        T = list(range(len(self.conv)))
+
+        for i, t in zip(I, T):
+            file_name = file_prefix + str(t)
+            with open(file_name, 'w') as f:
+                bias = self.conv[i].bias.data.numpy()
+                weight = self.conv[i].weight.data.numpy().flatten()
+                data = np.concatenate((bias, weight))
+                data.tofile(f)

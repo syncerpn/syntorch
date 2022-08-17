@@ -68,6 +68,42 @@ def set_template(args):
 		args.scale=2
 		args.core='IDAG_M3'
 
+	elif args.template == 'IDAG_M1_c3_Set14B':
+		print('[INFO] Template found')
+		args.style='Y'
+		args.testset_tag='Set14B'
+		args.testset_dir='/home/dataset/set14_dnb/2x/'
+		args.rgb_range=1.0
+		args.scale=2
+		args.core='IDAG_M1_c3'
+
+	elif args.template == 'IDAG_M1_r3_Set14B':
+		print('[INFO] Template found')
+		args.style='Y'
+		args.testset_tag='Set14B'
+		args.testset_dir='/home/dataset/set14_dnb/2x/'
+		args.rgb_range=1.0
+		args.scale=2
+		args.core='IDAG_M1_r3'
+
+	elif args.template == 'IDAG_M1_l64_Set14B':
+		print('[INFO] Template found')
+		args.style='Y'
+		args.testset_tag='Set14B'
+		args.testset_dir='/home/dataset/set14_dnb/2x/'
+		args.rgb_range=1.0
+		args.scale=2
+		args.core='IDAG_M1_l64'
+
+	elif args.template == 'IDAG_M1_l32_Set14B':
+		print('[INFO] Template found')
+		args.style='Y'
+		args.testset_tag='Set14B'
+		args.testset_dir='/home/dataset/set14_dnb/2x/'
+		args.rgb_range=1.0
+		args.scale=2
+		args.core='IDAG_M1_l32'
+
 	elif args.template == 'IDAG_M3_KD3_Set14B':
 		print('[INFO] Template found')
 		args.style='Y'
@@ -76,6 +112,24 @@ def set_template(args):
 		args.rgb_range=1.0
 		args.scale=2
 		args.core='IDAG_M3_KD3'
+
+	elif args.template == 'IDAG_M3_KD3s_Set14B':
+		print('[INFO] Template found')
+		args.style='Y'
+		args.testset_tag='Set14B'
+		args.testset_dir='/home/dataset/set14_dnb/2x/'
+		args.rgb_range=1.0
+		args.scale=2
+		args.core='IDAG_M3_KD3s'
+
+	elif args.template == 'IDAG_M3_KD2_Set14B':
+		print('[INFO] Template found')
+		args.style='Y'
+		args.testset_tag='Set14B'
+		args.testset_dir='/home/dataset/set14_dnb/2x/'
+		args.rgb_range=1.0
+		args.scale=2
+		args.core='IDAG_M3_KD2'
 
 	elif args.template == 'IDAG_M4_Set14B':
 		print('[INFO] Template found')
