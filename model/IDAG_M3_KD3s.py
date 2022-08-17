@@ -67,7 +67,7 @@ class IDAG_M3_KD3s(nn.Module): #hardcode
 
     def save_dn_module(self, file_prefix):
         I = list(range(len(self.conv)))
-        T = [ 0,  1,  2,  3,  4,  5,  6,  7, 8, 9]
+        T = list(range(len(self.conv)))
 
         for i, t in zip(I, T):
             file_name = file_prefix + str(t)
