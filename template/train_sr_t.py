@@ -159,11 +159,145 @@ def set_template(args):
 		args.core='IDAG_M1_c3'
 		args.checkpoint=None
 
+	elif args.template == 'IDAG_M6_4': #high weight decay
+		print('[INFO] Template found')
+		args.lr=1e-4
+		args.lr_decay_ratio=0.5
+		args.weight_decay=0.000001
+		args.batch_size=16
+		args.epoch_step=200
+		args.max_epochs=300
+		args.loss='L1'
+		args.optimizer='Adam'
+		args.max_load=0
+		args.style='Y'
+		args.trainset_tag='SR291B'
+		args.trainset_patch_size=21
+		args.trainset_dir='/home/dataset/sr291_21x21_dn/2x/'
+		args.testset_tag='Set14B'
+		args.testset_dir='/home/dataset/set14_dnb/2x/'
+		args.rgb_range=1.0
+		args.scale=2
+		args.core='IDAG_M6'
+		args.checkpoint=None
+
+	elif args.template == 'IDAG_M5_1':
+		print('[INFO] Template found')
+		args.lr=1e-4
+		args.lr_decay_ratio=0.5
+		args.weight_decay=0
+		args.batch_size=16
+		args.epoch_step=200
+		args.max_epochs=300
+		args.loss='L1'
+		args.optimizer='Adam'
+		args.max_load=0
+		args.style='Y'
+		args.trainset_tag='SR291B'
+		args.trainset_patch_size=21
+		args.trainset_dir='/home/dataset/sr291_21x21_dn/2x/'
+		args.testset_tag='Set14B'
+		args.testset_dir='/home/dataset/set14_dnb/2x/'
+		args.rgb_range=1.0
+		args.scale=2
+		args.core='IDAG_M5'
+		args.checkpoint=None
+
+	elif args.template == 'IDAG_M5_m16_1':
+		print('[INFO] Template found')
+		args.lr=1e-4
+		args.lr_decay_ratio=0.5
+		args.weight_decay=0
+		args.batch_size=16
+		args.epoch_step=200
+		args.max_epochs=300
+		args.loss='L1'
+		args.optimizer='Adam'
+		args.max_load=0
+		args.style='Y'
+		args.trainset_tag='SR291B'
+		args.trainset_patch_size=21
+		args.trainset_dir='/home/dataset/sr291_21x21_dn/2x/'
+		args.testset_tag='Set14B'
+		args.testset_dir='/home/dataset/set14_dnb/2x/'
+		args.rgb_range=1.0
+		args.scale=2
+		args.core='IDAG_M5_m16'
+		args.checkpoint=None
+
 	elif args.template == 'IDAG_M4_1':
 		print('[INFO] Template found')
 		args.lr=1e-4
 		args.lr_decay_ratio=0.5
 		args.weight_decay=0
+		args.batch_size=16
+		args.epoch_step=200
+		args.max_epochs=300
+		args.loss='L1'
+		args.optimizer='Adam'
+		args.max_load=0
+		args.style='Y'
+		args.trainset_tag='SR291B'
+		args.trainset_patch_size=21
+		args.trainset_dir='/home/dataset/sr291_21x21_dn/2x/'
+		args.testset_tag='Set14B'
+		args.testset_dir='/home/dataset/set14_dnb/2x/'
+		args.rgb_range=1.0
+		args.scale=2
+		args.core='IDAG_M4'
+		args.checkpoint=None
+
+	elif args.template == 'IDAG_M4_2':
+		print('[INFO] Template found')
+		args.lr=1e-4
+		args.lr_decay_ratio=0.5
+		args.weight_decay=0
+		args.batch_size=16
+		args.epoch_step=2000
+		args.max_epochs=3000
+		args.loss='L1'
+		args.optimizer='Adam'
+		args.max_load=0
+		args.style='Y'
+		args.trainset_tag='DIV2K'
+		args.trainset_patch_size=21
+		args.trainset_dir='/home/dataset/DIV2K/'
+		args.trainset_preload=800
+		args.testset_tag='Set14B'
+		args.testset_dir='/home/dataset/set14_dnb/2x/'
+		args.rgb_range=1.0
+		args.scale=2
+		args.core='IDAG_M4'
+		args.checkpoint=None
+
+	elif args.template == 'IDAG_M4_3':
+		print('[INFO] Template found')
+		args.lr=1e-4
+		args.lr_decay_ratio=0.5
+		args.weight_decay=0
+		args.batch_size=16
+		args.epoch_step=2000
+		args.max_epochs=3000
+		args.loss='L1'
+		args.optimizer='Adam'
+		args.max_load=0
+		args.style='Y'
+		args.trainset_tag='DIV2K'
+		args.trainset_patch_size=21
+		args.trainset_dir='/home/dataset/DIV2K/'
+		args.trainset_preload=800
+		args.testset_tag='Set14B'
+		args.testset_dir='/home/dataset/set14_dnb/2x/'
+		args.rgb_range=1.0
+		args.scale=2
+		args.core='IDAG_M4'
+		# args.checkpoint=None
+
+	elif args.template == 'IDAG_M4_4': #high weight decay
+		print('[INFO] Template found')
+		args.lr=1e-4
+		args.lr_decay_ratio=0.5
+		args.weight_decay=0.000001
 		args.batch_size=16
 		args.epoch_step=200
 		args.max_epochs=300
@@ -296,6 +430,28 @@ def set_template(args):
 		args.lr=1e-4
 		args.lr_decay_ratio=0.5
 		args.weight_decay=0
+		args.batch_size=16
+		args.epoch_step=200
+		args.max_epochs=300
+		args.loss='L1'
+		args.optimizer='Adam'
+		args.max_load=0
+		args.style='Y'
+		args.trainset_tag='SR291B'
+		args.trainset_patch_size=21
+		args.trainset_dir='/home/dataset/sr291_21x21_dn/2x/'
+		args.testset_tag='Set14B'
+		args.testset_dir='/home/dataset/set14_dnb/2x/'
+		args.rgb_range=1.0
+		args.scale=2
+		args.core='IDAG_M2'
+		args.checkpoint=None
+
+	elif args.template == 'IDAG_M2_4': #high weight decay
+		print('[INFO] Template found')
+		args.lr=1e-4
+		args.lr_decay_ratio=0.5
+		args.weight_decay=0.000001
 		args.batch_size=16
 		args.epoch_step=200
 		args.max_epochs=300
