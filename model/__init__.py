@@ -3,10 +3,12 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from model.IDAG_M6 import IDAG_M6
+from model.IDAG_M6_r3 import IDAG_M6_r3
 from model.IDAG_M5 import IDAG_M5
 from model.IDAG_M5_m16 import IDAG_M5_m16
 from model.IDAG_M4 import IDAG_M4
 from model.IDAG_M3 import IDAG_M3
+from model.IDAG_M3_g4 import IDAG_M3_g4
 from model.IDAG_M3_KD import IDAG_M3_KD
 from model.IDAG_M3_KD2 import IDAG_M3_KD2
 from model.IDAG_M3_KD3 import IDAG_M3_KD3
@@ -41,6 +43,8 @@ def config(args):
         core = IDAG_M2(scale=args.scale)
     elif (name == 'IDAG_M4'):
         core = IDAG_M4(scale=args.scale)
+    elif (name == 'IDAG_M6_r3'):
+        core = IDAG_M6_r3(scale=args.scale)
     elif (name == 'IDAG_M5'):
         core = IDAG_M5(scale=args.scale)
     elif (name == 'IDAG_M5_m16'):
@@ -49,6 +53,8 @@ def config(args):
         core = IDAG_M6(scale=args.scale)
     elif (name == 'IDAG_M3'):
         core = IDAG_M3(scale=args.scale)
+    elif (name == 'IDAG_M3_g4'):
+        core = IDAG_M3_g4(scale=args.scale)
     elif (name == 'IDAG_M3_KD'):
         core = IDAG_M3_KD(scale=args.scale)
     elif (name == 'IDAG_M3_KD2'):
