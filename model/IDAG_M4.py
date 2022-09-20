@@ -5,6 +5,8 @@ import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
 from model.common import residual_stack
+import math
+import torch
 
 class IDAG_M4(nn.Module): #hardcode
     def __init__(self, scale=2):
@@ -28,6 +30,28 @@ class IDAG_M4(nn.Module): #hardcode
         for i in range(len(self.conv)):
             self.conv[i].bias.data.fill_(0.01)
             nn.init.xavier_uniform_(self.conv[i].weight)
+
+        self.q_weights = []
+        self.prepare_q_weights(nbits=8)
+
+    def prepare_q_weights(self, nbits=16):
+        self.o_weights = [self.conv[i].weight.data for i in range(len(self.conv) - 1)]
+        self.q_weights = []
+        for i in range(len(self.conv) - 1):
+            w_max = torch.max(abs(self.conv[i].weight.data))
+            step = 2 ** (math.ceil(math.log(2 * w_max / (2 ** nbits - 1), 2)))
+            print(step)
+            self.q_weights.append((torch.round(self.conv[i].weight.data / step + 0.5) - 0.5) * step)
+
+    def quantize(self):
+        for i in range(len(self.conv) - 1):
+            self.conv[i].weight.data = self.q_weights[i]
+            self.conv[i].cuda()
+
+    def revert(self):
+        for i in range(len(self.conv) - 1):
+            self.conv[i].weight.data = self.o_weights[i]
+            self.conv[i].cuda()
 
     def forward(self, x):
         z = x
