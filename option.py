@@ -17,6 +17,8 @@ parser.add_argument('--optimizer', default='SGD', help='optimizer')
 parser.add_argument('--momentum', type=float, default=0.9, help='learning rate')
 #--adam
 
+#gradnorm
+parser.add_argument('--gradnorm', type=float, default=0, help='local gradient normalization')
 
 #data
 parser.add_argument('--max_load', default=0, help='max number of samples to use; useful for reducing loading time during debugging; 0 = load all')

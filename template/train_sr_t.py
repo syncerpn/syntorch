@@ -337,6 +337,29 @@ def set_template(args):
 		args.core='IDAG_M6_r3'
 		args.checkpoint=None
 
+	elif args.template == 'IDAG_M3_gradnorm_1':
+		print('[INFO] Template found')
+		args.lr=1e-1
+		args.lr_decay_ratio=0.1
+		args.weight_decay=0
+		args.batch_size=128
+		args.epoch_step=20
+		args.max_epochs=80
+		args.loss='L2'
+		args.optimizer='SGD'
+		args.max_load=0
+		args.style='Y'
+		args.trainset_tag='SR291B'
+		args.trainset_patch_size=21
+		args.trainset_dir='/home/dataset/sr291_21x21_dn/2x/'
+		args.testset_tag='Set14B'
+		args.testset_dir='/home/dataset/set14_dnb/2x/'
+		args.rgb_range=1.0
+		args.scale=2
+		args.core='IDAG_M3'
+		args.checkpoint=None
+		args.gradnorm=0.1
+
 	elif args.template == 'IDAG_M3_1':
 		print('[INFO] Template found')
 		args.lr=1e-4
