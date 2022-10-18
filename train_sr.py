@@ -40,6 +40,11 @@ def train(epoch):
         batch_loss = loss_func(yf, yt)
         optim.zero_grad()
         batch_loss.backward()
+        #nghiant: 2022/10/18 integrate grad norm into training
+        if args.gradnorm > 0:
+            utils.normalize_grad_(all_params, args.gradnorm)
+        #nghiant: end
+
         optim.step()
 
         total_loss += batch_loss
