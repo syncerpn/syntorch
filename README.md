@@ -26,12 +26,12 @@
 
 &nbsp; | psnr Complex | psnr Simple | Complex | Simple
 --- | --- | --- | --- |--- 
-[FusionNet](/model/FusionNet.py)     | 32.883 | &nbsp; | normal | 
-[FusionNet_2](/model/FusionNet_2.py) | 32.865 | &nbsp; | normal | 
-[FusionNet_3](/model/FusionNet_3.py) | 32.947 | &nbsp; | normal | 
-[FusionNet_4](/model/FusionNet_4.py) | 32.922 | &nbsp; | normal | 
-[FusionNet_5](/model/FusionNet_5.py) | 32.959 | &nbsp; | normal | 
-[FusionNet_6](/model/FusionNet_6.py) | 33.106 | &nbsp; | normal | 
-[FusionNet_7](/model/FusionNet_7.py) | 32.765 | &nbsp; | normal | 
-[FusionNet_8](/model/FusionNet_8.py) | 32.987 | &nbsp; | normal | 
-[FusionNet_9](/model/FusionNet_9.py) | 32.904 | &nbsp; | normal | 
+[FusionNet](/model/FusionNet.py)     | xxxxxx | 31.480 | 4 3x3x16 | 4 3x3x16 gconv
+[FusionNet_2](/model/FusionNet_2.py) | 32.894 | 32.599 | 4 3x3x16 + tail | 4 3x3x16 gconv + tail
+[FusionNet_3](/model/FusionNet_3.py) | 32.686 | 30.257 | 1 3x3x16 | 1 3x3x16 gconv
+[FusionNet_4](/model/FusionNet_4.py) | 3x.xxx | 32.647 | 1 3x3x16 | 1 3x3x16 mirror
+[FusionNet_5](/model/FusionNet_5.py) | 3x.xxx | 3x.xxx | 1 3x3x16 | 2 3x3x16 group 16
+[FusionNet_6](/model/FusionNet_6.py) | 3x.xxx | 32.160 | 1 3x3x16 | 1 [3x3x4 + 3x3x16]
+[FusionNet_7](/model/FusionNet_7.py) | 3x.xxx | 31.970 | 4 3x3x16 | 4 [3x3x4 + 3x3x16]
+[FusionNet_8](/model/FusionNet_8.py) | 32.888 | 32.159 | 1 3x3x32 | 1 [3x3x4 + 3x3x32]
+[FusionNet_9](/model/FusionNet_9.py) | 33.027 | 32.006 | 4 3x3x64 | 4 [3x3x4 + 3x3x64]
