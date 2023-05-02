@@ -21,3 +21,17 @@
 [IDAG_M4](/model/IDAG_M4.py) (8-bit weights) | 32.971 | &nbsp; | qtz-aware | adam | 291 | L2 (1e-6) | [GoogleDrive](https://drive.google.com/file/d/1GvOI9WeA9QrG6sfrTIq4lR_xOLuzBKqt/view?usp=sharing) | [GoogleDrive](https://drive.google.com/file/d/1E6F0On5JdUBPb95kkvU6Tudm1gfaZeQy/view?usp=sharing)
 [IDAG_M2](/model/IDAG_M2.py) | 33.029 | &nbsp; | normal | adam | 291 | L2 (1e-6) | [GoogleDrive](https://drive.google.com/file/d/1G8djcxq8ua1U5-axtMFI9qnA11TGW7P7/view?usp=sharing) | [GoogleDrive](https://drive.google.com/file/d/1yF7qjWd-wzTT2ox4cndmXOrkmphcjITU/view?usp=sharing)
 [IDAG_M6](/model/IDAG_M6.py) | 32.996 | &nbsp; | normal | adam | 291 | L2 (1e-6) | [GoogleDrive](https://drive.google.com/file/d/1GQuCxUyy9l4uoW7O2O9WduQULksRjtIr/view?usp=sharing) | [GoogleDrive](https://drive.google.com/file/d/1msvYXfYfykCVgsXmHNoVQvxe7l-rDnIs/view?usp=sharing)
+
+ FusionNet model description
+
+&nbsp; | psnr Complex | psnr Simple | Complex | Simple
+--- | --- | --- | --- |--- 
+[FusionNet](/model/FusionNet.py)     | 32.883 | &nbsp; | normal | 
+[FusionNet_2](/model/FusionNet_2.py) | 32.865 | &nbsp; | normal | 
+[FusionNet_3](/model/FusionNet_3.py) | 32.947 | &nbsp; | normal | 
+[FusionNet_4](/model/FusionNet_4.py) | 32.922 | &nbsp; | normal | 
+[FusionNet_5](/model/FusionNet_5.py) | 32.959 | &nbsp; | normal | 
+[FusionNet_6](/model/FusionNet_6.py) | 33.106 | &nbsp; | normal | 
+[FusionNet_7](/model/FusionNet_7.py) | 32.765 | &nbsp; | normal | 
+[FusionNet_8](/model/FusionNet_8.py) | 32.987 | &nbsp; | normal | 
+[FusionNet_9](/model/FusionNet_9.py) | 32.904 | &nbsp; | normal | 
