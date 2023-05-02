@@ -23,6 +23,20 @@ from model.IDAG_M1P import IDAG_M1P
 from model.IDAG_M3E import IDAG_M3E
 from model.SVDSR import SVDSR
 from model.SMSR import SMSR
+from model.FusionNet import FusionNet
+from model.FusionNet_2 import FusionNet_2
+from model.FusionNet_3 import FusionNet_3
+from model.FusionNet_4 import FusionNet_4
+from model.FusionNet_5 import FusionNet_5
+from model.FusionNet_6 import FusionNet_6
+from model.FusionNet_7 import FusionNet_7
+from model.FusionNet_8 import FusionNet_8
+from model.FusionNet_9 import FusionNet_9
+
+from model.FusionNet_7_debug import FusionNet_7_debug
+from model.FusionNet_7_gsi import FusionNet_7_gsi
+from model.FusionNet_7_gsi_mirror import FusionNet_7_gsi_mirror
+from model.VarNet import VarNet
 
 def config(args):
     arch = args.core.split('-')
@@ -70,6 +84,36 @@ def config(args):
     elif (name == 'SMSR'): #SVDSR-n_layer-filter_size
         n_feats = int(arch[1])
         core = SMSR(n_feats=n_feats, rgb_range=args.rgb_range, style=args.style, scale=args.scale)
+    elif (name == 'FusionNet'):
+        core = FusionNet(scale=args.scale)
+    elif (name == 'FusionNet_2'):
+        core = FusionNet_2(scale=args.scale)
+    elif (name == 'FusionNet_3'):
+        core = FusionNet_3(scale=args.scale)
+    elif (name == 'FusionNet_4'):
+        core = FusionNet_4(scale=args.scale)
+    elif (name == 'FusionNet_5'):
+        core = FusionNet_5(scale=args.scale)
+    elif (name == 'FusionNet_6'):
+        core = FusionNet_6(scale=args.scale)
+    elif (name == 'FusionNet_7'):
+        core = FusionNet_7(scale=args.scale)
+    elif (name == 'FusionNet_8'):
+        core = FusionNet_8(scale=args.scale)
+    elif (name == 'FusionNet_9'):
+        core = FusionNet_9(scale=args.scale)
+
+    elif (name == 'FusionNet_7_debug'):
+        core = FusionNet_7_debug(scale=args.scale)
+
+    elif (name == 'FusionNet_7_gsi'):
+        core = FusionNet_7_gsi(scale=args.scale)
+    elif (name == 'FusionNet_7_gsi_mirror'):
+        core = FusionNet_7_gsi_mirror(scale=args.scale)
+
+
+    elif (name == 'VarNet'):
+        core = VarNet(scale=args.scale)
     else:
         print('[ERRO] unknown model tag')
         assert(0)
@@ -80,7 +124,15 @@ def config(args):
             core.load(args.checkpoint)
         else:
             checkpoint_data = torch.load(args.checkpoint)
-            core.load_state_dict(checkpoint_data)
+            # to_remove = []
+            # for k in checkpoint_data:
+            #     if 'branch.1' in k:
+            #         to_remove.append(k)
+
+            # for k in to_remove:
+            #     del(checkpoint_data[k])
+                
+            core.load_state_dict(checkpoint_data, strict=False)
 
     return core
 

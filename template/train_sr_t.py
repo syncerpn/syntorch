@@ -27,6 +27,28 @@ def set_template(args):
 		args.core='IDAG_M1P'
 		args.checkpoint=None
 
+	elif args.template == 'VarNet_1':
+		print('[INFO] Template found')
+		args.lr=1e-4
+		args.lr_decay_ratio=0.5
+		args.weight_decay=0
+		args.batch_size=16
+		args.epoch_step=200
+		args.max_epochs=300
+		args.loss='L1'
+		args.optimizer='Adam'
+		args.max_load=0
+		args.style='Y'
+		args.trainset_tag='SR291B'
+		args.trainset_patch_size=21
+		args.trainset_dir='/home/dataset/sr291_21x21_dn/2x/'
+		args.testset_tag='Set14B'
+		args.testset_dir='/home/dataset/set14_dnb/2x/'
+		args.rgb_range=1.0
+		args.scale=2
+		args.core='VarNet'
+		args.checkpoint=None
+
 	elif args.template == 'IDAG_M1_3':
 		print('[INFO] Template found')
 		args.lr=1e-4
@@ -557,6 +579,28 @@ def set_template(args):
 		args.rgb_range=255
 		args.scale=2
 		args.core='SMSR-64'
+		args.checkpoint=None
+
+	elif args.template == 'FusionNet_1':
+		print('[INFO] Template found')
+		args.lr=1e-4
+		args.lr_decay_ratio=0.5
+		args.weight_decay=0
+		args.batch_size=16
+		args.epoch_step=200
+		args.max_epochs=300
+		args.loss='L1'
+		args.optimizer='Adam'
+		args.max_load=0
+		args.style='Y'
+		args.trainset_tag='SR291B'
+		args.trainset_patch_size=21
+		args.trainset_dir='/home/dataset/sr291_21x21_dn/2x/'
+		args.testset_tag='Set14B'
+		args.testset_dir='/home/dataset/set14_dnb/2x/'
+		args.rgb_range=1.0
+		args.scale=2
+		args.core='FusionNet'
 		args.checkpoint=None
 
 	else:
