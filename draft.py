@@ -22,7 +22,7 @@ from mask_generator_lib import GradientSobelFilter, RandomFlatMasker
 if args.template is not None:
     template.set_template(args)
 
-def merge_test():
+def merge_random():
     for psi in range(11):
         perf_fs = []
         #walk through the test set
@@ -42,6 +42,25 @@ def merge_test():
         log_str = f'[INFO] TS - MERGE RANDOM - PSI: {psi/10:.1f} - P: {mean_perf_f:.3f}'
         print(log_str)
 
+def merge_gradient():
+    for psi in range(11):
+        perf_fs = []
+        #walk through the test set
+        for batch_idx, (x, yt) in tqdm.tqdm(enumerate(XYtest), total=len(XYtest)):
+            x  = x.cuda()
+            yt = yt.cuda()
+
+            with torch.no_grad():
+                merge_map = gsf.generate_mask(x, psi/10)
+                yf = core.forward_merge_mask(x, {0: merge_map})
+
+            perf_f = evaluation.calculate(args, yf, yt)
+            perf_fs.append(perf_f.cpu())
+
+        mean_perf_f = torch.stack(perf_fs, 0).mean()
+
+        log_str = f'[INFO] TS - MERGE RANDOM - PSI: {psi/10:.1f} - P: {mean_perf_f:.3f}'
+        print(log_str)
 
 # load test data
 print('[INFO] load testset "%s" from %s' % (args.testset_tag, args.testset_dir))
@@ -54,4 +73,4 @@ core.cuda()
 rfm = RandomFlatMasker()
 gsf = GradientSobelFilter()
 
-merge_test()
+merge_random()
