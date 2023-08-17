@@ -16,6 +16,9 @@ import utils
 from option import parser
 from template import train_sr_fusionnet_t as template
 
+import torch.multiprocessing
+torch.multiprocessing.set_sharing_strategy('file_system')
+
 parser.add_argument("--skip-C", action="store_true", help="skip training C phase")
 
 args = parser.parse_args()
