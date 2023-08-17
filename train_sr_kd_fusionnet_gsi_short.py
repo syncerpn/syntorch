@@ -48,7 +48,7 @@ def train(epoch, optim):
 
     perf = torch.stack(perfs, 0).mean()
 
-    log_str = '[INFO] E: %d | P: %.3f | LOSS: %.3f' % (epoch, perf, total_loss)
+    log_str = '[INFO] [Train C branch with SR loss] E: %d | P: %.3f | LOSS: %.3f' % (epoch, perf, total_loss)
     print(log_str)
 
 def train_kd(epoch, optim):
