@@ -42,9 +42,9 @@ class SmallModule(nn.Module):
         z = F.relu(self.conv[1](z))
         return z
 
-class FusionNet_6(nn.Module): #hardcode
+class FusionNet_7_1s(nn.Module): #hardcode
     def __init__(self, scale=2):
-        super(FusionNet_6, self).__init__()
+        super(FusionNet_7_1s, self).__init__()
 
         self.scale = scale
 

@@ -21,8 +21,3 @@ class LrScheduler:
             param_group['lr'] = lr
             if epoch%self.epoch_step==0:
                 print('[INFO] Setting learning_rate to %.2E'%lr)
-
-#nghiant: 2022/10/18, pull this from its grave to the newer version
-#nghiant: derived from oriinal pytorch implementation; somehow improve the SR PSNR by 0.2 point, which is quite super
-from typing import Union, Iterable
-_tensor_or_tensors = Union[torch.Tensor, Iterable[torch.Tensor]]
