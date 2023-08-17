@@ -13,8 +13,12 @@ import loss
 import model
 import optimizer
 import utils
-from option import args
+from option import parser
 from template import train_sr_fusionnet_t as template
+
+parser.add_argument("--skip-C", action="store_true", help="skip training C phase")
+
+args = parser.parse_args()
 
 if args.template is not None:
     template.set_template(args)
@@ -48,7 +52,7 @@ def train(epoch, optim):
 
     perf = torch.stack(perfs, 0).mean()
 
-    log_str = '[INFO] [Train C branch with SR loss] E: %d | P: %.3f | LOSS: %.3f' % (epoch, perf, total_loss)
+    log_str = '[INFO] E: %d | P: %.3f | LOSS: %.3f' % (epoch, perf, total_loss)
     print(log_str)
 
 def train_kd(epoch, optim):
@@ -79,7 +83,7 @@ def train_kd(epoch, optim):
 
     perf = torch.stack(perfs, 0).mean()
 
-    log_str = '[INFO] [KD C branch to S branch] E: %d | P: %.3f | LOSS: %.3f' % (epoch, perf, total_loss)
+    log_str = '[INFO] E: %d | P: %.3f | LOSS: %.3f' % (epoch, perf, total_loss)
     print(log_str)
 
 def test(epoch, branches=[]):
@@ -119,23 +123,24 @@ XYtest = torchdata.DataLoader(testset, batch_size=batch_size_test, shuffle=False
 core = model.config(args)
 core.cuda()
 
+if not args.skip_C:
 #train only the C branch
-all_params = []
-all_params += core.branch[0].parameters()
-all_params += core.head.parameters()
-all_params += core.tail.parameters()
+    all_params = []
+    all_params += core.branch[0].parameters()
+    all_params += core.head.parameters()
+    all_params += core.tail.parameters()
 
-optim_phase_1 = optimizer.create_optimizer(all_params, args)
-lr_scheduler_phase_1 = utils.LrScheduler(optim_phase_1, args.lr, args.lr_decay_ratio, args.epoch_step)
+    optim_phase_1 = optimizer.create_optimizer(all_params, args)
+    lr_scheduler_phase_1 = utils.LrScheduler(optim_phase_1, args.lr, args.lr_decay_ratio, args.epoch_step)
 
-print('[INFO] train large branch first')
-for epoch in range(args.start_epoch, args.max_epochs+1):
-    lr_scheduler_phase_1.adjust_learning_rate(epoch)
+    print('[INFO] train large branch first')
+    for epoch in range(args.start_epoch, args.max_epochs+1):
+        lr_scheduler_phase_1.adjust_learning_rate(epoch)
 
-    if epoch % 10 == 0:
-        test(epoch, [0])
+        if epoch % 10 == 0:
+            test(epoch, [0])
 
-    train(epoch, optim_phase_1)
+        train(epoch, optim_phase_1)
 
 #train only the S branch
 sub_params = []

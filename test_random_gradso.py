@@ -13,11 +13,13 @@ import loss
 import model
 import optimizer
 import utils
-from option import args
+from option import parser
 from template import test_sr_fusionnet_t as template
 import numpy as np
 
 from mask_generator_lib import GradientSobelFilter, RandomFlatMasker
+
+args = parser.parse_args()
 
 if args.template is not None:
     template.set_template(args)

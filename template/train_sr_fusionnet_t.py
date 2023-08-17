@@ -25,7 +25,6 @@ def set_template(args):
 		args.rgb_range=1.0
 		args.scale=2
 		args.core='FusionNet_7_1s'
-		args.checkpoint=None
 
 	elif args.template == 'FusionNet_7_2s_1':
 		print('[INFO] Template found (FusionNet full branch trainer)')
@@ -47,7 +46,6 @@ def set_template(args):
 		args.rgb_range=1.0
 		args.scale=2
 		args.core='FusionNet_7_2s'
-		args.checkpoint=None
 
 	elif args.template == 'FusionNet_7_3s_1':
 		print('[INFO] Template found (FusionNet full branch trainer)')
@@ -69,7 +67,6 @@ def set_template(args):
 		args.rgb_range=1.0
 		args.scale=2
 		args.core='FusionNet_7_3s'
-		args.checkpoint=None
 
 	elif args.template == 'FusionNet_7_4s_1':
 		print('[INFO] Template found (FusionNet full branch trainer)')
@@ -91,7 +88,6 @@ def set_template(args):
 		args.rgb_range=1.0
 		args.scale=2
 		args.core='FusionNet_7_4s'
-		args.checkpoint=None
 
 	else:
 		print('[ERRO] Template not found')
