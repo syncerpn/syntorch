@@ -54,4 +54,4 @@ core.cuda()
 rfm = RandomFlatMasker()
 gsf = GradientSobelFilter()
 
-merge_test(branches=[0,1])
+merge_test()
