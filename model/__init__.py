@@ -15,15 +15,16 @@ from model.FusionNet_7_4s import FusionNet_7_4s
 def config(args):
     arch = args.core.split("-")
     name = arch[0]
-    if   (name == "FusionNet_6"):
-        core = FusionNet_6(scale=args.scale)
-    elif (name == "FusionNet_7"):
-        core = FusionNet_7(scale=args.scale)
-    elif (name == "FusionNet_8"):
-        core = FusionNet_8(scale=args.scale)
-    elif (name == "FusionNet_9"):
-        core = FusionNet_9(scale=args.scale)
 
+    if   (name == "FusionNet_7_1s"):
+        core = FusionNet_7_1s(scale=args.scale)
+    elif (name == "FusionNet_7_2s"):
+        core = FusionNet_7_2s(scale=args.scale)
+    elif (name == "FusionNet_7_3s"):
+        core = FusionNet_7_3s(scale=args.scale)
+    elif (name == "FusionNet_7_4s"):
+        core = FusionNet_7_4s(scale=args.scale)
+        
     elif (name == "FusionNet_7_debug"):
         core = FusionNet_7_debug(scale=args.scale)
 
@@ -32,15 +33,6 @@ def config(args):
 
     elif (name == "FusionNet_6_gsi"):
         core = FusionNet_6_gsi(scale=args.scale)
-
-    elif (name == "FusionNet_7_1s"):
-        core = FusionNet_7_1s(scale=args.scale)
-    elif (name == "FusionNet_7_2s"):
-        core = FusionNet_7_2s(scale=args.scale)
-    elif (name == "FusionNet_7_3s"):
-        core = FusionNet_7_3s(scale=args.scale)
-    elif (name == "FusionNet_7_4s"):
-        core = FusionNet_7_4s(scale=args.scale)
         
     else:
         print("[ERRO] unknown model tag")
