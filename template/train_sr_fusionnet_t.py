@@ -69,7 +69,7 @@ def set_template(args):
 		args.rgb_range=1.0
 		args.scale=2
 		args.core='FusionNet_3'
-		# args.checkpoint=None
+		args.checkpoint=None
 
 	elif args.template == 'FusionNet_4_1':
 		print('[INFO] Template found (FusionNet full branch trainer)')

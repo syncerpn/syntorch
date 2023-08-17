@@ -17,9 +17,6 @@ parser.add_argument('--optimizer', default='SGD', help='optimizer')
 parser.add_argument('--momentum', type=float, default=0.9, help='learning rate')
 #--adam
 
-#gradnorm
-parser.add_argument('--gradnorm', type=float, default=0, help='local gradient normalization')
-
 #data
 parser.add_argument('--max_load', default=0, help='max number of samples to use; useful for reducing loading time during debugging; 0 = load all')
 parser.add_argument('--style', default='Y', help='Y-channel or RGB style')
@@ -37,20 +34,10 @@ parser.add_argument('--core', default='SMSR_normal', help='core model (template 
 parser.add_argument('--checkpoint', default=None, help='checkpoint to load core from')
 
 #eval
-parser.add_argument('--eval_tag', default='psnr', help='evaluation tag; available: "psnr", "accuracy"')
+parser.add_argument('--eval_tag', default='psnr', help='evaluation tag; available: "psnr, ssim"')
 
 #output
 parser.add_argument('--cv_dir', default='backup/nobias_test/', help='checkpoint directory (models and logs are saved here)')
-
-#mask training option
-parser.add_argument('--zero-one-balance', type=bool, default=True, help='auto balancing zero and one loss')
-parser.add_argument('--wone', type=float, default=0.80, help='weighted learner')
-parser.add_argument('--clamp', type=float, default=1e-4, help='cross-entropy clipping bound for safe training')
-
-parser.add_argument('--target_layer_index', default=None, help='target layer fRor mask generation')
-parser.add_argument('--agent', default='IDAG_M3_parasitic_v0-4', help='agent model (template specified in sr_mask_agent.py)')
-parser.add_argument('--agent_checkpoint', default=None, help='checkpoint to load agent from')
-parser.add_argument('--mask_type', default='sigmoid', help='checkpoint to load agent from')
 
 #template
 parser.add_argument('--template', default=None)
