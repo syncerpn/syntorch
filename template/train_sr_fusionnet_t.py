@@ -36,7 +36,7 @@ def set_template(args):
 		args.max_epochs=150
 		args.loss='L1'
 		args.optimizer='Adam'
-		args.max_load=0
+		args.max_load=160
 		args.style='Y'
 		args.trainset_tag='SR291B'
 		args.trainset_patch_size=21
