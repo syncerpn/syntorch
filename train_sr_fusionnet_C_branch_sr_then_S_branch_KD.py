@@ -16,15 +16,40 @@ import utils
 from option import args
 from template import train_sr_fusionnet_t as template
 
-from model.FusionNet import FusionNet
-from model.FusionNet_4 import FusionNet_4
-
 if args.template is not None:
     template.set_template(args)
 
 if not os.path.exists(args.cv_dir):
     os.system('mkdir ' + args.cv_dir)
 utils.save_args(__file__, args)
+
+def train(epoch, optim):
+    perfs = []
+
+    total_loss = 0
+    for batch_idx, (x, yt) in tqdm.tqdm(enumerate(XYtrain), total=len(XYtrain)):
+        x  = x.cuda()
+        yt = yt.cuda()
+        
+        yf = core.forward(x, branch=0)
+
+        perf = evaluation.calculate(args, yf, yt)
+
+        loss_func = loss.create_loss_func(args.loss)
+
+        batch_loss = loss_func(yf, yt)
+        optim.zero_grad()
+        batch_loss.backward()
+
+        optim.step()
+
+        total_loss += batch_loss
+        perfs.append(perf.cpu())
+
+    perf = torch.stack(perfs, 0).mean()
+
+    log_str = '[INFO] [Train C branch with SR loss] E: %d | P: %.3f | LOSS: %.3f' % (epoch, perf, total_loss)
+    print(log_str)
 
 def train_kd(epoch, optim):
     perfs = []
@@ -40,7 +65,7 @@ def train_kd(epoch, optim):
         perf = evaluation.calculate(args, y_student, yt)
 
         loss_func = loss.create_loss_func(args.loss)
-        batch_loss = 0 #no more sr loss
+        batch_loss = 0
 
         for fea_student, fea_teacher in zip(feas_student, feas_teacher):
             batch_loss += loss_func(fea_student, fea_teacher)
@@ -54,7 +79,7 @@ def train_kd(epoch, optim):
 
     perf = torch.stack(perfs, 0).mean()
 
-    log_str = '[INFO] E: %d | P: %.3f | LOSS: %.3f' % (epoch, perf, total_loss)
+    log_str = '[INFO] [KD C branch to S branch] E: %d | P: %.3f | LOSS: %.3f' % (epoch, perf, total_loss)
     print(log_str)
 
 def test(epoch, branches=[]):
@@ -91,17 +116,28 @@ print('[INFO] load testset "%s" from %s' % (args.testset_tag, args.testset_dir))
 testset, batch_size_test = data.load_testset(args)
 XYtest = torchdata.DataLoader(testset, batch_size=batch_size_test, shuffle=False, num_workers=16)
 
-core_clone = FusionNet(scale=args.scale)
-# core_clone_checkpoint_data = torch.load('/home/nghiant/git/syntorch/backup/FusionNet_4_1_1680083556/branch_0_ckpt_E_300_P_32.649.t7')
-core_clone_checkpoint_data = torch.load('/home/nghiant/git/syntorch/backup/FusionNet_1_1678778543/ckpt_E_300_P_32.885.t7')
-core_clone.load_state_dict(core_clone_checkpoint_data)
-
 core = model.config(args)
-core.head = core_clone.head
-core.tail = core_clone.tail
-core.branch[0].load_state_dict(core_clone.branch[0].state_dict())
 core.cuda()
 
+#train only the C branch
+all_params = []
+all_params += core.branch[0].parameters()
+all_params += core.head.parameters()
+all_params += core.tail.parameters()
+
+optim_phase_1 = optimizer.create_optimizer(all_params, args)
+lr_scheduler_phase_1 = utils.LrScheduler(optim_phase_1, args.lr, args.lr_decay_ratio, args.epoch_step)
+
+print('[INFO] train large branch first')
+for epoch in range(args.start_epoch, args.max_epochs+1):
+    lr_scheduler_phase_1.adjust_learning_rate(epoch)
+
+    if epoch % 10 == 0:
+        test(epoch, [0])
+
+    train(epoch, optim_phase_1)
+
+#train only the S branch
 sub_params = []
 sub_params += core.branch[1].parameters()
 
@@ -113,6 +149,6 @@ for epoch in range(args.start_epoch, args.max_epochs+1):
     lr_scheduler_phase_2.adjust_learning_rate(epoch)
 
     if epoch % 10 == 0:
-        test(epoch, [0,1])
+        test(epoch, [0, 1])
 
     train_kd(epoch, optim_phase_2)
