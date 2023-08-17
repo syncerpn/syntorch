@@ -72,9 +72,7 @@ def train_kd(epoch, optim):
         batch_loss = loss_func(y_student, y_teacher)
 
         for fea_student, fea_teacher in zip(feas_student, feas_teacher):
-            print(id(fea_student))
             batch_loss += loss_func(fea_student, fea_teacher)
-        assert 0
 
         optim.zero_grad()
         batch_loss.backward()
