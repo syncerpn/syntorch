@@ -9,74 +9,76 @@ from model.common import residual_stack
 import numpy as np
 
 class LargeModule(nn.Module):
-    def __init__(self):
+    def __init__(self, ns):
         super(LargeModule, self).__init__()
+
+        self.ns = ns
         
         self.conv = nn.ModuleList()
-        self.conv.append(nn.Conv2d(16, 16, 3, 1, 1)) #2a
-        self.conv.append(nn.Conv2d(16, 16, 3, 1, 1)) #2b
-        self.conv.append(nn.Conv2d(16, 16, 3, 1, 1)) #2c
-        self.conv.append(nn.Conv2d(16, 16, 3, 1, 1)) #2d
+        for i in range(ns):
+            self.conv.append(nn.Conv2d(16, 16, 3, 1, 1))
 
         for i in range(len(self.conv)):
             self.conv[i].bias.data.fill_(0.01)
             nn.init.xavier_uniform_(self.conv[i].weight)
 
-    def forward(self, x, kd_train=False, stages=[0,1,2,3]):
+    def forward(self, x, stages=[]):
+        for s in stages:
+            assert (s < self.ns) and (s >= 0), f"[ERRO] invalid stage {s}"
+
         z = x
-        if 0 in stages:
-            z = F.relu(self.conv[0](z))
-        if 1 in stages:
-            z = F.relu(self.conv[1](z))
-        if 2 in stages:
-            z = F.relu(self.conv[2](z))
-        if 3 in stages:
-            z = F.relu(self.conv[3](z))
-        # return f4, [f1,f2,f3,f4]
-        # return f4, [f4]
-        return z
+        if stages:
+            for s in range(self.ns):
+                if s in stages:
+                    z = F.relu(self.conv[s](z))
+            return z
+        else:
+            feas = []
+            for s in range(self.ns):
+                z = F.relu(self.conv[s](z))
+                feas.append(z)
+            return z, feas
 
 class SmallModule(nn.Module):
-    def __init__(self):
+    def __init__(self, ns):
         super(SmallModule, self).__init__()
 
+        self.ns = ns
+
         self.conv = nn.ModuleList()
-        self.conv.append(nn.Conv2d(16, 4, 1, 1, 0)) #2a
-        self.conv.append(nn.Conv2d(4, 16, 3, 1, 1)) #2a
-        self.conv.append(nn.Conv2d(16, 4, 1, 1, 0)) #2b
-        self.conv.append(nn.Conv2d(4, 16, 3, 1, 1)) #2b
-        self.conv.append(nn.Conv2d(16, 4, 1, 1, 0)) #2c
-        self.conv.append(nn.Conv2d(4, 16, 3, 1, 1)) #2c
-        self.conv.append(nn.Conv2d(16, 4, 1, 1, 0)) #2d
-        self.conv.append(nn.Conv2d(4, 16, 3, 1, 1)) #2d
+        for i in range(ns):
+            self.conv.append(nn.Conv2d(16, 4, 1, 1, 0))
+            self.conv.append(nn.Conv2d(4, 16, 3, 1, 1))
 
         for i in range(len(self.conv)):
             self.conv[i].bias.data.fill_(0.01)
             nn.init.xavier_uniform_(self.conv[i].weight)
 
-    def forward(self, x, kd_train=False, stages=[0,1,2,3]):
+    def forward(self, x, stages=[]):
+        for s in stages:
+            assert (s < self.ns) and (s >= 0), f"[ERRO] invalid stage {s}"
+
         z = x
-        if 0 in stages:
-            z = F.relu(self.conv[0](z))
-            z = F.relu(self.conv[1](z))
-        if 1 in stages:
-            z = F.relu(self.conv[2](z))
-            z = F.relu(self.conv[3](z))
-        if 2 in stages:
-            z = F.relu(self.conv[4](z))
-            z = F.relu(self.conv[5](z))
-        if 3 in stages:
-            z = F.relu(self.conv[6](z))
-            z = F.relu(self.conv[7](z))
-        # return f4, [f1,f2,f3,f4]
-        # return f4, [f4]
-        return z
+        if stages:
+            for s in range(self.ns):
+                if s in stages:
+                    z = F.relu(self.conv[2*s](z))
+                    z = F.relu(self.conv[2*s+1](z))
+            return z
+        else:
+            feas = []
+            for s in range(self.ns):
+                z = F.relu(self.conv[2*s](z))
+                z = F.relu(self.conv[2*s+1](z))
+                feas.append(z)
+            return z, feas
 
 class FusionNet_7_4s(nn.Module): #hardcode
     def __init__(self, scale=2):
-        super(FusionNet_7_4s, self).__init__()
+        super(_FusionNet_7_4s, self).__init__()
 
         self.scale = scale
+        self.ns = 4
 
         self.head = nn.ModuleList()
         self.branch = nn.ModuleList()
@@ -85,8 +87,8 @@ class FusionNet_7_4s(nn.Module): #hardcode
         self.head.append(nn.Conv2d( 1, 32, 5, 1, 2)) #0
         self.head.append(nn.Conv2d(32, 16, 1, 1, 0)) #1
         
-        self.branch.append(LargeModule())
-        self.branch.append(SmallModule())
+        self.branch.append(LargeModule(self.ns))
+        self.branch.append(SmallModule(self.ns))
         
         self.tail.append(nn.Conv2d(16, 32, 1, 1, 0)) #6
         self.tail.append(nn.Conv2d(32, scale * scale, 3, 1, 1)) #7:last layer
@@ -118,67 +120,25 @@ class FusionNet_7_4s(nn.Module): #hardcode
 
         return y
 
-    def forward_merge_random(self, x, p=0.1, fea_out=False):
+    def forward_merge_mask(self, x, masks: dict, fea_out=False):
+        # mask in masks are binary; 1.0 uses for C or branch 0, and vice versa
         z = x
         z = F.relu(self.head[0](z))
         z = F.relu(self.head[1](z))
 
-        merge_map = None
+        feas = []
 
-        for ii in range(4):
+        for ii in range(self.ns):
             branch_fea_0 = self.branch[0](z, stages=[ii])
             branch_fea_1 = self.branch[1](z, stages=[ii])
             
-            if merge_map is None:
-                merge_map = torch.rand([1,1,branch_fea_0.shape[2],branch_fea_0.shape[3]])
-                merge_map = (merge_map < p).type(torch.float32)
-                merge_map = merge_map.repeat([branch_fea_0.shape[0],branch_fea_0.shape[1],1,1])
+            assert ii in masks, f"[ERRO]: missing mask for stage {ii}"
 
-                merge_map = merge_map.to('cuda')
-
+            merge_map = masks[ii]
             merge_fea = branch_fea_0 * merge_map + branch_fea_1 * (1.0 - merge_map)
+
             z = merge_fea
-
-        z = F.relu(self.tail[0](merge_fea))
-        z = self.tail[1](z)
-
-        y = residual_stack(z, x, self.scale)
-
-        if fea_out:
-            return y, merge_fea
-
-        return y
-
-    def forward_merge_gradient_sobel(self, x, p=0.1, fea_out=False):
-        z = x
-        z = F.relu(self.head[0](z))
-        z = F.relu(self.head[1](z))
-
-        #create sampling map using gradient sobel
-        sobel_filter_x = nn.Conv2d(1, 1, 3, 1, 1, bias=False)
-        sobel_filter_x.weight.data = torch.Tensor([[[[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]]]])
-        sobel_filter_x.to('cuda')
-
-        sobel_filter_y = nn.Conv2d(1, 1, 3, 1, 1, bias=False)
-        sobel_filter_y.weight.data = torch.Tensor([[[[-1, -2, -1], [0, 0, 0], [1, 2, 1]]]])
-        sobel_filter_y.to('cuda')
-
-        grad_map_x = sobel_filter_x.forward(x)
-        grad_map_y = sobel_filter_y.forward(x)
-        grad = abs(grad_map_x) + abs(grad_map_y)
-
-        grad_sorted, _ = torch.sort(grad.view(-1), descending=True)
-        grad_sorted_index = min(max(int(p * torch.numel(grad)), 0), torch.numel(grad)-1)
-        grad_sorted_threshold = grad_sorted[grad_sorted_index]
-        
-        merge_map = (grad > grad_sorted_threshold).type(torch.float32)
-        #done
-
-        for ii in range(4):
-            branch_fea_0 = self.branch[0](z, stages=[ii])
-            branch_fea_1 = self.branch[1](z, stages=[ii])
-            merge_fea = branch_fea_0 * merge_map + branch_fea_1 * (1.0 - merge_map)
-            z = merge_fea
+            feas.append(merge_fea)
         
         z = F.relu(self.tail[0](merge_fea))
         z = self.tail[1](z)
@@ -186,96 +146,6 @@ class FusionNet_7_4s(nn.Module): #hardcode
         y = residual_stack(z, x, self.scale)
 
         if fea_out:
-            return y, merge_fea
-
-        return y
-
-    def forward_merge_gradient_sobel_stages(self, x, p=0.1, fea_out=False, stages=[]):
-        z = x
-        z = F.relu(self.head[0](z))
-        z = F.relu(self.head[1](z))
-
-        #create sampling map using gradient sobel
-        sobel_filter_x = nn.Conv2d(1, 1, 3, 1, 1, bias=False)
-        sobel_filter_x.weight.data = torch.Tensor([[[[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]]]])
-        sobel_filter_x.to('cuda')
-
-        sobel_filter_y = nn.Conv2d(1, 1, 3, 1, 1, bias=False)
-        sobel_filter_y.weight.data = torch.Tensor([[[[-1, -2, -1], [0, 0, 0], [1, 2, 1]]]])
-        sobel_filter_y.to('cuda')
-
-        grad_map_x = sobel_filter_x.forward(x)
-        grad_map_y = sobel_filter_y.forward(x)
-        grad = abs(grad_map_x) + abs(grad_map_y)
-
-        grad_sorted, _ = torch.sort(grad.view(-1), descending=True)
-        grad_sorted_index = min(max(int(p * torch.numel(grad)), 0), torch.numel(grad)-1)
-        grad_sorted_threshold = grad_sorted[grad_sorted_index]
-        
-        merge_map = (grad > grad_sorted_threshold).type(torch.float32)
-        #done
-
-        for ii in range(4):
-            branch_fea_0 = self.branch[0](z, stages=[ii])
-            branch_fea_1 = self.branch[1](z, stages=[ii])
-            if ii in stages:
-                merge_fea = branch_fea_0 * merge_map + branch_fea_1 * (1.0 - merge_map)
-            else:
-                merge_fea = branch_fea_0
-
-            z = merge_fea
-        
-        z = F.relu(self.tail[0](merge_fea))
-        z = self.tail[1](z)
-
-        y = residual_stack(z, x, self.scale)
-
-        if fea_out:
-            return y, merge_fea
-
-        return y
-
-    def forward_merge_gradient_sobel_stages_psis(self, x, stages_psis={}, fea_out=False):
-        z = x
-        z = F.relu(self.head[0](z))
-        z = F.relu(self.head[1](z))
-
-        #create sampling map using gradient sobel
-        sobel_filter_x = nn.Conv2d(1, 1, 3, 1, 1, bias=False)
-        sobel_filter_x.weight.data = torch.Tensor([[[[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]]]])
-        sobel_filter_x.to('cuda')
-
-        sobel_filter_y = nn.Conv2d(1, 1, 3, 1, 1, bias=False)
-        sobel_filter_y.weight.data = torch.Tensor([[[[-1, -2, -1], [0, 0, 0], [1, 2, 1]]]])
-        sobel_filter_y.to('cuda')
-
-        grad_map_x = sobel_filter_x.forward(x)
-        grad_map_y = sobel_filter_y.forward(x)
-        grad = abs(grad_map_x) + abs(grad_map_y)
-
-        grad_sorted, _ = torch.sort(grad.view(-1), descending=True)
-
-        for ii in range(4):
-            branch_fea_0 = self.branch[0](z, stages=[ii])
-            branch_fea_1 = self.branch[1](z, stages=[ii])
-            if ii in stages_psis:
-                ii_psi = stages_psis[ii]
-                grad_sorted_index = min(max(int(ii_psi * torch.numel(grad)), 0), torch.numel(grad)-1)
-                grad_sorted_threshold = grad_sorted[grad_sorted_index]
-                
-                merge_map = (grad > grad_sorted_threshold).type(torch.float32)
-                merge_fea = branch_fea_0 * merge_map + branch_fea_1 * (1.0 - merge_map)
-            else:
-                merge_fea = branch_fea_0
-                
-            z = merge_fea
-        
-        z = F.relu(self.tail[0](merge_fea))
-        z = self.tail[1](z)
-
-        y = residual_stack(z, x, self.scale)
-
-        if fea_out:
-            return y, merge_fea
+            return y, feas
 
         return y
