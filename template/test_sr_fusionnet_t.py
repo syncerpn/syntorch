@@ -33,7 +33,7 @@ def set_template(args):
 			print(f"[INFO] Template found: {args.template}")
 			args.style="Y"
 			args.testset_tag="Set14B"
-			args.testset_dir="/home/dataset/set5_dnb/2x/"
+			args.testset_dir="/home/dataset/set14_dnb/2x/"
 			args.rgb_range=1.0
 			args.scale=2
 			args.core="FusionNet_7_4s"
