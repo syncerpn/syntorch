@@ -72,9 +72,9 @@ class SmallModule(nn.Module):
         # return f4, [f4]
         return z
 
-class FusionNet_7(nn.Module): #hardcode
+class FusionNet_7_4s(nn.Module): #hardcode
     def __init__(self, scale=2):
-        super(FusionNet_7, self).__init__()
+        super(FusionNet_7_4s, self).__init__()
 
         self.scale = scale
 
