@@ -33,7 +33,7 @@ def merge_random():
             with torch.no_grad():
                 merge_map = rfm.generate_mask([1, 1, x.shape[2], x.shape[3]], psi/10)
                 masks = {i: merge_map for i in range(core.ns)}
-                yf = core.forward_merge_mask(x, {0: merge_map})
+                yf = core.forward_merge_mask(x, masks)
 
             perf_f = evaluation.calculate(args, yf, yt)
             perf_fs.append(perf_f.cpu())
@@ -54,7 +54,7 @@ def merge_gradient():
             with torch.no_grad():
                 merge_map = gsf.generate_mask(x, psi/10)
                 masks = {i: merge_map for i in range(core.ns)}
-                yf = core.forward_merge_mask(x, {0: merge_map})
+                yf = core.forward_merge_mask(x, masks)
 
             perf_f = evaluation.calculate(args, yf, yt)
             perf_fs.append(perf_f.cpu())
