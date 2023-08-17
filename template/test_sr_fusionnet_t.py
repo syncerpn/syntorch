@@ -17,8 +17,8 @@ def set_template(args):
 	elif args.template == 'FusionNet_6_1':
 		print('[INFO] Template found')
 		args.style='Y'
-		args.testset_tag='Set14B'
-		args.testset_dir='/home/dataset/set14_dnb/2x/'
+		args.testset_tag='Set5B'
+		args.testset_dir='/home/dataset/set5_dnb/2x/'
 		args.rgb_range=1.0
 		args.scale=2
 		args.core='FusionNet_6'
@@ -40,6 +40,24 @@ def set_template(args):
 		args.rgb_range=1.0
 		args.scale=2
 		args.core='FusionNet_7_debug'
+
+	elif args.template == 'FusionNet_7_2s_1':
+		print('[INFO] Template found')
+		args.style='Y'
+		args.testset_tag='Set5B'
+		args.testset_dir='/home/dataset/set5_dnb/2x/'
+		args.rgb_range=1.0
+		args.scale=2
+		args.core='FusionNet_7_2s'
+
+	elif args.template == 'FusionNet_7_3s_1':
+		print('[INFO] Template found')
+		args.style='Y'
+		args.testset_tag='Set5B'
+		args.testset_dir='/home/dataset/set5_dnb/2x/'
+		args.rgb_range=1.0
+		args.scale=2
+		args.core='FusionNet_7_3s'
 
 	else:
 		print('[ERRO] Template not found')
