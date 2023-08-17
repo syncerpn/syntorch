@@ -36,7 +36,10 @@ from model.FusionNet_9 import FusionNet_9
 from model.FusionNet_7_debug import FusionNet_7_debug
 from model.FusionNet_7_gsi import FusionNet_7_gsi
 from model.FusionNet_7_gsi_mirror import FusionNet_7_gsi_mirror
-from model.VarNet import VarNet
+from model.FusionNet_6_gsi import FusionNet_6_gsi
+
+from model.FusionNet_7_2s import FusionNet_7_2s
+from model.FusionNet_7_3s import FusionNet_7_3s
 
 def config(args):
     arch = args.core.split('-')
@@ -111,9 +114,14 @@ def config(args):
     elif (name == 'FusionNet_7_gsi_mirror'):
         core = FusionNet_7_gsi_mirror(scale=args.scale)
 
+    elif (name == 'FusionNet_6_gsi'):
+        core = FusionNet_6_gsi(scale=args.scale)
 
-    elif (name == 'VarNet'):
-        core = VarNet(scale=args.scale)
+    elif (name == 'FusionNet_7_2s'):
+        core = FusionNet_7_2s(scale=args.scale)
+    elif (name == 'FusionNet_7_3s'):
+        core = FusionNet_7_3s(scale=args.scale)
+        
     else:
         print('[ERRO] unknown model tag')
         assert(0)

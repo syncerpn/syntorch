@@ -203,6 +203,28 @@ def set_template(args):
 		args.core='FusionNet_7_gsi_mirror'
 		# args.checkpoint=None
 
+	elif args.template == 'FusionNet_6_gsi_1':
+		print('[INFO] Template found (FusionNet full branch trainer)')
+		args.lr=1e-2
+		args.lr_decay_ratio=0.5
+		args.weight_decay=0
+		args.batch_size=16
+		args.epoch_step=100
+		args.max_epochs=300
+		args.loss='L1'
+		args.optimizer='Adam'
+		args.max_load=16000
+		args.style='Y'
+		args.trainset_tag='SR291B'
+		args.trainset_patch_size=21
+		args.trainset_dir='/home/dataset/sr291_21x21_dn/2x/'
+		args.testset_tag='Set14B'
+		args.testset_dir='/home/dataset/set14_dnb/2x/'
+		args.rgb_range=1.0
+		args.scale=2
+		args.core='FusionNet_6_gsi'
+		# args.checkpoint=None
+
 	elif args.template == 'FusionNet_8_1':
 		print('[INFO] Template found (FusionNet full branch trainer)')
 		args.lr=1e-4
@@ -245,6 +267,50 @@ def set_template(args):
 		args.rgb_range=1.0
 		args.scale=2
 		args.core='FusionNet_9'
+		args.checkpoint=None
+
+	elif args.template == 'FusionNet_7_2s_1':
+		print('[INFO] Template found (FusionNet full branch trainer)')
+		args.lr=1e-4
+		args.lr_decay_ratio=0.5
+		args.weight_decay=0
+		args.batch_size=16
+		args.epoch_step=200
+		args.max_epochs=300
+		args.loss='L1'
+		args.optimizer='Adam'
+		args.max_load=0
+		args.style='Y'
+		args.trainset_tag='SR291B'
+		args.trainset_patch_size=21
+		args.trainset_dir='/home/dataset/sr291_21x21_dn/2x/'
+		args.testset_tag='Set14B'
+		args.testset_dir='/home/dataset/set14_dnb/2x/'
+		args.rgb_range=1.0
+		args.scale=2
+		args.core='FusionNet_7_2s'
+		args.checkpoint=None
+
+	elif args.template == 'FusionNet_7_3s_1':
+		print('[INFO] Template found (FusionNet full branch trainer)')
+		args.lr=1e-4
+		args.lr_decay_ratio=0.5
+		args.weight_decay=0
+		args.batch_size=16
+		args.epoch_step=200
+		args.max_epochs=300
+		args.loss='L1'
+		args.optimizer='Adam'
+		args.max_load=0
+		args.style='Y'
+		args.trainset_tag='SR291B'
+		args.trainset_patch_size=21
+		args.trainset_dir='/home/dataset/sr291_21x21_dn/2x/'
+		args.testset_tag='Set14B'
+		args.testset_dir='/home/dataset/set14_dnb/2x/'
+		args.rgb_range=1.0
+		args.scale=2
+		args.core='FusionNet_7_3s'
 		args.checkpoint=None
 
 	else:
