@@ -74,3 +74,4 @@ rfm = RandomFlatMasker()
 gsf = GradientSobelFilter()
 
 merge_random()
+merge_gradient()
