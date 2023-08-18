@@ -76,7 +76,7 @@ def merge_single_layer(li):
 
             with torch.no_grad():
                 merge_map = gsf.generate_mask(x, psi/10)
-                masks = {1.0 for i in range(core.ns)}
+                masks = {i: 1.0 for i in range(core.ns)}
                 masks[li] = merge_map
                 yf = core.forward_merge_mask(x, masks)
 
