@@ -66,6 +66,29 @@ def merge_gradient():
         log_str = f'[INFO] TS - MERGE GRADSO - PSI: {psi/10:.1f} - P: {mean_perf_f:.3f}'
         print(log_str)
 
+def merge_single_layer(li):
+    for psi in range(11):
+        perf_fs = []
+        #walk through the test set
+        for batch_idx, (x, yt) in tqdm.tqdm(enumerate(XYtest), total=len(XYtest)):
+            x  = x.cuda()
+            yt = yt.cuda()
+
+            with torch.no_grad():
+                merge_map = gsf.generate_mask(x, psi/10)
+                masks = {1.0 for i in range(core.ns)}
+                masks[li] = merge_map
+                yf = core.forward_merge_mask(x, masks)
+
+            perf_f = evaluation.calculate(args, yf, yt)
+            perf_fs.append(perf_f.cpu())
+
+        mean_perf_f = torch.stack(perf_fs, 0).mean()
+
+        log_str = f'[INFO] TS - MERGE SINGLE {li} - PSI: {psi/10:.1f} - P: {mean_perf_f:.3f}'
+        print(log_str)
+
+
 # load test data
 print('[INFO] load testset "%s" from %s' % (args.testset_tag, args.testset_dir))
 testset, batch_size_test = data.load_testset(args)
@@ -79,3 +102,5 @@ gsf = GradientSobelFilter()
 
 merge_random()
 merge_gradient()
+merge_single_layer(0)
+merge_single_layer(1)
