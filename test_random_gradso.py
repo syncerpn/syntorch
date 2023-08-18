@@ -88,6 +88,28 @@ def merge_single_layer(li):
         log_str = f'[INFO] TS - MERGE SINGLE {li} - PSI: {psi/10:.1f} - P: {mean_perf_f:.3f}'
         print(log_str)
 
+def merge_diff_p2():
+    for psi_0 in range(11):
+        for psi_1 in range(11):
+            perf_fs = []
+            #walk through the test set
+            for batch_idx, (x, yt) in tqdm.tqdm(enumerate(XYtest), total=len(XYtest)):
+                x  = x.cuda()
+                yt = yt.cuda()
+
+                with torch.no_grad():
+                    merge_map_0 = gsf.generate_mask(x, psi_0/10)
+                    merge_map_1 = gsf.generate_mask(x, psi_1/10)
+                    masks = {0: merge_map_0, 1: merge_map_1}
+                    yf = core.forward_merge_mask(x, masks)
+
+                perf_f = evaluation.calculate(args, yf, yt)
+                perf_fs.append(perf_f.cpu())
+
+            mean_perf_f = torch.stack(perf_fs, 0).mean()
+
+            log_str = f'[INFO] TS - MERGE 2S 0:{psi_0} 1:{psi_1} - P: {mean_perf_f:.3f}'
+            print(log_str)
 
 # load test data
 print('[INFO] load testset "%s" from %s' % (args.testset_tag, args.testset_dir))
