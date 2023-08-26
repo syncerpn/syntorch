@@ -135,11 +135,11 @@ class SMB(nn.Module):
             if s == 0:
                 kernel_s.append([])
                 if self.d_out_num[s] > 0:
-                    kernel_d2d.append(self.conv[s].weight[ch_mask[0, :, s, 1]==1, ...]).view(self.d_out_num[s], -1)
+                    kernel_d2d.append(self.conv[s].weight[ch_mask[0, :, s, 1]==1, ...].view(self.d_out_num[s], -1))
                 else:
                     kernel_d2d.append([])
                 if self.s_out_num[s] > 0:
-                    kernel_d2s.append(self.conv[s].weight[ch_mask[0, :, s, 0]==1, ...]).view(self.s_out_num[s], -1)
+                    kernel_d2s.append(self.conv[s].weight[ch_mask[0, :, s, 0]==1, ...].view(self.s_out_num[s], -1))
 
             else:
                 if self.d_in_num[s] > 0 and self.d_out_num[s] > 0:
@@ -288,7 +288,7 @@ class SMB(nn.Module):
         '''
 
         self._prepare()
-        
+
         if self.training:
             spa_mask = x[1]
             ch_mask = gumbel_softmax(self.ch_mask, 3, self.tau)
