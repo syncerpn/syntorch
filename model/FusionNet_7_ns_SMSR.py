@@ -286,7 +286,7 @@ class SMB(nn.Module):
         x[0]: input feature [B, C, H, W]
         x[1]: spatial mask [B, 1, H, W]
         '''
-        if self. training:
+        if self.training:
             spa_mask = x[1]
             ch_mask = gumbel_softmax(self.ch_mask, 3, self.tau)
 

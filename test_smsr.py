@@ -45,6 +45,7 @@ XYtest = torchdata.DataLoader(testset, batch_size=batch_size_test, shuffle=False
 
 core = model.config(args)
 core.cuda()
+core.eval()
 
 single_forward()
 
