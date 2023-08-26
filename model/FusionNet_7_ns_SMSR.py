@@ -368,7 +368,7 @@ class SMLargeModule(nn.Module):
             out, ch_mask = self.body([x, spa_mask[:, :1, ...]])
             out = self.ca(out) + x
 
-            return out, spa_mask[:, :1, ...], ch_mask
+            return out, [spa_mask[:, :1, ...], ch_mask]
         
         if not self.training:
             spa_mask = self.spa_mask(x)
