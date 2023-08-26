@@ -21,7 +21,7 @@ def config(args):
         core = FusionNet_7_3s(scale=args.scale)
     elif (name == "FusionNet_7_4s"):
         core = FusionNet_7_4s(scale=args.scale)
-    elif (name == "FusionNet_7_4s_SMSR"):
+    elif (name == "FusionNet_7_ns_SMSR"):
         core = FusionNet_7_ns_SMSR(scale=args.scale)
     else:
         assert 0, f"[ERRO] unknown model tag {name}"
