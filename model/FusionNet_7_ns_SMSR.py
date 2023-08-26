@@ -320,9 +320,12 @@ class SMB(nn.Module):
             fea_s = None
             fea_dense = []
             fea_sparse = []
+            feas = []
 
             for i in range(self.ns):
                 fea_d, fea_s = self._sparse_conv(fea_d, fea_s, k = 3, index=i)
+                feas.append([fea_d, fea_s])
+
                 if fea_d is not None:
                     fea_dense.append(self.relu(fea_d))
                 if fea_s is not None:
@@ -333,7 +336,7 @@ class SMB(nn.Module):
             fea_sparse = torch.cat(fea_sparse, 0)
             out, _ = self._sparse_conv(fea_dense, fea_sparse, k=1, index = self.ns)
 
-            return out
+            return out, feas
         
 class SMLargeModule(nn.Module):
     def __init__ (self, ns):
@@ -350,7 +353,7 @@ class SMLargeModule(nn.Module):
             nn.ConvTranspose2d(4, 2, 3, 2, 1, output_padding=1),
         )
 
-        self.body = SMB(16, 32, ns=ns) # include 1x1 conv
+        self.body = SMB(16, 16, ns=ns) # include 1x1 conv
         self.ca = ChannelAttention(16)
         self.tau = 1
         
@@ -363,7 +366,7 @@ class SMLargeModule(nn.Module):
             spa_mask = gumbel_softmax(spa_mask, 1, self.tau)
 
             out, ch_mask = self.body([x, spa_mask[:, :1, ...]])
-            # out = self.ca(out) + x
+            out = self.ca(out) + x
 
             return out, spa_mask[:, :1, ...], ch_mask
         
@@ -371,20 +374,17 @@ class SMLargeModule(nn.Module):
             spa_mask = self.spa_mask(x)
             spa_mask = (spa_mask[:, :1, ...] > spa_mask[:, 1:, ...]).float()
 
-            out = self.body([x, spa_mask])
-            # out = self.ca(out) + x
+            out, feas = self.body([x, spa_mask])
+            out = self.ca(out) + x
 
-            return out
+            return out, feas
 
     
 class SmallModule(nn.Module):
-    def __init__(self, ns, inchannels):
+    def __init__(self, ns):
         super(SmallModule, self).__init__()
 
         self.ns = ns
-        self.inchannels = inchannels
-        self.ch_mask = nn.Parameter(torch.rand(1, self.inchannels, 2*self.ns, 2)) # 0: small 1: large
-        self.tau = 1
 
         self.conv = nn.ModuleList()
         for i in range(ns):
@@ -395,37 +395,32 @@ class SmallModule(nn.Module):
             self.conv[i].bias.data.fill_(0.01)
             nn.init.xavier_uniform_(self.conv[i].weight)
 
-    def forward(self, x, spa_mask, stages=[]):
+    def forward(self, x, stages=[]):
         for s in stages:
             assert (s < self.ns) and (s >= 0), f"[ERRO] invalid stage {s}"
 
-        if self.training:
-            ch_mask = gumbel_softmax(self.ch_mask, 3, self.tau)
-            z = x
-            if stages:
-                for s in range(self.ns):
-                    if s in stages:
-                        z = F.relu(self.conv[2*s](z))
-                        z = F.relu(self.conv[2*s+1](z))
-                        z = z * spa_mask 
-                return z
-            else:
-                feas = []
-                for s in range(self.ns):
+        z = x
+        if stages:
+            for s in range(self.ns):
+                if s in stages:
                     z = F.relu(self.conv[2*s](z))
-                    z = F.relu(self.conv[2*s+1](z * ch_mask[:, :, 2*s: 2*s+1, :1]))
-                    z = z * spa_mask
-                    feas.append(z)
-
-                return z, feas
+                    z = F.relu(self.conv[2*s+1](z))
+            return z
+        else:
+            feas = []
+            for s in range(self.ns):
+                z = F.relu(self.conv[2*s](z))
+                z = F.relu(self.conv[2*s+1](z))
+                feas.append(z)
+            return z, feas
         
 
-class FusionNet_7_1s_SMSR(nn.Module): #hardcode
+class FusionNet_7_ns_SMSR(nn.Module): #hardcode
     def __init__(self, scale=2):
-        super(FusionNet_7_1s_SMSR, self).__init__()
+        super(FusionNet_7_ns_SMSR, self).__init__()
 
         self.scale = scale
-        self.ns = 1
+        self.ns = 4 # for testing
 
         self.head = nn.ModuleList() # feature map 
         self.branch = nn.ModuleList() # 2 branches: Simple and Complex
