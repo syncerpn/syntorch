@@ -24,7 +24,7 @@ args = parser.parse_args()
 if args.template is not None:
     template.set_template(args)
 
-def single_forward():
+def single_forward(branch):
     for psi in range(11):
         perf_fs = []
         for batch_idx, (x, yt) in tqdm.tqdm(enumerate(XYtest), total=len(XYtest)):
@@ -32,11 +32,11 @@ def single_forward():
             yt = yt.cuda()
 
             with torch.no_grad():
-                yf = core.forward(x)
+                yf = core.forward(x,branch)
                 print(yf.detach().cpu().size())
 
 
-                
+
 
 # load test data
 print('[INFO] load testset "%s" from %s' % (args.testset_tag, args.testset_dir))
@@ -47,5 +47,7 @@ core = model.config(args)
 core.cuda()
 core.eval()
 
-single_forward()
-
+print("Large\n")
+single_forward(0)
+print("\nSmall\n")
+single_forward(1)
