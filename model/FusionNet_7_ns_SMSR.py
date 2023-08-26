@@ -69,7 +69,7 @@ class LargeModule(nn.Module):
             return z, feas
         
 class SMB(nn.Module):
-    def __init__(self, in_channels, out_channels, kernel_size=3, stride=1, padding=1, bias=False, ns=4):
+    def __init__(self, in_channels, out_channels, kernel_size=3, stride=1, padding=1, bias=True, ns=4):
         super(SMB, self).__init__()
 
         self.in_channels = in_channels
