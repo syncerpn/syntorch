@@ -154,10 +154,10 @@ class SMB(nn.Module):
                     kernel_d2s.append([])
                 if self.s_in_num[s] > 0:
                     kernel_s.append(
-                        torch.cat(
+                        torch.cat((
                             self.conv[s].weight[ch_mask[0, :, s, 1]==1][:, ch_mask[0, :, s-1, 0]==1],  # s2d
                             self.conv[s].weight[ch_mask[0, :, s, 0]==1][:, ch_mask[0, :, s-1, 0]==1]), # s2s
-                            0).view(self.d_out_num[s] + self.s_out_num[s], 0)
+                            0).view(self.d_out_num[s] + self.s_out_num[s], -1))
                 else:
                     kernel_s.append([])
 
