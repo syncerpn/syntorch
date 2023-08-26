@@ -32,7 +32,7 @@ def single_forward():
             yt = yt.cuda()
 
             with torch.no_grad():
-                yf = core.forward(x, 0)
+                yf = core.forward(x)
                 print(yf.detach().cpu().size())
 
 
@@ -41,7 +41,7 @@ def single_forward():
 # load test data
 print('[INFO] load testset "%s" from %s' % (args.testset_tag, args.testset_dir))
 testset, batch_size_test = data.load_testset(args)
-XYtest = torchdata.DataLoader(testset, batch_size=batch_size_test, shuffle=False, num_workers=16)
+XYtest = torchdata.DataLoader(testset, batch_size=batch_size_test, shuffle=False, num_workers=1)
 
 core = model.config(args)
 core.cuda()
