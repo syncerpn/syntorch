@@ -419,7 +419,7 @@ class SmallModule(nn.Module):
         
 
 class FusionSM_7_4s(nn.Module): #hardcode
-    def __init__(self, ns, scale=2):
+    def __init__(self, ns=4, scale=2):
         super(FusionSM_7_4s, self).__init__()
 
         self.scale = scale
