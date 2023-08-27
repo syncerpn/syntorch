@@ -183,7 +183,7 @@ class SMB(nn.Module):
         mask_indices = torch.nonzero(self.spa_mask.squeeze()) # in this function, 1 is sparse
 
         # indices: dense to sparse (1x1)
-        self.h_idx_1x1 = mask_indices[:, 0] #x
+        self.h_idx_1x1 = mask_indices[:, 0] #x index of sparse positions
         self.w_idx_1x1 = mask_indices[:, 1] #y
 
         # indices: dense to sparse (3x3)
@@ -200,7 +200,7 @@ class SMB(nn.Module):
 
     def _mask_select(self, x, k):
         if k == 1:
-            return x[0, :, self.h_idx_1x1, self.w_idx_1x1]
+            return x[0, :, self.h_idx_1x1, self.w_idx_1x1] # take every positions in all channels
         if k == 3:
             return F.pad(x, [1, 1, 1, 1])[0, :, self.h_idx_3x3, self.w_idx_3x3].view(9 * x.size(1), -1)
         
@@ -418,9 +418,9 @@ class SmallModule(nn.Module):
             return z, feas
         
 
-class FusionNet_7_ns_SMSR(nn.Module): #hardcode
-    def __init__(self, scale=2):
-        super(FusionNet_7_ns_SMSR, self).__init__()
+class FusionSM_7_4s(nn.Module): #hardcode
+    def __init__(self, ns, scale=2):
+        super(FusionSM_7_4s, self).__init__()
 
         self.scale = scale
         self.ns = 4 # for testing
