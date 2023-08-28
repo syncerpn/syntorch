@@ -384,7 +384,7 @@ class SMM(nn.Module):
         
 class SMSR(nn.Module):
     def __init__(self, ns, nbody=1, scale=2):
-        super(SMSR)._init__()
+        super(SMSR).__init__()
 
         kernel_size = 3
         self.ns = ns
