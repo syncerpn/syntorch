@@ -409,7 +409,7 @@ class SMSR(nn.Module):
         
         if not self.training:
             z = x
-            z, feas = self.body(fea)
+            z, feas = self.body(z)
             return z, feas
     
 class SmallModule(nn.Module):
