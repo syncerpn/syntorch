@@ -14,7 +14,9 @@ Dataset:
 python test_random_gradso.py --template FusionNet_7_2s_1 --checkpoint <model_name>
 
 #### For test FusionSM_7_4s
-`python test_smsr.py --core FusionSM_7_4s --testset_dir [path/to/testset]`
+```bash
+python test_smsr.py --core FusionSM_7_4s --testset_dir [path/to/testset]
+```
 
 ### Training
 For training C branch with SR and S branch with KD loss:

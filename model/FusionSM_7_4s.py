@@ -341,9 +341,9 @@ class SMB(nn.Module):
 
             return out, feas
         
-class SMLargeModule(nn.Module):
+class SMM(nn.Module):
     def __init__ (self, ns):
-        super(SMLargeModule, self).__init__()
+        super(SMM, self).__init__()
         self.ns = ns
 
         # spatial mask
@@ -381,7 +381,35 @@ class SMLargeModule(nn.Module):
             out = self.ca(out) + x
 
             return out, feas
+        
+class SMSR(nn.Module):
+    def __init__(self, ns, nbody=1, scale=2):
+        super(SMSR)._init__()
 
+        kernel_size = 3
+        self.ns = ns
+        self.nbody= nbody
+        self.scale = scale
+
+        # RGB mean
+        self.body = SMM(self.ns)
+        
+    def forward(self, x):
+        if self.training:
+            sparsity = []
+            out_fea = []
+            fea = x
+
+            fea, mask = self.body(fea)
+            _spa_mask, _ch_mask = mask
+            sparsity = _spa_mask * _ch_mask[..., 1].view(1, -1, 1, 1) + \
+                       torch.ones_like(_spa_mask) * _ch_mask[..., 0].view(1, -1, 1, 1)
+            return out_fea, sparsity
+        
+        if not self.training:
+            z = x
+            z, feas = self.body(fea)
+            return z, feas
     
 class SmallModule(nn.Module):
     def __init__(self, ns):
@@ -433,7 +461,7 @@ class FusionSM_7_4s(nn.Module): #hardcode
         self.head.append(nn.Conv2d( 1, 32, 5, 1, 2)) #0
         self.head.append(nn.Conv2d(32, 16, 1, 1, 0)) #1
 
-        self.branch.append(SMLargeModule(self.ns))
+        self.branch.append(SMSR(self.ns))
         self.branch.append(SmallModule(self.ns))
         
         self.tail.append(nn.Conv2d(16, 32, 1, 1, 0)) #6
