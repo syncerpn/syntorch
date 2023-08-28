@@ -392,7 +392,8 @@ class SMSR(nn.Module):
         self.scale = scale
 
         # RGB mean
-        self.body = SMM(self.ns)
+        self.body = nn.ModuleList()
+        self.body.append(SMM(self.ns))
         
     def forward(self, x):
         if self.training:
