@@ -38,14 +38,21 @@ def set_template(args):
 			args.scale=2
 			args.core="FusionNet_7_4s"
 
-		if args.template == "FusionNet_7_ns_SMSR":
+		if args.template == "FusionSM_7_4s":
 			print(f"[INFO] Template found: {args.template}")
 			args.style="Y"
 			args.testset_tag="Set14B"
-			args.testset_dir="/home/dataset/set14_dnb/2x/"
 			args.rgb_range=1.0
 			args.scale=2
-			args.core="FusionNet_7_ns_SMSR"
+			args.core="FusionSM_7_4s"
+
+		if args.template == "FusionSM_7_4s_v2":
+			print(f"[INFO] Template found: {args.template}")
+			args.style="Y"
+			args.testset_tag="Set14B"
+			args.rgb_range=1.0
+			args.scale=2
+			args.core="FusionSM_7_4s_v2"
 
 		else:
 			assert 0, f"[ERRO] Template not found {args.template}"
