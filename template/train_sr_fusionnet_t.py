@@ -3,7 +3,7 @@ import time
 def set_template(args):
 	timestamp = str(int(time.time()))
 	if args.template is not None:
-		args.cv_dir = 'backup/' + args.template + '_' + timestamp + '/'
+		args.cv_dir = 'outputs_' + args.template + '_' + timestamp + '/'
 
 	if   args.template == 'FusionNet_7_1s_1':
 		print('[INFO] Template found (FusionNet full branch trainer)')

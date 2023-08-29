@@ -31,7 +31,7 @@ python test_smsr.py --core FusionSM_7_4s_v2 --testset_dir <path/to/testset>
 
 #### (SMSR) For training C branch with SR and S branch with KD
 ```bash
-python train_SM_sr_S_kd.py --template FusionSM_7_4s_v2 --trainset_dir <path/to/trainset> --testset_dir <path/to/testset>
+python train_SM_sr_S_kd.py --template FusionSM_7_4s_v2 --trainset_dir <path/to/trainset> --testset_dir <path/to/testset> -- cv_dir <path/to/save>
 ```
 
 For training C branch with SR and S branch with KD loss:
