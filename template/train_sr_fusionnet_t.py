@@ -94,7 +94,7 @@ def set_template(args):
 		args.lr=1e-4
 		args.lr_decay_ratio=0.5
 		args.weight_decay=0
-		args.batch_size=32
+		args.batch_size=16
 		args.epoch_step=100
 		args.max_epochs=50
 		args.loss='L1'
