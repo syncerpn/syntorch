@@ -8,6 +8,7 @@ from model.FusionNet_7_2s import FusionNet_7_2s
 from model.FusionNet_7_3s import FusionNet_7_3s
 from model.FusionNet_7_4s import FusionNet_7_4s
 from model.FusionSM_7_4s import FusionSM_7_4s
+from model.FusionSM_7_4s_v2 import FusionSM_7_4s_v2
 
 def config(args):
     arch = args.core.split("-")
@@ -23,6 +24,8 @@ def config(args):
         core = FusionNet_7_4s(scale=args.scale)
     elif (name == "FusionSM_7_4s"):
         core = FusionSM_7_4s(scale=args.scale)
+    elif (name == "FusionSM_7_4s_v2"):
+        core = FusionSM_7_4s_v2(scale=args.scale)
     else:
         assert 0, f"[ERRO] unknown model tag {name}"
 

@@ -25,7 +25,7 @@ if args.template is not None:
     template.set_template(args)
 
 def single_forward(branch):
-    for psi in range(11):
+    for psi in range(5):
         perf_fs = []
         for batch_idx, (x, yt) in tqdm.tqdm(enumerate(XYtest), total=len(XYtest)):
             x = x.cuda()
@@ -33,9 +33,28 @@ def single_forward(branch):
 
             with torch.no_grad():
                 yf = core.forward(x,branch)
-                print(yf.detach().cpu().size())
+            perf_f = evaluation.calculate(args, yf, yt)
+            perf_fs.append(perf_f.cpu())
 
+        mean_perf_f = torch.stack(perf_fs, 0).mean()
+        log_str = f"[INFO] P: {mean_perf_f}"
 
+def single_forward_v2(branch):
+    for psi in range(5):
+        perf_fs = []
+        for batch_idx, (x, yt) in tqdm.tqdm(enumerate(XYtest), total=len(XYtest)):
+            x = x.cuda()
+            yt = yt.cuda()
+
+            with torch.no_grad():
+                yf, ch_mask = core.forward(x,branch)
+            print(ch_mask.size())
+            perf_f = evaluation.calculate(args, yf, yt)
+            perf_fs.append(perf_f.cpu())
+
+        mean_perf_f = torch.stack(perf_fs, 0).mean()
+        log_str = f"[INFO] P: {mean_perf_f}"
+        print(log_str)
 
 
 # load test data
@@ -48,6 +67,6 @@ core.cuda()
 core.eval()
 
 print("Large\n")
-single_forward(0)
+single_forward_v2(0)
 print("\nSmall\n")
-single_forward(1)
+single_forward_v2(1)
