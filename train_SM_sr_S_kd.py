@@ -18,7 +18,7 @@ import torch.multiprocessing
 torch.multiprocessing.set_sharing_strategy('file_system')
 
 
-def train(epoch, optim):
+def train_teacher(epoch, optim):
     perfs = []
     total_loss = 0
     for batch_ids, (x, yt) in tqdm.tqdm(enumerate(XYtrain), total=len(XYtrain)):

@@ -48,7 +48,6 @@ def single_forward_v2(branch):
 
             with torch.no_grad():
                 yf, ch_mask = core.forward(x,branch)
-            print(ch_mask.size())
             perf_f = evaluation.calculate(args, yf, yt)
             perf_fs.append(perf_f.cpu())
 

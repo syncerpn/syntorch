@@ -233,17 +233,19 @@ class LargeModule(nn.Module):
                 spa_mask = self.spa_mask(z)
                 spa_mask = gumbel_softmax(spa_mask, 1, self.tau)                
                 for s in stages:
-                    z, ch_mask = self.body([z, spa_mask[:, :1, ...]])
+                    z, ch_mask = self.body[s]([z, spa_mask[:, :1, ...]])
                     ch_masks.append(ch_mask.unsqueeze(2))
                 ch_masks = torch.cat(ch_masks, 2)
-                return z, ch_masks
+                sparsity = spa_mask[:, :1, :, :] * ch_mask[..., 0].view(1, -1, 1, 1) + \
+                           torch.ones_like(spa_mask[:, :1, :, :]) * ch_mask[..., 1].view(1, -1, 1, 1)
+                return z, sparsity
             
             if not self.training:
                 spa_mask = self.spa_mask(x)
                 spa_mask = (spa_mask[:, :1, ...] > spa_mask[:, 1:, ...]).float()
 
                 for s in stages:
-                    z, ch_mask = self.body([z, spa_mask])
+                    z, ch_mask = self.body[s]([z, spa_mask])
 
                 return z, ch_mask # ch_mask are not used in inference
         
@@ -256,6 +258,8 @@ class LargeModule(nn.Module):
                     z, ch_mask = self.body[s]([z, spa_mask[:, :1, ...]])
                     ch_masks.append(ch_mask.unsqueeze(2))
                 ch_masks = torch.cat(ch_masks, 2)
+                sparsity = spa_mask[:, :1, ...] * ch_mask[..., 0].view(1, -1, 1, 1) + \
+                           torch.ones_like(spa_mask[:, 1:, ...] * ch_mask[..., 1].view(1, -1, 1, 1))
                 return z, ch_masks
             
             if not self.training:
@@ -288,11 +292,13 @@ class SmallModule(nn.Module):
 
         z = x
         if stages:
+            feas = []
             for s in range(self.ns):
                 if s in stages:
                     z = F.relu(self.conv[2*s](z))
                     z = F.relu(self.conv[2*s+1](z))
-            return z
+                    feas.append(z)
+            return z, feas
         else:
             feas = []
             for s in range(self.ns):
@@ -339,7 +345,6 @@ class FusionSM_7_4s_v2(nn.Module): #hardcode
         z = F.relu(self.head[1](z))
 
         branch_fea, mask_or_feas = self.branch[branch](z)
-
         
         z = F.relu(self.tail[0](branch_fea))
         z = self.tail[1](z)
@@ -352,6 +357,8 @@ class FusionSM_7_4s_v2(nn.Module): #hardcode
         return y, mask_or_feas
 
     def forward_merge_mask(self, x, masks: dict, fea_out=False):
+        # TODO: Convert merge mask to smsr-like forward
+        
         # mask in masks are binary; 1.0 uses for C or branch 0, and vice versa
         z = x
         z = F.relu(self.head[0](z))
