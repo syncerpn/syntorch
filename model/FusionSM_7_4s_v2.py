@@ -194,7 +194,7 @@ class MaskedConv2d(nn.Module):
             fea_d = x[0]
             fea_s = None
 
-            fea_d = self._sparse_conv(fea_d, fea_s, k = 3)
+            fea_d = self._sparse_conv(fea_d, k = 3)
             out = self.relu(fea_d)
           
             return out, self.ch_mask
