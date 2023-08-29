@@ -155,14 +155,10 @@ class MaskedConv2d(nn.Module):
 
         # dense to sparse
         fea_d2s_masked = torch.mm(self.kernel_d2s[index], self._mask_select(fea_dense, k))
-        print(f"fea_d2s_masked: {fea_d2s_masked.size()}")
-        print(f"kernel_d2s[{index}]: {self.kernel_d2s[index].size()}")
-        print(f"mask: {self._mask_select(fea_dense, k).size()}")
 
         ### fusion v2 ###
         fea_d2s[0, :, self.h_idx_1x1, self.w_idx_1x1] = fea_d2s_masked
         fea_d = torch.cat([fea_d2d, fea_d2s], 1)
-        print(fea_d.size())
         
         return fea_d
     
