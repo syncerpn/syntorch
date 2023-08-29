@@ -64,7 +64,7 @@ class MaskedConv2d(nn.Module):
 
     def _prepare(self): # apply channel mask to sparse conv
         # channel mask
-        ch_mask = self.ch_mask.softmax(3).round()
+        ch_mask = self.ch_mask.softmax(2).round()
         self.ch_mask_round = ch_mask
 
         # number of channels
@@ -157,7 +157,7 @@ class MaskedConv2d(nn.Module):
         fea_d2s_masked = torch.mm(self.kernel_d2s[index], self._mask_select(fea_dense, k))
             
         ### fusion v2 ###
-        fea_d2s = F.pad(fea_d2s, [1,1,1,1])[0, :, self.h_idx_3x3, self.w_idx_3x3] = fea_d2s_masked
+        fea_d2s[0, :, self.h_idx_3x3, self.w_idx_3x3] = fea_d2s_masked
         fea_d = torch.cat([fea_d2d, fea_d2s], 1)
         print(fea_d.size())
         
