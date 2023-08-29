@@ -254,7 +254,7 @@ class LargeModule(nn.Module):
                 spa_mask = self.spa_mask(z)
                 spa_mask = gumbel_softmax(spa_mask, 1, self.tau)                
                 for s in range(self.ns):
-                    z, ch_mask = self.body([z, spa_mask[:, :1, ...]])
+                    z, ch_mask = self.body[s]([z, spa_mask[:, :1, ...]])
                     ch_masks.append(ch_mask.unsqueeze(2))
                 ch_masks = torch.cat(ch_masks, 2)
                 return z, ch_masks
@@ -264,7 +264,7 @@ class LargeModule(nn.Module):
                 spa_mask = (spa_mask[:, :1, ...] > spa_mask[:, 1:, ...]).float()
 
                 for s in range(self.ns):
-                    z, ch_mask = self.body([z, spa_mask])
+                    z, ch_mask = self.body[s]([z, spa_mask])
 
                 return z, ch_mask # ch_mask are not used in inference
     
@@ -377,7 +377,7 @@ class FusionSM_7_4s_v2(nn.Module): #hardcode
 
         y = residual_stack(z, x, self.scale)
 
-        if fea_out:
-            return y, feas
+        # if fea_out:
+        #     return y, feas
 
-        return y
+        return y, feas
