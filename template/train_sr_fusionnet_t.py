@@ -89,7 +89,7 @@ def set_template(args):
 		args.scale=2
 		args.core='FusionNet_7_4s'
 
-	elif args.template == 'FusionNet_7_4s_v2':
+	elif args.template == 'FusionSM_7_4s_v2':
 		print('[INFO] Template found (FusionSM full branch trainer)')
 		args.lr=1e-4
 		args.lr_decay_ratio=0.5
