@@ -173,7 +173,7 @@ class MaskedConv2d(nn.Module):
 
         if self.training:
             spa_mask = x[1]
-            ch_mask = gumbel_softmax(self.ch_mask, 3, self.tau)
+            ch_mask = gumbel_softmax(self.ch_mask, 2, self.tau)
 
             fea = x[0]
             fea = self.conv[0](fea)
