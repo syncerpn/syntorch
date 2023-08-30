@@ -106,7 +106,7 @@ def set_template(args):
 		args.testset_tag='Set14B'
 		args.rgb_range=1.0
 		args.scale=2
-		args.core='FusionNet_7_4s_v2'
+		args.core='FusionSM_7_4s_v2'
 
 	else:
 		print('[ERRO] Template not found')
