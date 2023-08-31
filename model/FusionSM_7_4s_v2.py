@@ -177,11 +177,12 @@ class MaskedConv2d(nn.Module):
 
             fea = x[0]
             fea = self.conv(fea)
-            print(fea.size())
-            print(ch_mask.size())
-            print(spa_mask.size())
-            fea = fea * ch_mask[:, :, :1] * spa_mask + fea * ch_mask[:, :, 1:]
-            # fea = (torch.mul(fea, ch_mask[:, :, :1]), spa_mask
+            print(f"Fea size: {fea.size()}")
+            print(f"Channel size: {ch_mask.size()}")
+            print(f"Spatial mask: {spa_mask.size()}")
+            # fea = fea * ch_mask[:, :, :1] * spa_mask + fea * ch_mask[:, :, 1:]
+            fea = torch.mul(torch.mul(fea, ch_mask[:, :, :1]), spa_mask) + \
+                    torch.mul(fea, ch_mask[:, :, 1:])
                     
             fea = self.relu(fea)
 
