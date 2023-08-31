@@ -177,6 +177,8 @@ class MaskedConv2d(nn.Module):
 
             fea = x[0]
             fea = self.conv(fea)
+            print(fea.size())
+            print(ch_mask.size())
             fea = fea * ch_mask[:, :, :1] * spa_mask + fea * ch_mask[:, :, 1:]
                     
             fea = self.relu(fea)
