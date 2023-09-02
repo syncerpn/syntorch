@@ -177,12 +177,16 @@ class MaskedConv2d(nn.Module):
 
             fea = x[0]
             fea = self.conv(fea)
-            print(f"Fea size: {fea.size()}")
-            print(f"Channel size: {ch_mask.size()}")
-            print(f"Spatial mask: {spa_mask.size()}")
+            # print(f"Fea size: {fea.size()}")
+            # print(f"Channel size: {ch_mask.size()}")
+            # print(f"Spatial mask: {spa_mask.size()}")
+            # print(f"Channel mask layer 0: {ch_mask[:, :, :1].view(1, -1, 1, 1).size()}")
+            # print(f"Channel mask layer 1: {ch_mask[:, :, 1:].view(1, -1, 1, 1).size()}")
+            # print()            
             # fea = fea * ch_mask[:, :, :1] * spa_mask + fea * ch_mask[:, :, 1:]
-            fea = torch.mul(torch.mul(fea, ch_mask[:, :, :1]), spa_mask) + \
-                    torch.mul(fea, ch_mask[:, :, 1:])
+            fea = fea * ch_mask[:, :, :1].view(1, -1, 1, 1) * spa_mask + \
+                  fea * ch_mask[:, :, 1:].view(1, -1, 1, 1)
+
                     
             fea = self.relu(fea)
 
@@ -213,10 +217,9 @@ class LargeModule(nn.Module):
         self.spa_mask = nn.Sequential(
             nn.Conv2d(16, 4, 3, 1, 1),
             nn.ReLU(True),
-            nn.AvgPool2d(2),
             nn.Conv2d(4, 4, 3, 1, 1),
             nn.ReLU(True),
-            nn.ConvTranspose2d(4, 2, 3, 2, 1, output_padding=1),
+            nn.Conv2d(4, 2, 3, 1, 1),
         )
 
         self.body = nn.ModuleList()

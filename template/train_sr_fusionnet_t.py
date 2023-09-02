@@ -94,7 +94,7 @@ def set_template(args):
 		args.lr=1e-4
 		args.lr_decay_ratio=0.5
 		args.weight_decay=0
-		args.batch_size=16
+		args.batch_size=1024
 		args.epoch_step=100
 		args.max_epochs=50
 		args.loss='L1'
@@ -107,6 +107,9 @@ def set_template(args):
 		args.rgb_range=1.0
 		args.scale=2
 		args.core='FusionSM_7_4s_v2'
+		args.trainset_dir='/home/nguyenduong/Data/FusionNet_data/dataset/2x/'
+		args.testset_dir='/home/nguyenduong/Data/FusionNet_data/dataset/set14_dnb/2x/'
+		args.cv_dir = "model_checkpoints"
 
 	else:
 		print('[ERRO] Template not found')
