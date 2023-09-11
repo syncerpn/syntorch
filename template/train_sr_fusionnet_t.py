@@ -95,8 +95,8 @@ def set_template(args):
 		args.lr_decay_ratio=0.5
 		args.weight_decay=0
 		args.batch_size=16
-		args.epoch_step=20
-		args.max_epochs=60
+		args.epoch_step=30
+		args.max_epochs=90
 		args.loss='L1'
 		args.optimizer='Adam'
 		args.max_load=0
