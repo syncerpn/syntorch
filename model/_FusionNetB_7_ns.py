@@ -178,8 +178,6 @@ class _FusionNetB_7_ns(nn.Module): #hardcode
         z = F.relu(self.head[0](z))
         z = F.relu(self.head[1](z))
 
-        feas = []
-
         for ii in range(self.ns):
             branch_fea_0 = self.branch[0](z, stages=[ii])
             branch_fea_1 = self.branch[1](z, stages=[ii])
@@ -194,4 +192,4 @@ class _FusionNetB_7_ns(nn.Module): #hardcode
 
             z = merge_fea
         
-        branch_fea_0, branch_fea_1
+        return branch_fea_0, branch_fea_1
