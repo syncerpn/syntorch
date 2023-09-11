@@ -73,7 +73,7 @@ def train_kd_stage(epoch, optim, target_stage):
         merge_map = gsf.generate_mask(x, args.psi)
         masks = {i: merge_map for i in range(target_stage)}
         
-        feas_teacher, feas_student = core.forward_stage_wise_sequential_train(x, masks, target_stage)
+        fea_teacher, fea_student = core.forward_stage_wise_sequential_train(x, masks, target_stage)
 
         loss_func = loss.create_loss_func(args.loss)
         batch_loss = loss_func(fea_student, fea_teacher)
