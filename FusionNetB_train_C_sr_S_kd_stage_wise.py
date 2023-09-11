@@ -146,7 +146,7 @@ if not args.skip_C:
 gsf = GradientSobelFilter()
 
 #train only the S branch
-for target_stage in core.ns:
+for target_stage in range(core.ns):
     sub_params = core.branch[1].stages[target_stage].parameters()
 
     optim_phase_2 = optimizer.create_optimizer(sub_params, args)
