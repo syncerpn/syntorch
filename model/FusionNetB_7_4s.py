@@ -9,7 +9,7 @@ from model.common import residual_stack
 import numpy as np
 
 class LargeModuleStage(nn.Module):
-    def __init__(self, ns):
+    def __init__(self):
         super(LargeModuleStage, self).__init__()
         self.conv = nn.ModuleList()
         self.conv.append(nn.Conv2d(16, 16, 3, 1, 1))
@@ -52,7 +52,7 @@ class LargeModule(nn.Module):
             return z, feas
 
 class SmallModuleStage(nn.Module):
-    def __init__(self, ns):
+    def __init__(self):
         super(SmallModuleStage, self).__init__()
         self.conv = nn.ModuleList()
         self.conv.append(nn.Conv2d(16, 4, 1, 1, 0))
@@ -171,3 +171,27 @@ class FusionNetB_7_4s(nn.Module): #hardcode
             return y, feas
 
         return y
+
+    def forward_stage_wise_sequential_train(self, x, masks: dict, target_stage):
+        # mask in masks are binary; 1.0 uses for C or branch 0, and vice versa
+        z = x
+        z = F.relu(self.head[0](z))
+        z = F.relu(self.head[1](z))
+
+        feas = []
+
+        for ii in range(self.ns):
+            branch_fea_0 = self.branch[0](z, stages=[ii])
+            branch_fea_1 = self.branch[1](z, stages=[ii])
+
+            if ii == target_stage:
+                break
+            
+            assert ii in masks, f"[ERRO]: missing mask for stage {ii}"
+
+            merge_map = masks[ii]
+            merge_fea = branch_fea_0 * merge_map + branch_fea_1 * (1.0 - merge_map)
+
+            z = merge_fea
+        
+        branch_fea_0, branch_fea_1

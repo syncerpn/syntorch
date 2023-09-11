@@ -9,7 +9,7 @@ from model.common import residual_stack
 import numpy as np
 
 class LargeModuleStage(nn.Module):
-    def __init__(self, ns):
+    def __init__(self):
         super(LargeModuleStage, self).__init__()
         self.conv = nn.ModuleList()
         self.conv.append(nn.Conv2d(16, 16, 3, 1, 1))
@@ -52,7 +52,7 @@ class LargeModule(nn.Module):
             return z, feas
 
 class SmallModuleStage(nn.Module):
-    def __init__(self, ns):
+    def __init__(self):
         super(SmallModuleStage, self).__init__()
         self.conv = nn.ModuleList()
         self.conv.append(nn.Conv2d(16, 4, 1, 1, 0))
