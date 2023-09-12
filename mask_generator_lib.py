@@ -6,6 +6,7 @@ class GradientSobelFilter:
         self.n_groups = n_groups
 
         self.sfx = nn.Conv2d(self.n_groups, self.n_groups, 3, 1, 1, bias=False, groups=self.n_groups)
+        print(self.sfx.weight.size())
         self.sfx.weight.data = torch.Tensor([[[[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]]]]).expand([self.n_groups,1,1,1,1])
         self.sfx.to('cuda')
 
