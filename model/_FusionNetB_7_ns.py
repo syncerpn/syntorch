@@ -193,3 +193,25 @@ class _FusionNetB_7_ns(nn.Module): #hardcode
             z = merge_fea
         
         return branch_fea_0, branch_fea_1
+
+    def forward_stage_wise_close_mask(self, x, mask_gen, p, target_stage):
+        # mask_gen is a function
+        z = x
+        z = F.relu(self.head[0](z))
+        z = F.relu(self.head[1](z))
+
+        for ii in range(self.ns):
+            
+            merge_map = mask_gen.generate_mask(z, p)
+            
+            branch_fea_0 = self.branch[0](z, stages=[ii])
+            branch_fea_1 = self.branch[1](z, stages=[ii])
+
+            merge_fea = branch_fea_0 * merge_map + branch_fea_1 * (1.0 - merge_map)
+
+            if ii == target_stage:
+                break
+            
+            z = merge_fea
+        
+        return branch_fea_0, branch_fea_1, merge_map
