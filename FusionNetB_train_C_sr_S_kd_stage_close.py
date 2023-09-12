@@ -140,7 +140,7 @@ if not args.skip_C:
 
         train(epoch, optim_phase_1)
 
-gsf = GradientSobelFilter()
+gsf = GradientSobelFilter(n_groups=16)
 
 #train only the S branch
 for target_stage in range(core.ns):
