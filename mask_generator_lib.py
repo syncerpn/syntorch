@@ -7,11 +7,11 @@ class GradientSobelFilter:
 
         self.sfx = nn.Conv2d(self.n_groups, self.n_groups, 3, 1, 1, bias=False, groups=self.n_groups)
         print(self.sfx.weight.size())
-        self.sfx.weight.data = torch.Tensor([[[[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]]]]).expand([self.n_groups,-1])
+        self.sfx.weight.data = torch.Tensor([[[[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]]]]).expand([self.n_groups,1,3,3])
         self.sfx.to('cuda')
 
         self.sfy = nn.Conv2d(self.n_groups, self.n_groups, 3, 1, 1, bias=False, groups=self.n_groups)
-        self.sfy.weight.data = torch.Tensor([[[[-1, -2, -1], [0, 0, 0], [1, 2, 1]]]]).expand([self.n_groups,-1])
+        self.sfy.weight.data = torch.Tensor([[[[-1, -2, -1], [0, 0, 0], [1, 2, 1]]]]).expand([self.n_groups,1,3,3])
         self.sfy.to('cuda')
 
     def generate_mask(self, x, p):
