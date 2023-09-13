@@ -24,6 +24,26 @@ args = parser.parse_args()
 if args.template is not None:
     template.set_template(args)
 
+def test(epoch, branches=[]):
+    for bri in branches:
+
+        perf_fs = []
+        #walk through the test set
+        for batch_idx, (x, yt) in tqdm.tqdm(enumerate(XYtest), total=len(XYtest)):
+            x  = x.cuda()
+            yt = yt.cuda()
+
+            with torch.no_grad():
+                yf = core.forward(x, branch=bri)
+            
+            perf_f = evaluation.calculate(args, yf, yt)
+            perf_fs.append(perf_f.cpu())
+
+        mean_perf_f = torch.stack(perf_fs, 0).mean()
+
+        log_str = f'[INFO] TS - BRANCH_ID: {bri} - P: {mean_perf_f:.3f}'
+        print(log_str)
+
 def merge_gradient():
     for psi in range(11):
         perf_fs = []
@@ -45,6 +65,26 @@ def merge_gradient():
         log_str = f'[INFO] TS - MERGE GRADSO - PSI: {psi/10:.1f} - P: {mean_perf_f:.3f}'
         print(log_str)
 
+
+def merge_stage_close(mask_gen):
+    for psi in range(11):
+        perf_fs = []
+
+        for batch_idx, (x, yt) in tqdm.tqdm(enumerate(XYtrain), total=len(XYtrain)):
+            x  = x.cuda()
+            yt = yt.cuda()
+            
+            yf = core.forward_stage_wise_close_mask(x, mask_gen, psi/10, core.ns) #target_stage = core.ns to run all and return sr image
+
+            perf_f = evaluation.calculate(args, yf, yt)
+            perf_fs.append(perf_f.cpu())
+
+        mean_perf_f = torch.stack(perf_fs, 0).mean()
+
+        log_str = f'[INFO] TS - BRANCH_ID: {bri} - P: {mean_perf_f:.3f}'
+        print(log_str)
+
+
 # load test data
 print('[INFO] load testset "%s" from %s' % (args.testset_tag, args.testset_dir))
 testset, batch_size_test = data.load_testset(args)
@@ -55,5 +95,8 @@ core.cuda()
 
 rfm = RandomFlatMasker()
 gsf = GradientSobelFilter()
+gsf2 = GradientSobelFilter(n_groups=16)
 
+test(branches=[0,1])
 merge_gradient()
+merge_stage_close(gfs2)
