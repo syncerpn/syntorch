@@ -153,7 +153,7 @@ print('[INFO] train small branch with SR')
 for epoch in range(args.start_epoch, args.max_epochs+1):
     lr_scheduler_phase_2.adjust_learning_rate(epoch)
 
-        if epoch % 10 == 0:
-            test(epoch, [1])
+    if epoch % 10 == 0:
+        test(epoch, [1])
 
-        train_small_sr(epoch, optim_phase_2)
+    train_small_sr(epoch, optim_phase_2)
