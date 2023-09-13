@@ -81,7 +81,7 @@ def merge_stage_close(mask_gen):
 
         mean_perf_f = torch.stack(perf_fs, 0).mean()
 
-        log_str = f'[INFO] TS - BRANCH_ID: {bri} - P: {mean_perf_f:.3f}'
+        log_str = f'[INFO] TS - MERGE CLOSE - PSI: {psi/10:.1f} - P: {mean_perf_f:.3f}'
         print(log_str)
 
 
