@@ -91,12 +91,12 @@ def set_template(args):
 
 	elif args.template == 'FusionNetB_7_4s_1':
 		print('[INFO] Template found (FusionNet full branch trainer)')
-		args.lr=1e-2
-		args.lr_decay_ratio=0.5
+		args.lr=1e-3
+		args.lr_decay_ratio=0.1
 		args.weight_decay=0
-		args.batch_size=16
-		args.epoch_step=20
-		args.max_epochs=60
+		args.batch_size=64
+		args.epoch_step=10
+		args.max_epochs=30
 		args.loss='L1'
 		args.optimizer='Adam'
 		args.max_load=0
