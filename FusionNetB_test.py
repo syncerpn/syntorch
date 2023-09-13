@@ -70,7 +70,7 @@ def merge_stage_close(mask_gen):
     for psi in range(11):
         perf_fs = []
 
-        for batch_idx, (x, yt) in tqdm.tqdm(enumerate(XYtrain), total=len(XYtrain)):
+        for batch_idx, (x, yt) in tqdm.tqdm(enumerate(XYtest), total=len(XYtest)):
             x  = x.cuda()
             yt = yt.cuda()
             
