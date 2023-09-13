@@ -156,4 +156,4 @@ for epoch in range(args.start_epoch, args.max_epochs+1):
         if epoch % 10 == 0:
             test(epoch, [1])
 
-        train(epoch, optim_phase_1)
+        train_small_sr(epoch, optim_phase_2)
