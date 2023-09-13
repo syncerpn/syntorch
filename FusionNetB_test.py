@@ -99,4 +99,4 @@ gsf2 = GradientSobelFilter(n_groups=16)
 
 test(branches=[0,1])
 merge_gradient()
-merge_stage_close(gfs2)
+merge_stage_close(gsf2)
