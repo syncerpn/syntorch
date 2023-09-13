@@ -24,7 +24,7 @@ args = parser.parse_args()
 if args.template is not None:
     template.set_template(args)
 
-def test(epoch, branches=[]):
+def test(branches=[]):
     for bri in branches:
 
         perf_fs = []
