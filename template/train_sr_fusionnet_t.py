@@ -91,7 +91,7 @@ def set_template(args):
 
 	elif args.template == 'FusionNetB_7_4s_1':
 		print('[INFO] Template found (FusionNet full branch trainer)')
-		args.lr=1e-4
+		args.lr=1e-1
 		args.lr_decay_ratio=0.5
 		args.weight_decay=0
 		args.batch_size=16
