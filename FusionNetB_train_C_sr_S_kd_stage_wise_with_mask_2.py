@@ -147,9 +147,13 @@ gsf = GradientSobelFilter()
 
 #train only the S branch
 for target_stage in range(core.ns):
+    #try this
     for param in core.parameters():
-        print(param.shape)
-    assert 0
+        param.requires_grad = False
+    
+    for param in core.branch[1].stages[target_stage].parameters():
+        param.requires_grad = True
+
     sub_params = core.branch[1].stages[target_stage].parameters()
 
     optim_phase_2 = optimizer.create_optimizer(sub_params, args)
