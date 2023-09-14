@@ -91,6 +91,30 @@ def merge_gradient():
         log_str = f'[INFO] TS - MERGE GRADSO - PSI: {psi/10:.1f} - P: {mean_perf_f:.3f}'
         print(log_str)
 
+def explore_merge_gradient_fixed(psi=0.2):
+    perf_fs = []
+    #walk through the test set
+    for batch_idx, (x, yt) in tqdm.tqdm(enumerate(XYtest), total=len(XYtest)):
+        x  = x.cuda()
+        yt = yt.cuda()
+
+        with torch.no_grad():
+            merge_map = gsf.generate_mask(x, psi/10)
+            masks = {i: merge_map for i in range(core.ns)}
+            yf, feas = core.forward_merge_mask(x, masks, fea_out=True)
+
+            for fi, feas in enumerate(feas):
+                file_name = f'{args.template}_{batch_idx}_{bri}_{fi}.npy'
+                np.save(file_name, feas.cpu().numpy())
+
+        perf_f = evaluation.calculate(args, yf, yt)
+        perf_fs.append(perf_f.cpu())
+
+    mean_perf_f = torch.stack(perf_fs, 0).mean()
+
+    log_str = f'[INFO] TS - MERGE GRADSO - PSI: {psi/10:.1f} - P: {mean_perf_f:.3f}'
+    print(log_str)
+
 # load test data
 print('[INFO] load testset "%s" from %s' % (args.testset_tag, args.testset_dir))
 testset, batch_size_test = data.load_testset(args)
@@ -103,5 +127,6 @@ rfm = RandomFlatMasker()
 gsf = GradientSobelFilter()
 
 test_save(branches=[0,1])
-merge_random()
-merge_gradient()
+explore_merge_gradient_fixed(psi=0.2)
+# merge_random()
+# merge_gradient()
