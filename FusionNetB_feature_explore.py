@@ -103,7 +103,9 @@ def explore_merge_gradient_fixed(psi=0.2):
             masks = {i: merge_map for i in range(core.ns)}
             yf, feas = core.forward_merge_mask(x, masks, fea_out=True)
 
-            for fi, feas in enumerate(feas):
+            for ffi, feas in enumerate(feas):
+                bri = ffi % 3
+                fi = ffi // 3
                 file_name = f'{args.template}_{batch_idx}_{bri}_{fi}.npy'
                 np.save(file_name, feas.cpu().numpy())
 
