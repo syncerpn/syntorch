@@ -99,7 +99,7 @@ def explore_merge_gradient_fixed(psi=0.2):
         yt = yt.cuda()
 
         with torch.no_grad():
-            merge_map = gsf.generate_mask(x, psi/10)
+            merge_map = gsf.generate_mask(x, psi)
             masks = {i: merge_map for i in range(core.ns)}
             yf, feas = core.forward_merge_mask(x, masks, fea_out=True)
 
