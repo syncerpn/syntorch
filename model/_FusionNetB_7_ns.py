@@ -160,7 +160,7 @@ class _FusionNetB_7_ns(nn.Module): #hardcode
             merge_fea = branch_fea_0 * merge_map + branch_fea_1 * (1.0 - merge_map)
 
             z = merge_fea
-            feas += [branch_fea_0, branch_fea_1, merge_fea]
+            feas += [branch_fea_0, branch_fea_1, merge_map]
         
         z = F.relu(self.tail[0](merge_fea))
         z = self.tail[1](z)
