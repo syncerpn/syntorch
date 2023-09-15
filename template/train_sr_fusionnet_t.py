@@ -107,8 +107,6 @@ def set_template(args):
 		args.rgb_range=1.0
 		args.scale=2
 		args.core='FusionSM_7_4s_v2'
-		args.trainset_dir=''
-		args.testset_dir=''
 		args.cv_dir = "model_checkpoints"
 
 	else:
