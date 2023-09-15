@@ -27,11 +27,21 @@ python test_random_gradso.py --template FusionNet_7_2s_1 --checkpoint <model_nam
 python test_smsr.py --core FusionSM_7_4s_v2 --testset_dir <path/to/testset>
 ```
 
+#### For test FusionSM_7_4s_v2 (Kaggle)
+```bash
+python test_smrs.py --template FusionSM_7_4s_v2 --testset_dir <path/to/test/set> --checkpoint <checkpoint path>
+```
+
 ### Training
 
 #### (SMSR) For training C branch with SR and S branch with KD
 ```bash
 python train_SM_sr_S_kd.py --template FusionSM_7_4s_v2
+```
+
+#### (SMSR) For training C branch with SR and S branch with KD (on Kaggle)
+```bash
+python train_SM_sr_S_kd.py --template FusionSM_7_4s_v2 --trainset_dir <trainset path> --testset_dir <testset path>
 ```
 
 For training C branch with SR and S branch with KD loss:
