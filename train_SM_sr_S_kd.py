@@ -31,6 +31,13 @@ if not os.path.exists(args.cv_dir):
     os.system('mkdir ' + args.cv_dir)
 utils.save_args(__file__, args)
 
+def write_to_file(text, file, mode='a'):
+    with open(file, mode) as f:
+        f.write(f"{text}\n")
+        
+save_path = os.path.join(args.cv_dir, 'sparsity.txt')
+write_to_file("Loss sparsity", save_path, 'w')
+
 def train_teacher(epoch, optim):
     perfs = []
     total_loss = 0
@@ -44,11 +51,11 @@ def train_teacher(epoch, optim):
         loss_func = loss.create_loss_func(args.loss)
 
         loss_SR = loss_func(yf, yt)
-        loss_sparsity = sparsity.mean() # we try to reduct the sparsity to perseve information from features
-        lambda_0=0.1
-        # lambda_sparsity = min((epoch-1) / 50, 1) * lambda_0
-        batch_loss = loss_SR + lambda_0 * loss_sparsity
-
+        loss_sparsity = sparsity.mean() # we try to reduce the sparsity to perseve information from features
+        lambda_0= 0.0 if epoch <= 45 else 0.02
+        # lambda_sparsity = min(lambda_0 * epoch / 10, 0.01)
+        batch_loss = loss_SR + 0.005 * loss_sparsity
+        
         optim.zero_grad()
         batch_loss.backward()
 
@@ -59,6 +66,7 @@ def train_teacher(epoch, optim):
 
     perf = torch.stack(perfs, 0).mean()
 
+    write_to_file(f"Epoch {epoch}: Loss sparsity {loss_sparsity}", save_path, 'a')
     log_str = '[INFO] E: %d | P: %.3f | LOSS: %.3f' % (epoch, perf, total_loss)
     print(log_str)
 
@@ -70,7 +78,8 @@ def train_kd(epoch, optim):
         x  = x.cuda()
         yt = yt.cuda()
         
-        y_teacher, sparsity = core.forward(x, branch=0, fea_out=True)
+        with torch.no_grad():
+            y_teacher, sparsity = core.forward(x, branch=0, fea_out=True)
         y_student, feas = core.forward(x, branch=1, fea_out=True)
 
         perf = evaluation.calculate(args, y_student, yt)

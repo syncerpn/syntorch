@@ -53,6 +53,8 @@ def set_template(args):
 			args.rgb_range=1.0
 			args.scale=2
 			args.core="FusionSM_7_4s_v2"
+			args.testset_dir='/home/nguyenduong/Data/FusionNet_data/dataset/set14_dnb/2x/'
+			args.checkpoint="/home/nguyenduong/Projects/syntorch/model_checkpoints/branch_1_ckpt_E_50_P_29.256.t7"
 
 		else:
 			assert 0, f"[ERRO] Template not found {args.template}"

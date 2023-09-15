@@ -35,12 +35,12 @@ def single_forward(branch):
                 yf = core.forward(x,branch)
             perf_f = evaluation.calculate(args, yf, yt)
             perf_fs.append(perf_f.cpu())
-
         mean_perf_f = torch.stack(perf_fs, 0).mean()
         log_str = f"[INFO] P: {mean_perf_f}"
 
 def single_forward_v2(branch):
     for psi in range(5):
+        print(f"\nExp {psi}")
         perf_fs = []
         for batch_idx, (x, yt) in tqdm.tqdm(enumerate(XYtest), total=len(XYtest)):
             x = x.cuda()
@@ -50,10 +50,52 @@ def single_forward_v2(branch):
                 yf, ch_mask = core.forward(x,branch)
             perf_f = evaluation.calculate(args, yf, yt)
             perf_fs.append(perf_f.cpu())
+           
+        print(core.get_sparsity_inference())
 
         mean_perf_f = torch.stack(perf_fs, 0).mean()
         log_str = f"[INFO] P: {mean_perf_f}"
         print(log_str)
+        
+def single_forward_v2(branch):
+    for psi in range(5):
+        print(f"\nExp {psi}")
+        perf_fs = []
+        for batch_idx, (x, yt) in tqdm.tqdm(enumerate(XYtest), total=len(XYtest)):
+ 
+            x = x.cuda()
+            yt = yt.cuda()
+
+            with torch.no_grad():
+                yf, ch_mask = core.forward(x,branch)
+            perf_f = evaluation.calculate(args, yf, yt)
+            perf_fs.append(perf_f.cpu())
+         
+           
+        print(core.get_sparsity_inference())
+
+        mean_perf_f = torch.stack(perf_fs, 0).mean()
+        log_str = f"[INFO] P: {mean_perf_f}"
+        print(log_str)
+        
+def pretrained_infer(branch):
+    perfs= []
+    for batch_idx, (x, yt) in tqdm.tqdm(enumerate(XYtest), total= len(XYtest)):
+        x = x.cuda()
+        yt = yt.cuda()
+        try:
+            with torch.no_grad():
+         
+                yf, ch_mask = core.forward(x, branch)
+                perf = evaluation.calculate(args, yf, yt)
+                perfs.append(perf)
+
+        except: continue
+         
+    if len(perfs) > 0:
+        perfs = torch.stack(perfs, 0).mean()
+        print(f"Mean branch {branch} perf: {perfs}")
+        # print(core.get_sparsity_inference())
 
 
 # load test data
@@ -65,7 +107,10 @@ core = model.config(args)
 core.cuda()
 core.eval()
 
-print("Large\n")
-single_forward_v2(0)
-print("\nSmall\n")
-single_forward_v2(1)
+pretrained_infer(0)
+pretrained_infer(1)
+
+# print("Large\n")
+# single_forward_v2(0)
+# print("\nSmall\n")
+# single_forward_v2(1)
