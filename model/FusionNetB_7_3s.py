@@ -95,12 +95,12 @@ class SmallModule(nn.Module):
                 feas.append(z)
             return z, feas
 
-class _FusionNetB_7_ns(nn.Module): #hardcode
-    def __init__(self, ns, scale=2):
-        super(_FusionNetB_7_ns, self).__init__()
+class FusionNetB_7_3s(nn.Module): #hardcode
+    def __init__(self, scale=2):
+        super(FusionNetB_7_3s, self).__init__()
 
         self.scale = scale
-        self.ns = ns
+        self.ns = 3
 
         self.head = nn.ModuleList()
         self.branch = nn.ModuleList()

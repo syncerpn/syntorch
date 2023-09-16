@@ -183,7 +183,7 @@ class FusionNetB_7_1s(nn.Module): #hardcode
             branch_fea_1 = self.branch[1](z, stages=[ii])
 
             if ii == target_stage:
-                break
+                return branch_fea_0, branch_fea_1
             
             assert ii in masks, f"[ERRO]: missing mask for stage {ii}"
 
@@ -192,7 +192,12 @@ class FusionNetB_7_1s(nn.Module): #hardcode
 
             z = merge_fea
         
-        return branch_fea_0, branch_fea_1
+        z = F.relu(self.tail[0](merge_fea))
+        z = self.tail[1](z)
+
+        y = residual_stack(z, x, self.scale)
+
+        return y
 
     def forward_stage_wise_close_mask(self, x, mask_gen, p, target_stage):
         # mask_gen is a function
@@ -210,8 +215,13 @@ class FusionNetB_7_1s(nn.Module): #hardcode
             merge_fea = branch_fea_0 * merge_map + branch_fea_1 * (1.0 - merge_map)
 
             if ii == target_stage:
-                break
-            
+                return branch_fea_0, branch_fea_1, merge_map
+
             z = merge_fea
         
-        return branch_fea_0, branch_fea_1, merge_map
+        z = F.relu(self.tail[0](merge_fea))
+        z = self.tail[1](z)
+
+        y = residual_stack(z, x, self.scale)
+
+        return y

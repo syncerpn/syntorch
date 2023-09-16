@@ -8,6 +8,7 @@ from model.FusionNet_7_2s import FusionNet_7_2s
 from model.FusionNet_7_3s import FusionNet_7_3s
 from model.FusionNet_7_4s import FusionNet_7_4s
 from model.FusionNetB_7_1s import FusionNetB_7_1s
+from model.FusionNetB_7_3s import FusionNetB_7_3s
 from model.FusionNetB_7_4s import FusionNetB_7_4s
 
 def config(args):
@@ -24,6 +25,8 @@ def config(args):
         core = FusionNet_7_4s(scale=args.scale)
     elif (name == "FusionNetB_7_1s"):
         core = FusionNetB_7_1s(scale=args.scale)
+    elif (name == "FusionNetB_7_3s"):
+        core = FusionNetB_7_3s(scale=args.scale)
     elif (name == "FusionNetB_7_4s"):
         core = FusionNetB_7_4s(scale=args.scale)
     else:
