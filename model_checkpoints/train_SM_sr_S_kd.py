@@ -120,6 +120,7 @@ def test(epoch, branches=[]):
         print(log_str)
 
         torch.save(core.state_dict(), args.cv_dir + '/branch_%d_ckpt_E_%d_P_%.3f.t7' % (bri, epoch, mean_perf_f))
+        torch.save(core.state_dict(), args.cv_dir + '/latest.t7')
 
 
 print('[INFO] load trainset "%s" from %s' % (args.trainset_tag, args.trainset_dir))
