@@ -127,7 +127,7 @@ def set_template(args):
 		args.rgb_range=1.0
 		args.scale=2
 		args.core='FusionSM_7_4s_v2'
-		args.cv_dir = "model_checkpoints"
+		args.cv_dir = "/kaggle/working/model_checkpoints"
 		args.trainset_dir='/kaggle/input/fn-data-and-cktpt/data_ckpt/dataset/sr291_2x/2x/'
 		args.testset_dir='/kaggle/input/fn-data-and-cktpt/data_ckpt/dataset/set14_dnb/set14_dnb/2x/'
 
