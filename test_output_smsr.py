@@ -40,14 +40,14 @@ def compare_output(branch):
         with torch.no_grad():
             yf_train, sparsity = core.forward(x, branch)
             perf_train = evaluation.calculate(args, yf_train, yt)
-            write_to_file(f"Perf train: {perf_train}", save_output_file)
+        write_to_file(f"Perf train: {perf_train}", save_output_file)
             
         # evaluation forward
         core.eval()
         with torch.no_grad():
             yf_val, _ = core.forward(x, branch)
             perf_val = evaluation.calculate(args, yf_val, yt)
-            write_to_file(f"Perf val: {perf_val}", save_output_file)
+        write_to_file(f"Perf val: {perf_val}", save_output_file)
             
         write_to_file(f"Sparsity {batch_idx}: {sparsity.mean()}", save_output_file)
         write_to_file(f"Check similarity {batch_idx}: {(torch.abs(yf_val - yf_train) <= 1e-1).float().mean()}", save_output_file)
