@@ -51,6 +51,7 @@ def compare_output(branch):
             
         write_to_file(f"Sparsity {batch_idx}: {sparsity.mean()}", save_output_file)
         write_to_file(f"Check similarity {batch_idx}: {(torch.abs(yf_val - yf_train) <= 1e-1).float().mean()}", save_output_file)
+        write_to_file(f"Mean difference {batch_idx}: {torch.abs(yf_val - yf_train).mean()}", save_output_file)
        
 # load test data
 print('[INFO] load testset "%s" from %s' % (args.testset_tag, args.testset_dir))
