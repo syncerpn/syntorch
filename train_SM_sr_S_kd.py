@@ -52,7 +52,7 @@ def train_teacher(epoch, optim):
 
         loss_SR = loss_func(yf, yt)
         loss_sparsity = sparsity.mean() # we try to reduce the sparsity to perseve information from features
-        lambda_0= 0.0 if epoch <= 45 else 0.02
+        lambda_0= 0.0 if epoch <= 45 else 0.2
         # lambda_sparsity = min(lambda_0 * epoch / 10, 0.01)
         batch_loss = loss_SR + lambda_0 * loss_sparsity
         
