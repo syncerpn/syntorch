@@ -160,7 +160,9 @@ class MaskedConv2d(nn.Module):
 
         ### fusion v2 ###
         fea_d2s[0, :, self.h_idx_1x1, self.w_idx_1x1] = fea_d2s_masked
-        fea_d = torch.cat([fea_d2d, fea_d2s], 1)
+        fea_d = torch.ones_like(fea_dense)
+        fea_d[:, torch.nonzero(self.ch_mask_round[..., 1], as_tuple=True), :, :] = fea_d2d
+        fea_d[:, torch.nonzero(self.ch_mask_round[..., 0], as_tuple=True), :, :] = fea_d2s
         
         return fea_d
     
@@ -168,7 +170,7 @@ class MaskedConv2d(nn.Module):
         '''
         :param x: [x[0], x[1]]
         x[0]: input feature [B, C, H, W]
-        x[1]: spatial mask [B, 1, H, W] -> 1: sparse
+        x[1]: spatial mask [B, 1, H, W] -> sparse channel spa_mask[:1]
         '''
 
         if self.training:
@@ -256,9 +258,6 @@ class LargeModule(nn.Module):
                     sparsity.append(spa_mask[:, :1, :, :] * ch_mask[..., 1].view(1, -1, 1, 1) + \
                             torch.ones_like(spa_mask[:, :1, :, :]) * ch_mask[..., 0].view(1, -1, 1, 1))                   
                     
-                # ch_masks = torch.cat(ch_masks, 2)
-                # sparsity = spa_mask[:, :1, :, :] * ch_masks[..., 0].view(1, -1, 1, 1) + \
-                #            torch.ones_like(spa_mask[:, :1, :, :]) * ch_masks[..., 1].view(1, -1, 1, 1)
                 sparsity = torch.cat(sparsity, 0)
                 return z, sparsity
             
