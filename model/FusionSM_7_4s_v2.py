@@ -160,9 +160,17 @@ class MaskedConv2d(nn.Module):
 
         ### fusion v2 ###
         fea_d2s[0, :, self.h_idx_1x1, self.w_idx_1x1] = fea_d2s_masked
+        sparse_indices = torch.nonzero(self.ch_mask_round[..., 1].squeeze())
+        dense_indices = torch.nonzero(self.ch_mask_round[..., 1].squeeze())
+        
         fea_d = torch.ones_like(fea_dense)
-        fea_d[0, torch.nonzero(self.ch_mask_round[0, :, 1], as_tuple=True), :, :] = fea_d2d[0, ...]
-        fea_d[0, torch.nonzero(self.ch_mask_round[0, :, 0], as_tuple=True), :, :] = fea_d2s[0, ...]
+        for idx in range(self.d_out_num[0]):
+            did = dense_indices[idx]
+            fea_d[0, did, ...] = fea_d2d[0, idx, ...]
+        for idx in range(self.s_out_num[0]):
+            assert(sid not in dense_indices), "Sparse and Dense overlapped"
+            sid = sparse_indices[idx]
+            fea_d[0, sid, ...] = fea_d2s[0, idx, ...]
         
         return fea_d
     
