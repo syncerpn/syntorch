@@ -126,6 +126,19 @@ core.cuda()
 
 if not args.skip_C:
 #train only the C branch
+
+    for param in core.parameters():
+        param.requires_grad = False
+
+    for param in core.branch[0].parameters():
+        param.requires_grad = True
+
+    for param in core.head.parameters():
+        param.requires_grad = True
+
+    for param in core.tail.parameters():
+        param.requires_grad = True
+
     all_params = []
     all_params += core.branch[0].parameters()
     all_params += core.head.parameters()
