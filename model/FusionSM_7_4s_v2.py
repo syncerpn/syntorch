@@ -161,8 +161,8 @@ class MaskedConv2d(nn.Module):
         ### fusion v2 ###
         fea_d2s[0, :, self.h_idx_1x1, self.w_idx_1x1] = fea_d2s_masked
         fea_d = torch.ones_like(fea_dense)
-        fea_d[0, torch.nonzero(self.ch_mask_round[..., 1], as_tuple=True), :, :] = fea_d2d[0, ...]
-        fea_d[0, torch.nonzero(self.ch_mask_round[..., 0], as_tuple=True), :, :] = fea_d2s[0, ...]
+        fea_d[0, torch.nonzero(self.ch_mask_round[0, :, 1], as_tuple=True), :, :] = fea_d2d[0, ...]
+        fea_d[0, torch.nonzero(self.ch_mask_round[0, :, 0], as_tuple=True), :, :] = fea_d2s[0, ...]
         
         return fea_d
     
