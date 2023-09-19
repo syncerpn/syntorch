@@ -21,6 +21,7 @@ torch.multiprocessing.set_sharing_strategy('file_system')
 
 
 parser.add_argument("--skip-C", action= "store_true", help="skip training C phase")
+parser.add_argument("--slambda", type=float, help='sparsity lambda', default=0.01)
 
 args = parser.parse_args()
 
@@ -52,7 +53,7 @@ def train_teacher(epoch, optim):
 
         loss_SR = loss_func(yf, yt)
         loss_sparsity = sparsity.mean() # we try to reduce the sparsity to perseve information from features
-        lambda_0 = 0.01
+        lambda_0 = args.slambda
         lambda_sparsity = lambda_0
         batch_loss = loss_SR + lambda_sparsity * loss_sparsity
         
