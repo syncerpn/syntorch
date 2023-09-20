@@ -159,17 +159,18 @@ if not args.skip_C:
         train_teacher(epoch, optim_phase_1)
 
 #train only the S branch
-sub_params = []
-sub_params += core.branch[1].parameters()
 
-optim_phase_2 = optimizer.create_optimizer(sub_params, args)
-lr_scheduler_phase_2 = utils.LrScheduler(optim_phase_2, args.lr, args.lr_decay_ratio, args.epoch_step)
+# sub_params = []
+# sub_params += core.branch[1].parameters()
 
-print('[INFO] train small branch with KD')
-for epoch in range(args.start_epoch, args.max_epochs+1):
-    lr_scheduler_phase_2.adjust_learning_rate(epoch)
+# optim_phase_2 = optimizer.create_optimizer(sub_params, args)
+# lr_scheduler_phase_2 = utils.LrScheduler(optim_phase_2, args.lr, args.lr_decay_ratio, args.epoch_step)
 
-    if epoch % 10 == 0:
-        test(epoch, [0, 1])
+# print('[INFO] train small branch with KD')
+# for epoch in range(args.start_epoch, args.max_epochs+1):
+#     lr_scheduler_phase_2.adjust_learning_rate(epoch)
 
-    train_kd(epoch, optim_phase_2)
+#     if epoch % 10 == 0:
+#         test(epoch, [0, 1])
+
+#     train_kd(epoch, optim_phase_2)
