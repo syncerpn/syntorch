@@ -284,11 +284,11 @@ class LargeModule(nn.Module):
                 for s in range(self.ns):
                     z, ch_mask = self.body[s]([z, spa_mask[:, 1:, ...]])
                     ch_masks.append(ch_mask.unsqueeze(2))
-                    sparsity.append(spa_mask[:, 1:, ...] * ch_mask[..., 0].view(1, -1, 1, 1) + \
+                    density.append(spa_mask[:, 1:, ...] * ch_mask[..., 0].view(1, -1, 1, 1) + \
                             torch.ones_like(spa_mask[:, 1:, ...]) * ch_mask[..., 1].view(1, -1, 1, 1))  
-                sparsity = torch.cat(sparsity, 0)            
+                density = torch.cat(density, 0)            
                 
-                return z, sparsity
+                return z, density
             
             if not self.training:
                 spa_mask = self.spa_mask(x)
