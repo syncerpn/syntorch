@@ -102,6 +102,7 @@ class MaskedConv2d(nn.Module):
         self.kernel_d2d = kernel_d2d
         self.kernel_d2s = kernel_d2s
         self.kernel_s = kernel_s
+        self.bias = self.conv.bias
 
 
     def _generate_indices(self): # apply spatial mask to sparse conv
@@ -152,16 +153,16 @@ class MaskedConv2d(nn.Module):
         fea_d2d = torch.mm(self.kernel_d2d[0].view(self.d_out_num[0], -1), fea_col) 
         fea_d2d = fea_d2d.view(1, self.d_out_num[0], fea_dense.size(2), fea_dense.size(3)) # 1, dout, H', W'
 
-        fea_d2s = torch.mm(self.kernel_d2s[0].view(self.s_out_num[0], -1), fea_col)
-        fea_d2s = fea_d2s.view(1, self.s_out_num[0], fea_dense.size(2), -1)
+        fea_d2s = torch.mm(torch.ones_like(self.kernel_d2s[0]).view(self.s_out_num[0], -1), fea_col)
+        fea_d2s = fea_d2s.view(1, self.s_out_num[0], fea_dense.size(2), fea_dense.size(3))
 
         # dense to sparse
         fea_d2s_masked = torch.mm(self.kernel_d2s[0], self._mask_select(fea_dense, k))
 
         ### fusion v2 ###
         fea_d2s[0, :, self.h_idx_1x1, self.w_idx_1x1] = fea_d2s_masked
-        sparse_indices = torch.nonzero(self.ch_mask_round[..., 0].squeeze(), as_tuple=True)
-        dense_indices = torch.nonzero(self.ch_mask_round[..., 1].squeeze(), as_tuple=True)
+        sparse_indices = torch.nonzero(self.ch_mask_round[..., 0].squeeze())
+        dense_indices = torch.nonzero(self.ch_mask_round[..., 1].squeeze())
         
         fea_d = torch.ones_like(fea_dense)
         for idx in range(self.d_out_num[0]):
@@ -171,7 +172,7 @@ class MaskedConv2d(nn.Module):
             sid = sparse_indices[idx]            
             assert(sid not in dense_indices), "Sparse and Dense overlapped"
             fea_d[0, sid, ...] = fea_d2s[0, idx, ...]
-        
+        fea_d = fea_d + self.bias
         return fea_d
     
     def forward(self, x):
@@ -194,8 +195,8 @@ class MaskedConv2d(nn.Module):
             # print(f"Channel mask layer 1: {ch_mask[:, :, 1:].view(1, -1, 1, 1).size()}")
             # print()            
             # fea = fea * ch_mask[:, :, :1] * spa_mask + fea * ch_mask[:, :, 1:]
-            fea = fea * ch_mask[:, :, 1:].view(1, -1, 1, 1) * spa_mask + \
-                  fea * ch_mask[:, :, :1].view(1, -1, 1, 1)
+            fea = fea * ch_mask[:, :, 1:].view(1, -1, 1, 1) + \
+                  fea * ch_mask[:, :, :1].view(1, -1, 1, 1) * spa_mask
 
                     
             fea = self.relu(fea)
@@ -261,7 +262,7 @@ class LargeModule(nn.Module):
                 spa_mask = self.spa_mask(z)
                 spa_mask = gumbel_softmax(spa_mask, 1, self.tau)                
                 for s in stages:
-                    z, ch_mask = self.body[s]([z, spa_mask[:, :1, ...]])
+                    z, ch_mask = self.body[s]([z, spa_mask[:, 1:, ...]])
                     ch_masks.append(ch_mask.unsqueeze(2))
                     sparsity.append(spa_mask[:, :1, :, :] * ch_mask[..., 1].view(1, -1, 1, 1) + \
                             torch.ones_like(spa_mask[:, :1, :, :]) * ch_mask[..., 0].view(1, -1, 1, 1))                   
@@ -272,12 +273,13 @@ class LargeModule(nn.Module):
             if not self.training:
                 print(f"x: {x.cpu().size()}")
                 spa_mask = self.spa_mask(x)
-                spa_mask = (spa_mask[:, :1, ...] > spa_mask[:, 1:, ...]).float()
+                spa_mask = (spa_mask[:, 1:, ...] > spa_mask[:, :1, ...]).float()
                 print(f"spa_mask: {spa_mask.cpu().mean()}")
 
                 for s in stages:
                     z, ch_mask = self.body[s]([z, spa_mask])
-                    self.calc_sparsity(ch_mask, spa_mask)
+                    sparsity.append(spa_mask[:, :1, :, :] * ch_mask[..., 1].view(1, -1, 1, 1) + \
+                            torch.ones_like(spa_mask[:, :1, :, :]) * ch_mask[..., 0].view(1, -1, 1, 1))     
                     ch_masks.append(ch_mask.unsqueeze(2))
                 # ch_masks = torch.cat(ch_masks, 2)
                 # self.calc_sparsity(ch_masks, spa_mask)
