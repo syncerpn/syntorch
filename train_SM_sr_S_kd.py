@@ -170,7 +170,6 @@ for epoch in range(args.start_epoch, args.max_epochs+1):
     lr_scheduler_phase_2.adjust_learning_rate(epoch)
 
     if epoch % 10 == 0:
-        core.eval()
         test(epoch, [0, 1])
 
     core.train()
