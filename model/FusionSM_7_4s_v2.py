@@ -269,8 +269,8 @@ class LargeModule(nn.Module):
 
                 for s in stages:
                     z, ch_mask = self.body[s]([z, spa_mask])
-                    density.append(spa_mask[:, 1:, :, :] * ch_mask[..., 0].view(1, -1, 1, 1) + \
-                            torch.ones_like(spa_mask[:, 1:, :, :]) * ch_mask[..., 1].view(1, -1, 1, 1))     
+                    density.append(spa_mask * ch_mask[..., 0].view(1, -1, 1, 1) + \
+                            torch.ones_like(spa_mask) * ch_mask[..., 1].view(1, -1, 1, 1))     
                     ch_masks.append(ch_mask.unsqueeze(2))
                 # ch_masks = torch.cat(ch_masks, 2)
                 # self.calc_sparsity(ch_masks, spa_mask)
@@ -298,8 +298,8 @@ class LargeModule(nn.Module):
 
                 for s in range(self.ns):
                     z, ch_mask = self.body[s]([z, spa_mask])
-                    density.append(spa_mask[:, 1:, :, :] * ch_mask[..., 0].view(1, -1, 1, 1) + \
-                            torch.ones_like(spa_mask[:, 1:, :, :]) * ch_mask[..., 1].view(1, -1, 1, 1))     
+                    density.append(spa_mask * ch_mask[..., 0].view(1, -1, 1, 1) + \
+                            torch.ones_like(spa_mask) * ch_mask[..., 1].view(1, -1, 1, 1))     
                     ch_masks.append(ch_mask.unsqueeze(2))
                 return z, ch_mask # ch_mask are not used in inference
     
