@@ -38,7 +38,7 @@ class ChannelAttention(nn.Module):
         return x * y
         
 class MaskedConv2d(nn.Module):
-    def __init__(self, in_channels, out_channels, kernel_size=3, stride=1, padding=1, bias=True, ns=4):
+    def __init__(self, in_channels, out_channels, kernel_size=3, stride=1, padding=1, bias=False, ns=4):
         super(MaskedConv2d, self).__init__()
 
         self.in_channels = in_channels
@@ -52,8 +52,6 @@ class MaskedConv2d(nn.Module):
 
         # body conv
         self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding, bias=bias)
-
-        self.conv.bias.data.fill_(0.01)
         nn.init.xavier_uniform_(self.conv.weight)
         
         # collect information after concat
@@ -102,7 +100,6 @@ class MaskedConv2d(nn.Module):
         self.kernel_d2d = kernel_d2d
         self.kernel_d2s = kernel_d2s
         self.kernel_s = kernel_s
-        self.bias = self.conv.bias
 
 
     def _generate_indices(self): # apply spatial mask to sparse conv
@@ -172,7 +169,7 @@ class MaskedConv2d(nn.Module):
             sid = sparse_indices[idx]            
             assert(sid not in dense_indices), "Sparse and Dense overlapped"
             fea_d[0, sid, ...] = fea_d2s[0, idx, ...]
-        fea_d = fea_d + self.bias
+            
         return fea_d
     
     def forward(self, x):
