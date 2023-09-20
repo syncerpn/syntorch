@@ -74,8 +74,8 @@ class MaskedConv2d(nn.Module):
            
         self.d_in_num.append(self.in_channels)
         self.s_in_num.append(0)
-        self.d_out_num.append(int(ch_mask[0, :, 1].sum(0)))
-        self.s_out_num.append(int(ch_mask[0, :, 0].sum(0)))
+        self.d_out_num.append(int(ch_mask[0, :, 0].sum(0)))
+        self.s_out_num.append(int(ch_mask[0, :, 1].sum(0)))
         print(f"d out num: {self.d_out_num}")
         print(f"s out num: {self.s_out_num}")
 
@@ -91,11 +91,11 @@ class MaskedConv2d(nn.Module):
 
         kernel_s.append([])
         if self.d_out_num[0] > 0:
-            kernel_d2d.append(self.conv.weight[ch_mask[0, :, 1]==1, ...].view(self.d_out_num[0], -1))
+            kernel_d2d.append(self.conv.weight[ch_mask[0, :, 0]==1, ...].view(self.d_out_num[0], -1))
         else:
             kernel_d2d.append([])
         if self.s_out_num[0] > 0:
-            kernel_d2s.append(self.conv.weight[ch_mask[0, :, 0]==1, ...].view(self.s_out_num[0], -1))
+            kernel_d2s.append(self.conv.weight[ch_mask[0, :, 1]==1, ...].view(self.s_out_num[0], -1))
 
         self.kernel_d2d = kernel_d2d
         self.kernel_d2s = kernel_d2s
@@ -158,8 +158,8 @@ class MaskedConv2d(nn.Module):
 
         ### fusion v2 ###
         fea_d2s[0, :, self.h_idx_1x1, self.w_idx_1x1] = fea_d2s_masked
-        sparse_indices = torch.nonzero(self.ch_mask_round[..., 0].squeeze())
-        dense_indices = torch.nonzero(self.ch_mask_round[..., 1].squeeze())
+        sparse_indices = torch.nonzero(self.ch_mask_round[..., 1].squeeze())
+        dense_indices = torch.nonzero(self.ch_mask_round[..., 0].squeeze())
         
         fea_d = torch.ones_like(fea_dense)
         for idx in range(self.d_out_num[0]):
@@ -192,8 +192,8 @@ class MaskedConv2d(nn.Module):
             # print(f"Channel mask layer 1: {ch_mask[:, :, 1:].view(1, -1, 1, 1).size()}")
             # print()            
             # fea = fea * ch_mask[:, :, :1] * spa_mask + fea * ch_mask[:, :, 1:]
-            fea = fea * ch_mask[:, :, 1:].view(1, -1, 1, 1) + \
-                  fea * ch_mask[:, :, :1].view(1, -1, 1, 1) * spa_mask
+            fea = fea * ch_mask[:, :, 1:].view(1, -1, 1, 1) * spa_mask + \
+                  fea * ch_mask[:, :, :1].view(1, -1, 1, 1)
 
                     
             fea = self.relu(fea)
@@ -261,8 +261,8 @@ class LargeModule(nn.Module):
                 for s in stages:
                     z, ch_mask = self.body[s]([z, spa_mask[:, 1:, ...]])
                     ch_masks.append(ch_mask.unsqueeze(2))
-                    sparsity.append(spa_mask[:, :1, :, :] * ch_mask[..., 1].view(1, -1, 1, 1) + \
-                            torch.ones_like(spa_mask[:, :1, :, :]) * ch_mask[..., 0].view(1, -1, 1, 1))                   
+                    sparsity.append(spa_mask[:, 1:, :, :] * ch_mask[..., 1].view(1, -1, 1, 1) + \
+                            torch.ones_like(spa_mask[:, 1:, :, :]) * ch_mask[..., 0].view(1, -1, 1, 1))                   
                     
                 sparsity = torch.cat(sparsity, 0)
                 return z, sparsity
@@ -275,8 +275,8 @@ class LargeModule(nn.Module):
 
                 for s in stages:
                     z, ch_mask = self.body[s]([z, spa_mask])
-                    sparsity.append(spa_mask[:, :1, :, :] * ch_mask[..., 1].view(1, -1, 1, 1) + \
-                            torch.ones_like(spa_mask[:, :1, :, :]) * ch_mask[..., 0].view(1, -1, 1, 1))     
+                    sparsity.append(spa_mask * ch_mask[..., 1].view(1, -1, 1, 1) + \
+                            torch.ones_like(spa_mask) * ch_mask[..., 0].view(1, -1, 1, 1))     
                     ch_masks.append(ch_mask.unsqueeze(2))
                 # ch_masks = torch.cat(ch_masks, 2)
                 # self.calc_sparsity(ch_masks, spa_mask)
@@ -290,8 +290,8 @@ class LargeModule(nn.Module):
                 for s in range(self.ns):
                     z, ch_mask = self.body[s]([z, spa_mask[:, :1, ...]])
                     ch_masks.append(ch_mask.unsqueeze(2))
-                    sparsity.append(spa_mask[:, :1, ...] * ch_mask[..., 1].view(1, -1, 1, 1) + \
-                            torch.ones_like(spa_mask[:, :1, ...]) * ch_mask[..., 0].view(1, -1, 1, 1))  
+                    sparsity.append(spa_mask[:, 1:, ...] * ch_mask[..., 1].view(1, -1, 1, 1) + \
+                            torch.ones_like(spa_mask[:, 1:, ...]) * ch_mask[..., 0].view(1, -1, 1, 1))  
                 sparsity = torch.cat(sparsity, 0)            
                 
                 return z, sparsity
@@ -299,12 +299,13 @@ class LargeModule(nn.Module):
             if not self.training:
                 spa_mask = self.spa_mask(x)
                 print(f"original spa mask: {spa_mask.cpu().mean()}")
-                spa_mask = (spa_mask[:, :1, ...] > spa_mask[:, 1:, ...]).float()
+                spa_mask = (spa_mask[:, 1:, ...] > spa_mask[:, :1, ...]).float()
                 print(f"spa_mask: {spa_mask.cpu().mean()}")
 
                 for s in range(self.ns):
                     z, ch_mask = self.body[s]([z, spa_mask])
-                    self.calc_sparsity(ch_mask, spa_mask)
+                    sparsity.append(spa_mask * ch_mask[..., 1].view(1, -1, 1, 1) + \
+                            torch.ones_like(spa_mask) * ch_mask[..., 0].view(1, -1, 1, 1)) 
                 return z, ch_mask # ch_mask are not used in inference
     
 class SmallModule(nn.Module):
