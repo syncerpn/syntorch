@@ -30,6 +30,8 @@ if args.template is not None:
     template.set_template(args)
 
 def compare_output(branch):
+    perf_trains = []
+    perf_vals = []
     for batch_idx, (x, yt) in tqdm.tqdm(enumerate(XYtest), total= len(XYtest)):
         write_to_file(f"Batch {batch_idx}", save_output_file)
         x = x.cuda()
@@ -41,6 +43,7 @@ def compare_output(branch):
             yf_train, sparsity = core.forward(x, branch)
             perf_train = evaluation.calculate(args, yf_train, yt)
         write_to_file(f"Perf train: {perf_train}", save_output_file)
+        perf_trains.append(perf_train)
             
         # evaluation forward
         core.eval()
@@ -48,10 +51,16 @@ def compare_output(branch):
             yf_val, _ = core.forward(x, branch)
             perf_val = evaluation.calculate(args, yf_val, yt)
         write_to_file(f"Perf val: {perf_val}", save_output_file)
+        perf_vals.append(perf_val)
             
-        write_to_file(f"Sparsity {batch_idx}: {sparsity.mean()}", save_output_file)
-        write_to_file(f"Check similarity {batch_idx}: {(torch.abs(yf_val - yf_train) <= 1e-1).float().mean()}", save_output_file)
-        write_to_file(f"Mean difference {batch_idx}: {torch.abs(yf_val - yf_train).mean()}", save_output_file)
+        write_to_file(f"Sparsity: {sparsity.mean()}", save_output_file)
+        write_to_file(f"Check similarity: {(torch.abs(yf_val - yf_train) <= 1e-1).float().mean()}", save_output_file)
+        write_to_file(f"Mean difference: {torch.abs(yf_val - yf_train).mean()}", save_output_file)
+        
+    perf_trains = torch.stack(perf_trains, 0)
+    perf_vals = torch.stack(perf_vals, 0)
+    write_to_file(f"Mean perf train: {perf_trains.cpu().mean()}", save_output_file)
+    write_to_file(f"Mean perf val: {perf_vals.cpu().mean()}", save_output_file)
        
 # load test data
 print('[INFO] load testset "%s" from %s' % (args.testset_tag, args.testset_dir))
