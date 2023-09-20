@@ -54,7 +54,7 @@ def train_teacher(epoch, optim):
         loss_SR = loss_func(yf, yt)
         loss_sparsity = sparsity.mean() # we try to reduce the sparsity to perseve information from features
         lambda_0 = args.slambda
-        lambda_sparsity = 0.0 if epoch <= 45 else 0.01
+        lambda_sparsity = 0.0 if epoch <= 45 else 0.05
         batch_loss = loss_SR + lambda_sparsity * loss_sparsity
         
         optim.zero_grad()
@@ -155,7 +155,7 @@ if not args.skip_C:
 
         if epoch % 10 == 0:
             test(epoch, [0])
-            
+
         train_teacher(epoch, optim_phase_1)
 
 #train only the S branch
@@ -172,5 +172,4 @@ for epoch in range(args.start_epoch, args.max_epochs+1):
     if epoch % 10 == 0:
         test(epoch, [0, 1])
 
-    core.train()
     train_kd(epoch, optim_phase_2)
