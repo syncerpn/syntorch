@@ -220,7 +220,7 @@ class MaskedConv2d(nn.Module):
             fea_d = self._sparse_conv(fea_d, k = 3)
             out = self.relu(fea_d)
           
-            return out, self.ch_mask
+            return out, self.ch_mask_round
         
 class LargeModule(nn.Module):
     def __init__ (self, ns):
@@ -306,15 +306,15 @@ class LargeModule(nn.Module):
             if not self.training:
                 spa_mask = self.spa_mask(x)
                 print(f"original spa mask: {spa_mask.cpu().mean()}")
-                spa_mask = (spa_mask[:, 1:, ...] > spa_mask[:, :1, ...]).float()
-                print(f"spa_mask: {spa_mask.cpu().mean()}")
+                _spa_mask = (spa_mask[:, 1:, ...] > spa_mask[:, :1, ...]).float()
+                print(f"spa_mask: {_spa_mask.cpu().mean()}")
 
                 for s in range(self.ns):
-                    z, ch_mask = self.body[s]([z, spa_mask])
-                    sparsity.append(spa_mask * ch_mask[..., 1].view(1, -1, 1, 1) + \
-                            torch.ones_like(spa_mask) * ch_mask[..., 0].view(1, -1, 1, 1)) 
+                    z, ch_mask = self.body[s]([z, _spa_mask])
+                    sparsity.append(_spa_mask * ch_mask[..., 1].view(1, -1, 1, 1) + \
+                            torch.ones_like(_spa_mask) * ch_mask[..., 0].view(1, -1, 1, 1)) 
                 sparsity = torch.cat(sparsity, 0)
-                return z, sparsity # ch_mask are not used in inference
+                return z, sparsity 
     
 class SmallModule(nn.Module):
     def __init__(self, ns):
