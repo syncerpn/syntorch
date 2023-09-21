@@ -104,7 +104,7 @@ class MaskedConv2d(nn.Module):
 
     def _generate_indices(self): # apply spatial mask to sparse conv
         A = torch.arange(3).to(self.spa_mask.device).view(-1, 1, 1)
-        mask_indices = torch.nonzero(self.spa_mask.squeeze()) # in this function, 1 is sparse
+        mask_indices = torch.nonzero(self.spa_mask.squeeze()) # in this function, 1 is dense
 
         # indices: dense to sparse (1x1)
         self.h_idx_1x1 = mask_indices[:, 0] #x index of sparse positions
@@ -151,6 +151,7 @@ class MaskedConv2d(nn.Module):
         fea_d2d = fea_d2d.view(1, self.d_out_num[0], fea_dense.size(2), fea_dense.size(3)) # 1, dout, H', W'
 
         fea_d2s = torch.mm(torch.ones_like(self.kernel_d2s[0]).view(self.s_out_num[0], -1), fea_col)
+        fea_d2s = torch.mm(self.kernel_d2s[0].view(self.s_out_num[0], -1), fea_col) 
         fea_d2s = fea_d2s.view(1, self.s_out_num[0], fea_dense.size(2), fea_dense.size(3))
 
         # dense to sparse
