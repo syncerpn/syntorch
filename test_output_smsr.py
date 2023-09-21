@@ -40,7 +40,7 @@ def compare_output(branch):
         # training forward
         core.train()
         with torch.no_grad():
-            yf_train, sparsity = core.forward(x, branch)
+            yf_train, sparsity_train = core.forward(x, branch)
             perf_train = evaluation.calculate(args, yf_train, yt)
         write_to_file(f"Perf train: {perf_train}", save_output_file)
         perf_trains.append(perf_train)
@@ -48,17 +48,19 @@ def compare_output(branch):
         # evaluation forward
         core.eval()
         with torch.no_grad():
-            yf_val, _ = core.forward(x, branch)
+            yf_val, sparsity_val = core.forward(x, branch)
             perf_val = evaluation.calculate(args, yf_val, yt)
         write_to_file(f"Perf val: {perf_val}", save_output_file)
         perf_vals.append(perf_val)
             
-        write_to_file(f"Sparsity: {sparsity.mean()}", save_output_file)
+        write_to_file(f"Sparsity train: {sparsity_train.mean()}", save_output_file)
+        write_to_file(f"Sparsity val: {sparsity_val.mean()}", save_output_file)
         write_to_file(f"Check similarity: {(torch.abs(yf_val - yf_train) <= 1e-1).float().mean()}", save_output_file)
         write_to_file(f"Mean difference: {torch.abs(yf_val - yf_train).mean()}", save_output_file)
         
     perf_trains = torch.stack(perf_trains, 0)
     perf_vals = torch.stack(perf_vals, 0)
+    write_to_file(50*"=", save_output_file)
     write_to_file(f"Mean perf train: {perf_trains.cpu().mean()}", save_output_file)
     write_to_file(f"Mean perf val: {perf_vals.cpu().mean()}", save_output_file)
        

@@ -284,9 +284,10 @@ class LargeModule(nn.Module):
                     sparsity.append(spa_mask * ch_mask[..., 1].view(1, -1, 1, 1) + \
                             torch.ones_like(spa_mask) * ch_mask[..., 0].view(1, -1, 1, 1))     
                     ch_masks.append(ch_mask.unsqueeze(2))
+                sparsity = torch.cat(sparsity, 0)
                 # ch_masks = torch.cat(ch_masks, 2)
                 # self.calc_sparsity(ch_masks, spa_mask)
-                return z, ch_mask # ch_mask are not used in inference
+                return z, sparsity # ch_mask are not used in inference
         
         else:
            
@@ -312,7 +313,8 @@ class LargeModule(nn.Module):
                     z, ch_mask = self.body[s]([z, spa_mask])
                     sparsity.append(spa_mask * ch_mask[..., 1].view(1, -1, 1, 1) + \
                             torch.ones_like(spa_mask) * ch_mask[..., 0].view(1, -1, 1, 1)) 
-                return z, ch_mask # ch_mask are not used in inference
+                sparsity = torch.cat(sparsity, 0)
+                return z, sparsity # ch_mask are not used in inference
     
 class SmallModule(nn.Module):
     def __init__(self, ns):
