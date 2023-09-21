@@ -151,7 +151,7 @@ class MaskedConv2d(nn.Module):
         fea_d2d = fea_d2d.view(1, self.d_out_num[0], fea_dense.size(2), fea_dense.size(3)) # 1, dout, H', W'
 
         fea_d2s = torch.mm(torch.ones_like(self.kernel_d2s[0]).view(self.s_out_num[0], -1), fea_col)
-        fea_d2s = torch.mm(self.kernel_d2s[0].view(self.s_out_num[0], -1), fea_col) 
+        # fea_d2s = torch.mm(self.kernel_d2s[0].view(self.s_out_num[0], -1), fea_col) 
         fea_d2s = fea_d2s.view(1, self.s_out_num[0], fea_dense.size(2), fea_dense.size(3))
 
         # dense to sparse
