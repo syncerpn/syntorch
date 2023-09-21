@@ -150,26 +150,31 @@ class MaskedConv2d(nn.Module):
         fea_d2d = torch.mm(self.kernel_d2d[0].view(self.d_out_num[0], -1), fea_col) 
         fea_d2d = fea_d2d.view(1, self.d_out_num[0], fea_dense.size(2), fea_dense.size(3)) # 1, dout, H', W'
 
-        fea_d2s = torch.mm(torch.ones_like(self.kernel_d2s[0]).view(self.s_out_num[0], -1), fea_col)
-        # fea_d2s = torch.mm(self.kernel_d2s[0].view(self.s_out_num[0], -1), fea_col) 
-        fea_d2s = fea_d2s.view(1, self.s_out_num[0], fea_dense.size(2), fea_dense.size(3))
+        if self.s_out_num[0] > 0:
+            fea_d2s = torch.mm(torch.ones_like(self.kernel_d2s[0]).view(self.s_out_num[0], -1), fea_col)
+            # fea_d2s = torch.mm(self.kernel_d2s[0].view(self.s_out_num[0], -1), fea_col) 
+            fea_d2s = fea_d2s.view(1, self.s_out_num[0], fea_dense.size(2), fea_dense.size(3))
 
-        # dense to sparse
-        fea_d2s_masked = torch.mm(self.kernel_d2s[0], self._mask_select(fea_dense, k))
-
-        ### fusion v2 ###
-        fea_d2s[0, :, self.h_idx_1x1, self.w_idx_1x1] = fea_d2s_masked
-        sparse_indices = torch.nonzero(self.ch_mask_round[..., 1].squeeze())
-        dense_indices = torch.nonzero(self.ch_mask_round[..., 0].squeeze())
+            # dense to sparse
+            fea_d2s_masked = torch.mm(self.kernel_d2s[0], self._mask_select(fea_dense, k))
         
-        fea_d = torch.ones_like(fea_dense)
-        for idx in range(self.d_out_num[0]):
-            did = dense_indices[idx]
-            fea_d[0, did, ...] = fea_d2d[0, idx, ...]
-        for idx in range(self.s_out_num[0]):
-            sid = sparse_indices[idx]            
-            assert(sid not in dense_indices), "Sparse and Dense overlapped"
-            fea_d[0, sid, ...] = fea_d2s[0, idx, ...]
+
+            ### fusion v2 ###
+            fea_d2s[0, :, self.h_idx_1x1, self.w_idx_1x1] = fea_d2s_masked
+            sparse_indices = torch.nonzero(self.ch_mask_round[..., 1].squeeze())
+            dense_indices = torch.nonzero(self.ch_mask_round[..., 0].squeeze())
+            
+            fea_d = torch.ones_like(fea_dense)
+            for idx in range(self.d_out_num[0]):
+                did = dense_indices[idx]
+                fea_d[0, did, ...] = fea_d2d[0, idx, ...]
+            for idx in range(self.s_out_num[0]):
+                sid = sparse_indices[idx]            
+                assert(sid not in dense_indices), "Sparse and Dense overlapped"
+                fea_d[0, sid, ...] = fea_d2s[0, idx, ...]
+                
+        else:
+            fea_d = fea_d2d
             
         return fea_d
     
