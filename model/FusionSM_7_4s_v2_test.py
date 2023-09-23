@@ -206,18 +206,12 @@ class MaskedConv2d(nn.Module):
 
         if self.training:
             spa_mask = x[1]
-            ch_mask = gumbel_softmax(self.ch_mask, 2, self.tau)
-            ch_mask = ch_mask.round()
+            # ch_mask = gumbel_softmax(self.ch_mask, 2, self.tau)
+            ch_mask = self.ch_mask.softmax(2).round()
 
             fea = x[0]
             fea = self.conv(fea)
-            # print(f"Fea size: {fea.size()}")
-            # print(f"Channel size: {ch_mask.size()}")
-            # print(f"Spatial mask: {spa_mask.size()}")
-            # print(f"Channel mask layer 0: {ch_mask[:, :, :1].view(1, -1, 1, 1).size()}")
-            # print(f"Channel mask layer 1: {ch_mask[:, :, 1:].view(1, -1, 1, 1).size()}")
-            # print()            
-            # fea = fea * ch_mask[:, :, :1] * spa_mask + fea * ch_mask[:, :, 1:]
+
             fea = fea * ch_mask[:, :, 1:].view(1, -1, 1, 1) * spa_mask + \
                   fea * ch_mask[:, :, :1].view(1, -1, 1, 1)
 
