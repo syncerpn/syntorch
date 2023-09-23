@@ -116,7 +116,7 @@ def set_template(args):
 		args.weight_decay=0
 		args.batch_size=1024
 		args.epoch_step=100
-		args.max_epochs=50
+		args.max_epochs=200
 		args.loss='L1'
 		args.optimizer='Adam'
 		args.max_load=0
