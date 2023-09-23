@@ -38,6 +38,8 @@ def compare_output(branch):
         yt = yt.cuda()
         
         # training forward
+        core = model.config(args)
+        core.cuda()
         core.train()
         with torch.no_grad():
             yf_train, sparsity_train = core.forward(x, branch)
@@ -46,6 +48,8 @@ def compare_output(branch):
         perf_trains.append(perf_train)
             
         # evaluation forward
+        core = model.config(args)
+        core.cuda()
         core.eval()
         with torch.no_grad():
             yf_val, sparsity_val = core.forward(x, branch)
