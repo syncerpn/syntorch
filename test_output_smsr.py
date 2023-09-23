@@ -47,7 +47,6 @@ def compare_output(branch):
             
         # evaluation forward
         core.eval()
-        core._prepare()
         with torch.no_grad():
             yf_val, sparsity_val = core.forward(x, branch)
             perf_val = evaluation.calculate(args, yf_val, yt)

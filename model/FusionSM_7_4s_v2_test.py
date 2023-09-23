@@ -219,7 +219,6 @@ class MaskedConv2d(nn.Module):
             return fea, ch_mask
         
         if not self.training:
-            self._prepare()
             self.spa_mask = x[1]
 
             # generate indices
@@ -264,6 +263,8 @@ class LargeModule(nn.Module):
         z = x
         ch_masks = []
         sparsity = []
+        for body in self.body:
+            body._prepare()
         if stages:
             print(f"x: {x.cpu().size()}")
             spa_mask = self.spa_mask(x)
@@ -359,9 +360,6 @@ class FusionSM_7_4s_v2_test(nn.Module): #hardcode
         for i in range(len(self.tail)):
             self.tail[i].bias.data.fill_(0.01)
             nn.init.xavier_uniform_(self.tail[i].weight)
-            
-    def _prepare(self):
-        self.branch[0]._prepare()
 
     def forward(self, x, branch=0, fea_out=False):
         z = x
