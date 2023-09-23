@@ -396,6 +396,10 @@ class FusionSM_7_4s_v2(nn.Module): #hardcode
         for i in range(len(self.tail)):
             self.tail[i].bias.data.fill_(0.01)
             nn.init.xavier_uniform_(self.tail[i].weight)
+            
+    def _prepare(self):
+        self.branch[0]._prepare()
+                
 
     def forward(self, x, branch=0, fea_out=False):
         z = x

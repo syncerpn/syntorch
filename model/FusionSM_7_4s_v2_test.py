@@ -211,11 +211,9 @@ class MaskedConv2d(nn.Module):
 
             fea = x[0]
             fea = self.conv(fea)
-
             fea = fea * ch_mask[:, :, 1:].view(1, -1, 1, 1) * spa_mask + \
                   fea * ch_mask[:, :, :1].view(1, -1, 1, 1)
 
-                    
             fea = self.relu(fea)
 
             return fea, ch_mask
@@ -258,13 +256,6 @@ class LargeModule(nn.Module):
         
     def _update_tau(self, tau):
         self.tau = tau
-        
-    def calc_sparsity(self, ch_mask, spa_mask):
-        sparsity = spa_mask[:, :1, :, :] * ch_mask[..., 1].view(1, -1, 1, 1) + \
-                    torch.ones_like(spa_mask[:, :1, :, :]) * ch_mask[..., 0].view(1, -1, 1, 1)  
-        self.sparsities.append(sparsity)
-        return sparsity
-        
 
     def forward(self, x, stages=[]):
         # TODO: Write forward
@@ -280,10 +271,9 @@ class LargeModule(nn.Module):
             print(f"spa_mask: {spa_mask.cpu().mean()}")
 
             for s in stages:
-                z, ch_mask = self.body[s]([z, spa_mask])
+                z, ch_mask = self.body[s]([z, _spa_mask])
                 sparsity.append(_spa_mask * ch_mask[..., 1].view(1, -1, 1, 1) + \
                         torch.ones_like(_spa_mask) * ch_mask[..., 0].view(1, -1, 1, 1))     
-                ch_masks.append(ch_mask.unsqueeze(2))
             sparsity = torch.cat(sparsity, 0)
             # ch_masks = torch.cat(ch_masks, 2)
             # self.calc_sparsity(ch_masks, spa_mask)
@@ -369,6 +359,9 @@ class FusionSM_7_4s_v2_test(nn.Module): #hardcode
         for i in range(len(self.tail)):
             self.tail[i].bias.data.fill_(0.01)
             nn.init.xavier_uniform_(self.tail[i].weight)
+            
+    def _prepare(self):
+        self.branch[0]._prepare()
 
     def forward(self, x, branch=0, fea_out=False):
         z = x

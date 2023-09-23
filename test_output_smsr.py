@@ -38,8 +38,6 @@ def compare_output(branch):
         yt = yt.cuda()
         
         # training forward
-        core = model.config(args)
-        core.cuda()
         core.train()
         with torch.no_grad():
             yf_train, sparsity_train = core.forward(x, branch)
@@ -48,17 +46,16 @@ def compare_output(branch):
         perf_trains.append(perf_train)
             
         # evaluation forward
-        core = model.config(args)
-        core.cuda()
         core.eval()
+        core._prepare()
         with torch.no_grad():
             yf_val, sparsity_val = core.forward(x, branch)
             perf_val = evaluation.calculate(args, yf_val, yt)
         write_to_file(f"Perf val: {perf_val}", save_output_file)
         perf_vals.append(perf_val)
             
-        write_to_file(f"Sparsity train: {sparsity_train.mean()}", save_output_file)
-        write_to_file(f"Sparsity val: {sparsity_val.mean()}", save_output_file)
+        write_to_file(f"Density train: {sparsity_train.mean()}", save_output_file)
+        write_to_file(f"Density val: {sparsity_val.mean()}", save_output_file)
         write_to_file(f"Check similarity: {(torch.abs(yf_val - yf_train) <= 1e-1).float().mean()}", save_output_file)
         write_to_file(f"Mean difference: {torch.abs(yf_val - yf_train).mean()}", save_output_file)
         
