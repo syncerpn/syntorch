@@ -256,14 +256,7 @@ class LargeModule(nn.Module):
             self.body.append(MaskedConv2d(16, 16))
         
     def _update_tau(self, tau):
-        self.tau = tau
-        
-    def calc_sparsity(self, ch_mask, spa_mask):
-        sparsity = spa_mask[:, :1, :, :] * ch_mask[..., 1].view(1, -1, 1, 1) + \
-                    torch.ones_like(spa_mask[:, :1, :, :]) * ch_mask[..., 0].view(1, -1, 1, 1)  
-        self.sparsities.append(sparsity)
-        return sparsity
-        
+        self.tau = tau     
 
     def forward(self, x, stages=[]):
         # TODO: Write forward
@@ -272,8 +265,10 @@ class LargeModule(nn.Module):
         z = x
         ch_masks = []
         sparsity = []
+        for body in self.body:
+            body._prepare()
+            
         if stages:
-           
             if self.training:
                 spa_mask = self.spa_mask(z)
                 spa_mask = gumbel_softmax(spa_mask, 1, self.tau)                
@@ -303,7 +298,6 @@ class LargeModule(nn.Module):
                 return z, sparsity # ch_mask are not used in inference
         
         else:
-           
             if self.training:
                 spa_mask = self.spa_mask(z)
                 spa_mask = gumbel_softmax(spa_mask, 1, self.tau)           
