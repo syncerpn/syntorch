@@ -402,7 +402,7 @@ class FusionSM_7_4s_v2_test(nn.Module): #hardcode
         z = F.relu(self.head[1](z))
 
         # print(f"fea map: {z.cpu().size()}")       
-        branch_fea, mask_or_feas = self.branch[branch](z, masked)
+        branch_fea, mask_or_feas = self.branch[branch](z, masked=masked)
         
         z = F.relu(self.tail[0](branch_fea))
         z = self.tail[1](z)

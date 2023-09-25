@@ -116,4 +116,4 @@ XYtest = torchdata.DataLoader(testset, batch_size=batch_size_test, shuffle=False
 core = model.config(args)
 core.cuda()
 
-compare_output(0)
+compare_psnr_by_dense(0)
