@@ -152,6 +152,7 @@ if not args.skip_C:
     lr_scheduler_phase_1 = utils.LrScheduler(optim_phase_1, args.lr, args.lr_decay_ratio, args.epoch_step)
 
     print('[INFO] train large branch first')
+    print(f'[INFO] train large branch for {args.max_epochs}')
     for epoch in range(args.start_epoch, args.max_epochs+1):
         lr_scheduler_phase_1.adjust_learning_rate(epoch)
 
