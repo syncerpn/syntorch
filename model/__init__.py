@@ -35,7 +35,7 @@ def config(args):
     if args.checkpoint is not None:
         print("[INFO] load core from torch checkpoint: " + args.checkpoint)
         checkpoint_data = torch.load(args.checkpoint)
-        core.load_state_dict(checkpoint_data, strict=False)
+        core.load_state_dict(checkpoint_data, strict=True)
 
     return core
 
