@@ -220,7 +220,6 @@ class MaskedConv2d(nn.Module):
             return fea, ch_mask
         
         if not self.training:
-            self._prepare()
             self.spa_mask = x[1]
 
             # generate indices
