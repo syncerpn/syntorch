@@ -327,7 +327,7 @@ class LargeModule(nn.Module):
             sparsity = torch.cat(sparsity, 0)
         self.ch_masks = ch_masks
         
-        return z, sparsity
+        return z, sparsity. self.ch_masks
 class SmallModule(nn.Module):
     def __init__(self, ns):
         super(SmallModule, self).__init__()
