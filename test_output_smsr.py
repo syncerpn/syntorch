@@ -63,6 +63,50 @@ def compare_output(branch):
     write_to_file(50*"=", save_output_file)
     write_to_file(f"Mean perf train: {perf_trains.cpu().mean()}", save_output_file)
     write_to_file(f"Mean perf val: {perf_vals.cpu().mean()}", save_output_file)
+    
+    
+def compare_psnr_by_dense(branch):
+    perf_trains = []
+    perf_vals = []
+    for batch_idx, (x, yt) in tqdm.tqdm(enumerate(XYtest), total= len(XYtest)):
+        write_to_file(f"Batch {batch_idx}", save_output_file)
+        x = x.cuda()
+        yt = yt.cuda()
+        
+        # training forward
+        core.train()
+        with torch.no_grad():
+            yf_train, _ = core.forward(x, branch, masked=False)
+            perf_train = evaluation.calculate(args, yf_train, yt)
+        write_to_file(f"PSNR with mask removed: {perf_train}", save_output_file)
+        perf_trains.append(perf_train)
+        
+        # training forward - soft mask
+        core.train()
+        with torch.no_grad():
+            yf_train, _ = core.forward(x, branch, masked=True)
+            perf_train = evaluation.calculate(args, yf_train, yt)
+        write_to_file(f"PSNR with soft mask: {perf_train}", save_output_file)
+        perf_trains.append(perf_train)
+            
+        # evaluation forward
+        core.eval()
+        with torch.no_grad():
+            yf_val, sparsity_val = core.forward(x, branch)
+            perf_val = evaluation.calculate(args, yf_val, yt)
+        write_to_file(f"PSNR with hard mask: {perf_val}", save_output_file)
+        perf_vals.append(perf_val)
+            
+        # write_to_file(f"Density train: {sparsity_train.mean()}", save_output_file)
+        write_to_file(f"Density val: {sparsity_val.mean()}", save_output_file)
+        write_to_file(f"Check similarity: {(torch.abs(yf_val - yf_train) <= 1e-1).float().mean()}", save_output_file)
+        write_to_file(f"Mean difference: {torch.abs(yf_val - yf_train).mean()}", save_output_file)
+        
+    perf_trains = torch.stack(perf_trains, 0)
+    perf_vals = torch.stack(perf_vals, 0)
+    write_to_file(50*"=", save_output_file)
+    write_to_file(f"Mean perf train: {perf_trains.cpu().mean()}", save_output_file)
+    write_to_file(f"Mean perf val: {perf_vals.cpu().mean()}", save_output_file)
        
 # load test data
 print('[INFO] load testset "%s" from %s' % (args.testset_tag, args.testset_dir))

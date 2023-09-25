@@ -197,7 +197,7 @@ class MaskedConv2d(nn.Module):
             
         return fea_d
     
-    def forward(self, x):
+    def forward(self, x, masked=True):
         '''
         :param x: [x[0], x[1]]
         x[0]: input feature [B, C, H, W]
@@ -205,20 +205,29 @@ class MaskedConv2d(nn.Module):
         '''
 
         if self.training:
-            spa_mask = x[1]
-            # ch_mask = gumbel_softmax(self.ch_mask, 2, self.tau)
-            ch_mask = self.ch_mask.softmax(2).round()
+            if masked:
+                # Soft mask
+                spa_mask = x[1]
+                ch_mask = gumbel_softmax(self.ch_mask, 2, self.tau)
 
-            fea = x[0]
-            fea = self.conv(fea)
-            # fea = fea * ch_mask[:, :, 1:].view(1, -1, 1, 1) * spa_mask + \
-            #       fea * ch_mask[:, :, :1].view(1, -1, 1, 1)
+                fea = x[0]
+                fea = self.conv(fea)
+                fea = fea * ch_mask[:, :, 1:].view(1, -1, 1, 1) * spa_mask + \
+                      fea * ch_mask[:, :, :1].view(1, -1, 1, 1)
 
-            fea = self.relu(fea)
-
+                fea = self.relu(fea)
+            else:
+                # Remove mask
+                spa_mask = x[1]
+                ch_mask = self.ch_mask.softmax(2).round()
+                fea = x[0]
+                fea = self.conv(fea)
+                fea = self.relu(fea)
+                
             return fea, ch_mask
         
         if not self.training:
+            # Hard mask
             self.spa_mask = x[1]
 
             # generate indices
@@ -255,8 +264,7 @@ class LargeModule(nn.Module):
         
     def _update_tau(self, tau):
         self.tau = tau
-
-    def forward(self, x, stages=[]):
+    def forward(self, x, stages=[], masked=True):
         # TODO: Write forward
         for s in stages:
             assert (s < self.ns) and (s >= 0), f"[ERROR] invalid stage {s}"
@@ -265,29 +273,56 @@ class LargeModule(nn.Module):
         sparsity = []
         for body in self.body:
             body._prepare()
-        if stages:
-            print(f"x: {x.cpu().size()}")
-            spa_mask = self.spa_mask(x)
-            _spa_mask = (spa_mask[:, 1:, ...] > spa_mask[:, :1, ...]).float()
-            print(f"spa_mask: {spa_mask.cpu().mean()}")
+            
+        # if stages:
+        #     if self.training:
+        #         spa_mask = self.spa_mask(z)
+        #         spa_mask = gumbel_softmax(spa_mask, 1, self.tau)                
+        #         for s in stages:
+        #             z, ch_mask = self.body[s]([z, spa_mask[:, 1:, ...]])
+        #             ch_masks.append(ch_mask.unsqueeze(2))
+        #             sparsity.append(spa_mask[:, 1:, :, :] * ch_mask[..., 1].view(1, -1, 1, 1) + \
+        #                     torch.ones_like(spa_mask[:, 1:, :, :]) * ch_mask[..., 0].view(1, -1, 1, 1))                   
+                    
+        #         sparsity = torch.cat(sparsity, 0)
+        #         return z, sparsity
+            
+        #     if not self.training:
+        #         print(f"x: {x.cpu().size()}")
+        #         spa_mask = self.spa_mask(x)
+        #         _spa_mask = (spa_mask[:, 1:, ...] > spa_mask[:, :1, ...]).float()
+        #         print(f"spa_mask: {spa_mask.cpu().mean()}")
 
-            for s in stages:
-                z, ch_mask = self.body[s]([z, _spa_mask])
-                sparsity.append(_spa_mask * ch_mask[..., 1].view(1, -1, 1, 1) + \
-                        torch.ones_like(_spa_mask) * ch_mask[..., 0].view(1, -1, 1, 1))     
-            sparsity = torch.cat(sparsity, 0)
-            # ch_masks = torch.cat(ch_masks, 2)
-            # self.calc_sparsity(ch_masks, spa_mask)
-            return z, sparsity # ch_mask are not used in inference
-    
-        else:
+        #         for s in stages:
+        #             z, ch_mask = self.body[s]([z, spa_mask])
+        #             sparsity.append(_spa_mask * ch_mask[..., 1].view(1, -1, 1, 1) + \
+        #                     torch.ones_like(_spa_mask) * ch_mask[..., 0].view(1, -1, 1, 1))     
+        #             ch_masks.append(ch_mask.unsqueeze(2))
+        #         sparsity = torch.cat(sparsity, 0)
+        #         # ch_masks = torch.cat(ch_masks, 2)
+        #         # self.calc_sparsity(ch_masks, spa_mask)
+        #         return z, sparsity # ch_mask are not used in inference
+        
+        # else:
+
+        if self.training:
+            spa_mask = self.spa_mask(z)
+            spa_mask = gumbel_softmax(spa_mask, 1, self.tau)           
+            for s in range(self.ns):
+                z, ch_mask = self.body[s]([z, spa_mask[:, :1, ...]], masked)
+                sparsity.append(spa_mask[:, 1:, ...] * ch_mask[..., 1].view(1, -1, 1, 1) + \
+                        torch.ones_like(spa_mask[:, 1:, ...]) * ch_mask[..., 0].view(1, -1, 1, 1))  
+            sparsity = torch.cat(sparsity, 0)            
+            
+            return z, sparsity
+        
+        if not self.training:
             spa_mask = self.spa_mask(x)
-            print(f"original spa mask: {spa_mask.cpu().mean()}")
             _spa_mask = (spa_mask[:, 1:, ...] > spa_mask[:, :1, ...]).float()
             print(f"spa_mask: {_spa_mask.cpu().mean()}")
 
             for s in range(self.ns):
-                z, ch_mask = self.body[s]([z, _spa_mask])
+                z, ch_mask = self.body[s]([z, _spa_mask], masked)
                 sparsity.append(_spa_mask * ch_mask[..., 1].view(1, -1, 1, 1) + \
                         torch.ones_like(_spa_mask) * ch_mask[..., 0].view(1, -1, 1, 1)) 
             sparsity = torch.cat(sparsity, 0)
@@ -361,13 +396,13 @@ class FusionSM_7_4s_v2_test(nn.Module): #hardcode
             self.tail[i].bias.data.fill_(0.01)
             nn.init.xavier_uniform_(self.tail[i].weight)
 
-    def forward(self, x, branch=0, fea_out=False):
+    def forward(self, x, branch=0, masked=True):
         z = x
         z = F.relu(self.head[0](z))
         z = F.relu(self.head[1](z))
 
         # print(f"fea map: {z.cpu().size()}")       
-        branch_fea, mask_or_feas = self.branch[branch](z)
+        branch_fea, mask_or_feas = self.branch[branch](z, masked)
         
         z = F.relu(self.tail[0](branch_fea))
         z = self.tail[1](z)
