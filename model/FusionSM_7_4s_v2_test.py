@@ -82,8 +82,6 @@ class MaskedConv2d(nn.Module):
         self.s_in_num.append(0)
         self.d_out_num.append(int(ch_mask[0, :, 0].sum(0)))
         self.s_out_num.append(int(ch_mask[0, :, 1].sum(0)))
-        print(f"d out num: {self.d_out_num}")
-        print(f"s out num: {self.s_out_num}")
 
         # kernel split
         kernel_d2d = []
@@ -248,6 +246,7 @@ class LargeModule(nn.Module):
         self.ns = ns
         self.tau = 1
         self.sparsities = []
+        self.ch_masks = []
 
         # spatial mask
         self.spa_mask = nn.Sequential(
@@ -310,12 +309,11 @@ class LargeModule(nn.Module):
             spa_mask = gumbel_softmax(spa_mask, 1, self.tau)           
             for s in range(self.ns):
                 z, ch_mask = self.body[s]([z, spa_mask[:, :1, ...]], masked)
+                ch_masks.append(ch_mask)
                 sparsity.append(spa_mask[:, 1:, ...] * ch_mask[..., 1].view(1, -1, 1, 1) + \
                         torch.ones_like(spa_mask[:, 1:, ...]) * ch_mask[..., 0].view(1, -1, 1, 1))  
             sparsity = torch.cat(sparsity, 0)            
-            
-            return z, sparsity
-        
+
         if not self.training:
             spa_mask = self.spa_mask(x)
             _spa_mask = (spa_mask[:, 1:, ...] > spa_mask[:, :1, ...]).float()
@@ -323,11 +321,13 @@ class LargeModule(nn.Module):
 
             for s in range(self.ns):
                 z, ch_mask = self.body[s]([z, _spa_mask], masked)
+                ch_masks.append(ch_mask)
                 sparsity.append(_spa_mask * ch_mask[..., 1].view(1, -1, 1, 1) + \
                         torch.ones_like(_spa_mask) * ch_mask[..., 0].view(1, -1, 1, 1)) 
             sparsity = torch.cat(sparsity, 0)
-            return z, sparsity 
-
+        self.ch_masks = ch_masks
+        
+        return z, sparsity
 class SmallModule(nn.Module):
     def __init__(self, ns):
         super(SmallModule, self).__init__()
@@ -371,6 +371,7 @@ class FusionSM_7_4s_v2_test(nn.Module): #hardcode
 
         self.scale = scale
         self.ns = 4 # for testing
+        self.ch_masks = []
 
         self.head = nn.ModuleList() # feature map 
         self.branch = nn.ModuleList() # 2 branches: Simple and Complex
@@ -402,7 +403,8 @@ class FusionSM_7_4s_v2_test(nn.Module): #hardcode
         z = F.relu(self.head[1](z))
 
         # print(f"fea map: {z.cpu().size()}")       
-        branch_fea, mask_or_feas = self.branch[branch](z, masked=masked)
+        branch_fea, mask_or_feas, ch_masks = self.branch[branch](z, masked=masked)
+        self.ch_masks = ch_masks
         
         z = F.relu(self.tail[0](branch_fea))
         z = self.tail[1](z)

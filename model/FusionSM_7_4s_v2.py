@@ -76,8 +76,8 @@ class MaskedConv2d(nn.Module):
         self.s_in_num.append(0)
         self.d_out_num.append(int(ch_mask[0, :, 0].sum(0)))
         self.s_out_num.append(int(ch_mask[0, :, 1].sum(0)))
-        print(f"d out num: {self.d_out_num}")
-        print(f"s out num: {self.s_out_num}")
+        # print(f"d out num: {self.d_out_num}")
+        # print(f"s out num: {self.s_out_num}")
 
         # kernel split
         kernel_d2d = []

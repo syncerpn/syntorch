@@ -66,6 +66,7 @@ def compare_output(branch):
     
     
 def compare_psnr_by_dense(branch):
+    ch_masks = []
     perf_trains = []
     perf_vals = []
     perf_train_softs = []
@@ -85,8 +86,8 @@ def compare_psnr_by_dense(branch):
         # training forward - soft mask
         core.train()
         with torch.no_grad():
-            yf_train, _ = core.forward(x, branch, masked=True)
-            perf_train_soft = evaluation.calculate(args, yf_train, yt)
+            yf_train_soft, _ = core.forward(x, branch, masked=True)
+            perf_train_soft = evaluation.calculate(args, yf_train_soft, yt)
         write_to_file(f"PSNR with soft mask: {perf_train_soft}", save_output_file)
         perf_train_softs.append(perf_train_soft)
             
@@ -97,16 +98,21 @@ def compare_psnr_by_dense(branch):
             perf_val = evaluation.calculate(args, yf_val, yt)
         write_to_file(f"PSNR with hard mask: {perf_val}", save_output_file)
         perf_vals.append(perf_val)
+        ch_masks = core.ch_masks
             
         # write_to_file(f"Density train: {sparsity_train.mean()}", save_output_file)
-        write_to_file(f"Density val: {sparsity_val.mean()}", save_output_file)
+        write_to_file(f"Density: {sparsity_val.mean()}", save_output_file)
         write_to_file(f"Check similarity: {(torch.abs(yf_val - yf_train) <= 1e-1).float().mean()}", save_output_file)
         write_to_file(f"Mean difference: {torch.abs(yf_val - yf_train).mean()}", save_output_file)
-        
+
+    dense_channels = [int(ch_mask[0, :, 0].sum(0)) for ch_mask in ch_masks]
+    sparse_channels = [int(ch_mask[0, :, 1].sum(0)) for ch_mask in ch_masks]
     perf_train_softs = torch.stack(perf_train_softs, 0)
     perf_trains = torch.stack(perf_trains, 0)
     perf_vals = torch.stack(perf_vals, 0)
     write_to_file(50*"=", save_output_file)
+    for d, s in zip(dense_channels, sparse_channels):
+        write_to_file(f"Dense {d} Sparse {s}", save_output_file)
     write_to_file(f"Mean PSNR with mask removed: {perf_trains.cpu().mean()}", save_output_file)
     write_to_file(f"Mean PSNR with soft mask: {perf_train_softs.cpu().mean()}", save_output_file)
     write_to_file(f"Mean PSNR with hard mask: {perf_vals.cpu().mean()}", save_output_file)
