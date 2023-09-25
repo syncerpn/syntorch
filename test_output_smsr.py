@@ -68,6 +68,7 @@ def compare_output(branch):
 def compare_psnr_by_dense(branch):
     perf_trains = []
     perf_vals = []
+    perf_train_softs = []
     for batch_idx, (x, yt) in tqdm.tqdm(enumerate(XYtest), total= len(XYtest)):
         write_to_file(f"Batch {batch_idx}", save_output_file)
         x = x.cuda()
@@ -85,9 +86,9 @@ def compare_psnr_by_dense(branch):
         core.train()
         with torch.no_grad():
             yf_train, _ = core.forward(x, branch, masked=True)
-            perf_train = evaluation.calculate(args, yf_train, yt)
-        write_to_file(f"PSNR with soft mask: {perf_train}", save_output_file)
-        perf_trains.append(perf_train)
+            perf_train_soft = evaluation.calculate(args, yf_train, yt)
+        write_to_file(f"PSNR with soft mask: {perf_train_soft}", save_output_file)
+        perf_train_softs.append(perf_train_soft)
             
         # evaluation forward
         core.eval()
@@ -102,11 +103,13 @@ def compare_psnr_by_dense(branch):
         write_to_file(f"Check similarity: {(torch.abs(yf_val - yf_train) <= 1e-1).float().mean()}", save_output_file)
         write_to_file(f"Mean difference: {torch.abs(yf_val - yf_train).mean()}", save_output_file)
         
+    perf_train_softs = torch.stack(perf_train_softs, 0)
     perf_trains = torch.stack(perf_trains, 0)
     perf_vals = torch.stack(perf_vals, 0)
     write_to_file(50*"=", save_output_file)
-    write_to_file(f"Mean perf train: {perf_trains.cpu().mean()}", save_output_file)
-    write_to_file(f"Mean perf val: {perf_vals.cpu().mean()}", save_output_file)
+    write_to_file(f"Mean PSNR with mask removed: {perf_trains.cpu().mean()}", save_output_file)
+    write_to_file(f"Mean PSNR with soft mask: {perf_train_softs.cpu().mean()}", save_output_file)
+    write_to_file(f"Mean PSNR with hard mask: {perf_vals.cpu().mean()}", save_output_file)
        
 # load test data
 print('[INFO] load testset "%s" from %s' % (args.testset_tag, args.testset_dir))
