@@ -103,7 +103,7 @@ def test(epoch):
     log_str = f'[INFO] TS - CORE - P: {mean_perf_f:.3f}'
     print(log_str)
 
-    torch.save(core.state_dict(), args.cv_dir + '/core_%d_ckpt_E_%d_P_%.3f.t7' % (bri, epoch, mean_perf_f))
+    torch.save(core.state_dict(), args.cv_dir + '/core_ckpt_E_%d_P_%.3f.t7' % (epoch, mean_perf_f))
 
 def test_mask(epoch):
     perf_fs = []
@@ -135,7 +135,7 @@ def test_mask(epoch):
         masks_stat[mi] /= len(XYtest)
         print(f"[INFO] TS - MASK - Stage {mi}: {masks_stat[mi]:.3f}")
 
-    torch.save(core.state_dict(), args.cv_dir + '/mask_%d_ckpt_E_%d_P_%.3f.t7' % (bri, epoch, mean_perf_f))
+    torch.save(core.state_dict(), args.cv_dir + '/mask_ckpt_E_%d_P_%.3f.t7' % (epoch, mean_perf_f))
 
 print('[INFO] load trainset "%s" from %s' % (args.trainset_tag, args.trainset_dir))
 trainset = data.load_trainset(args)
