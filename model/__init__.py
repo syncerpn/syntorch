@@ -11,6 +11,7 @@ from model.FusionNetB_7_1s import FusionNetB_7_1s
 from model.FusionNetB_7_2s import FusionNetB_7_2s
 from model.FusionNetB_7_3s import FusionNetB_7_3s
 from model.FusionNetB_7_4s import FusionNetB_7_4s
+from model.MaskNetB_7_4s import MaskNetB_7_4s
 
 def config(args):
     arch = args.core.split("-")
@@ -32,6 +33,8 @@ def config(args):
         core = FusionNetB_7_3s(scale=args.scale)
     elif (name == "FusionNetB_7_4s"):
         core = FusionNetB_7_4s(scale=args.scale)
+    elif (name == "MaskNetB_7_4s"):
+        core = MaskNetB_7_4s(scale=args.scale)
     else:
         assert 0, f"[ERRO] unknown model tag {name}"
 
