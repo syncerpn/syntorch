@@ -116,7 +116,7 @@ def set_template(args):
 		args.weight_decay=0
 		args.batch_size=2048
 		args.epoch_step=100
-		args.max_epochs=100
+		args.max_epochs=200
 		args.loss='L1'
 		args.optimizer='Adam'
 		args.max_load=0
@@ -127,7 +127,7 @@ def set_template(args):
 		args.rgb_range=1.0
 		args.scale=2
 		args.core='FusionSM_7_4s_v2'
-		args.checkpoint='/kaggle/working/syntorch/trained_store/branch_0_ckpt_E_50_P_32.505.t7'
+		args.checkpoint='/kaggle/working/syntorch/trained_store/branch_0_ckpt_E_90_P_32.560.t7'
 		args.cv_dir = "/kaggle/working/syntorch/model_checkpoints"
 		args.trainset_dir='/kaggle/input/fn-data-and-cktpt/data_ckpt/dataset/sr291_2x/2x/'
 		args.testset_dir='/kaggle/input/fn-data-and-cktpt/data_ckpt/dataset/set14_dnb/set14_dnb/2x/'
