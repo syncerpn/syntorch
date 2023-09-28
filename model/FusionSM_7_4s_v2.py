@@ -243,16 +243,23 @@ class LargeModule(nn.Module):
 
         # spatial mask
         self.spa_mask = nn.Sequential(
-            nn.Conv2d(16, 4, 3, 1, 1),
+            nn.Conv2d(16, 8, 3, 1, 1),
+            nn.BatchNorm2d(8),
             nn.ReLU(True),
-            nn.Conv2d(4, 4, 3, 1, 1),
+            nn.Conv2d(8, 4, 3, 1, 1),
+            nn.BatchNorm2d(4),
             nn.ReLU(True),
             nn.Conv2d(4, 2, 3, 1, 1),
+            nn.BatchNorm2d(2)
         )
 
         self.body = nn.ModuleList()
-        for _ in range(self.ns):
-            self.body.append(MaskedConv2d(16, 16))
+        for i in range(self.ns):
+            if i==self.ns-1:
+                self.body.append(MaskedConv2d(64, 16))
+            else:
+                self.body.append(MaskedConv2d(64, 64))
+            
         
     def _update_tau(self, tau):
         self.tau = tau     
@@ -372,7 +379,7 @@ class FusionSM_7_4s_v2(nn.Module): #hardcode
         self.mask = nn.ModuleList() # mask before put into branches
 
         self.head.append(nn.Conv2d( 1, 32, 5, 1, 2)) #0
-        self.head.append(nn.Conv2d(32, 16, 1, 1, 0)) #1
+        self.head.append(nn.Conv2d(32, 64, 1, 1, 0)) #1
 
         self.branch.append(LargeModule(self.ns))
         self.branch.append(SmallModule(self.ns))
