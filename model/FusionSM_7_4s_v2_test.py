@@ -324,10 +324,9 @@ class LargeModule(nn.Module):
             for s in range(self.ns):
                 z, ch_mask = self.body[s]([z, _spa_mask], masked)
                 ch_masks.append(ch_mask)
+                _spa_mask = (spa_mask[:, 1:, ...] > spa_mask[:, :1, ...]).float()                
                 sparsity.append(_spa_mask * ch_mask[..., 1].view(1, -1, 1, 1) + \
                         torch.ones_like(_spa_mask) * ch_mask[..., 0].view(1, -1, 1, 1)) 
-                print("Spa mask: ", _spa_mask.cpu().mean())
-                print(f"Channel mask ", ch_mask.cpu().mean())
             sparsity = torch.cat(sparsity, 0)
         self.ch_masks = ch_masks
         
