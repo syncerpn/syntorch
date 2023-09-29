@@ -326,8 +326,8 @@ class LargeModule(nn.Module):
                 ch_masks.append(ch_mask)
                 sparsity.append(_spa_mask * ch_mask[..., 1].view(1, -1, 1, 1) + \
                         torch.ones_like(_spa_mask) * ch_mask[..., 0].view(1, -1, 1, 1)) 
-                print("Spa mask: ", _spa_mask.item())
-                print(f"Channel mask ", ch_mask.item())
+                print("Spa mask: ", _spa_mask[0,0,0])
+                print(f"Channel mask ", ch_mask[0,0,0])
             sparsity = torch.cat(sparsity, 0)
         self.ch_masks = ch_masks
         
