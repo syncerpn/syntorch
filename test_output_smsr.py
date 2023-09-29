@@ -70,6 +70,7 @@ def compare_psnr_by_dense(branch):
     perf_trains = []
     perf_vals = []
     perf_train_softs = []
+    sparsities = []
     for batch_idx, (x, yt) in tqdm.tqdm(enumerate(XYtest), total= len(XYtest)):
         write_to_file(f"Batch {batch_idx}", save_output_file)
         x = x.cuda()
@@ -98,10 +99,12 @@ def compare_psnr_by_dense(branch):
             perf_val = evaluation.calculate(args, yf_val, yt)
         write_to_file(f"PSNR with hard mask: {perf_val}", save_output_file)
         perf_vals.append(perf_val)
+        sparsities.append(sparsity_val)
+        
         ch_masks = core.ch_masks
             
         # write_to_file(f"Density train: {sparsity_train.mean()}", save_output_file)
-        write_to_file(f"Density: {sparsity_val.mean()}", save_output_file)
+        write_to_file(f"Density: {sparsity_val.cpu().mean()}", save_output_file)
         write_to_file(f"Check similarity: {(torch.abs(yf_val - yf_train) <= 1e-1).float().mean()}", save_output_file)
         write_to_file(f"Mean difference: {torch.abs(yf_val - yf_train).mean()}", save_output_file)
 
@@ -110,9 +113,11 @@ def compare_psnr_by_dense(branch):
     perf_train_softs = torch.stack(perf_train_softs, 0)
     perf_trains = torch.stack(perf_trains, 0)
     perf_vals = torch.stack(perf_vals, 0)
+    sparsities = torch.cat(sparsities, 0)
     write_to_file(50*"=", save_output_file)
     for d, s in zip(dense_channels, sparse_channels):
         write_to_file(f"Dense {d} Sparse {s}", save_output_file)
+    write_to_file(f"Mean density with hard mask: {sparsities.cpu().mean()}", save_output_file)
     write_to_file(f"Mean PSNR with mask removed: {perf_trains.cpu().mean()}", save_output_file)
     write_to_file(f"Mean PSNR with soft mask: {perf_train_softs.cpu().mean()}", save_output_file)
     write_to_file(f"Mean PSNR with hard mask: {perf_vals.cpu().mean()}", save_output_file)

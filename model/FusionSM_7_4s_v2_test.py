@@ -227,7 +227,6 @@ class MaskedConv2d(nn.Module):
         if not self.training:
             # Hard mask
             self.spa_mask = x[1]
-
             # generate indices
             self._generate_indices()
 
