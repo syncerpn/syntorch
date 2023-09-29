@@ -317,7 +317,7 @@ class LargeModule(nn.Module):
             sparsity = torch.cat(sparsity, 0)            
 
         if not self.training:
-            spa_mask = self.spa_mask(x)
+            spa_mask = self.spa_mask(z)
             _spa_mask = (spa_mask[:, 1:, ...] > spa_mask[:, :1, ...]).float()
             print(f"spa_mask: {_spa_mask.cpu().mean()}")
 
@@ -326,8 +326,8 @@ class LargeModule(nn.Module):
                 ch_masks.append(ch_mask)
                 sparsity.append(_spa_mask * ch_mask[..., 1].view(1, -1, 1, 1) + \
                         torch.ones_like(_spa_mask) * ch_mask[..., 0].view(1, -1, 1, 1)) 
-                print("Spa mask: ", _spa_mask[0,0,0])
-                print(f"Channel mask ", ch_mask[0,0,0])
+                print("Spa mask: ", _spa_mask.cpu().mean())
+                print(f"Channel mask ", ch_mask.cpu().mean())
             sparsity = torch.cat(sparsity, 0)
         self.ch_masks = ch_masks
         
