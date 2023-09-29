@@ -262,10 +262,7 @@ class LargeModule(nn.Module):
 
         self.body = nn.ModuleList()
         for i in range(self.ns):
-            if i==self.ns-1:
-                self.body.append(MaskedConv2d(64, 16))
-            else:
-                self.body.append(MaskedConv2d(64, 64))
+            self.body.append(MaskedConv2d(64, 64))
         
     def _update_tau(self, tau):
         self.tau = tau
