@@ -250,13 +250,13 @@ class LargeModule(nn.Module):
 
         # spatial mask
         self.spa_mask = nn.Sequential(
-            nn.Conv2d(16, 8, 3, 1, 1),
-            nn.BatchNorm2d(8),
+            nn.Conv2d(64, 32, 3, 1, 1),
+            nn.BatchNorm2d(32),
             nn.ReLU(True),
-            nn.Conv2d(8, 4, 3, 1, 1),
-            nn.BatchNorm2d(4),
+            nn.Conv2d(32, 16, 3, 1, 1),
+            nn.BatchNorm2d(16),
             nn.ReLU(True),
-            nn.Conv2d(4, 2, 3, 1, 1),
+            nn.Conv2d(16, 2, 3, 1, 1),
             nn.BatchNorm2d(2)
         )
 
