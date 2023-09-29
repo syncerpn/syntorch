@@ -99,7 +99,7 @@ def compare_psnr_by_dense(branch):
             perf_val = evaluation.calculate(args, yf_val, yt)
         write_to_file(f"PSNR with hard mask: {perf_val}", save_output_file)
         perf_vals.append(perf_val)
-        sparsities.append(sparsity_val)
+        sparsities.append(sparsity_val.cpu().mean().item())
         
         ch_masks = core.ch_masks
             
@@ -113,11 +113,12 @@ def compare_psnr_by_dense(branch):
     perf_train_softs = torch.stack(perf_train_softs, 0)
     perf_trains = torch.stack(perf_trains, 0)
     perf_vals = torch.stack(perf_vals, 0)
-    sparsities = torch.cat(sparsities, 0)
+    sparsities = np.mean(np.array(sparsities))
     write_to_file(50*"=", save_output_file)
     for d, s in zip(dense_channels, sparse_channels):
         write_to_file(f"Dense {d} Sparse {s}", save_output_file)
-    write_to_file(f"Mean density with hard mask: {sparsities.cpu().mean()}", save_output_file)
+        
+    write_to_file(f"Mean density with hard mask: {sparsities}", save_output_file)
     write_to_file(f"Mean PSNR with mask removed: {perf_trains.cpu().mean()}", save_output_file)
     write_to_file(f"Mean PSNR with soft mask: {perf_train_softs.cpu().mean()}", save_output_file)
     write_to_file(f"Mean PSNR with hard mask: {perf_vals.cpu().mean()}", save_output_file)
