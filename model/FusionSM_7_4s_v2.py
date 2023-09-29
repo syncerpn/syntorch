@@ -255,10 +255,7 @@ class LargeModule(nn.Module):
 
         self.body = nn.ModuleList()
         for i in range(self.ns):
-            if i==self.ns-1:
-                self.body.append(MaskedConv2d(64, 16))
-            else:
-                self.body.append(MaskedConv2d(64, 64))
+            self.body.append(MaskedConv2d(64, 64))
             
         
     def _update_tau(self, tau):
@@ -384,7 +381,7 @@ class FusionSM_7_4s_v2(nn.Module): #hardcode
         self.branch.append(LargeModule(self.ns))
         self.branch.append(SmallModule(self.ns))
         
-        self.tail.append(nn.Conv2d(16, 32, 1, 1, 0)) #6
+        self.tail.append(nn.Conv2d(64, 32, 1, 1, 0)) #6
         self.tail.append(nn.Conv2d(32, scale * scale, 3, 1, 1)) #7:last layer
         
         # init_head:
