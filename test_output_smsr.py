@@ -80,7 +80,7 @@ def save_spa_mask(batch:int, soft: torch.tensor, hard: torch.tensor):
     
     soft_mask = cv2.cvtColor(soft_mask, cv2.COLOR_GRAY2RGB)
         
-    cv2.imwrite(os.path.join(dir, f"im_{batch}_soft.png"), soft_mask)
+    plt.imsave(os.path.join(dir, f"im_{batch}_soft.png"), soft_mask)
     cv2.imwrite(os.path.join(dir, f"im_{batch}_hard.png"), hard_mask)
     
     
