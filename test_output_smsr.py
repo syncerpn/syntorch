@@ -78,8 +78,8 @@ def save_spa_mask(batch:int, soft: torch.tensor, hard: torch.tensor):
     soft_mask = soft_mask.cpu().numpy().transpose(1,2,0)
     hard_mask = hard_mask.cpu().numpy().transpose(1,2,0)
         
-    cv2.imwrite(os.path.join(dir, f"im_{batch}_soft.jpg"), soft_mask)
-    cv2.imwrite(os.path.join(dir, f"im_{batch}_hard.jpg"), hard_mask)
+    cv2.imwrite(os.path.join(dir, f"im_{batch}_soft.png"), soft_mask)
+    cv2.imwrite(os.path.join(dir, f"im_{batch}_hard.png"), hard_mask)
     
     
     
