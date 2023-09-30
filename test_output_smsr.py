@@ -6,6 +6,7 @@ import torch.backends.cudnn as cudnn
 cudnn.benchmark = True
 import tqdm
 import cv2
+import matplotlib.pyplot as plt
 
 #custom modules
 import data
@@ -66,22 +67,19 @@ def compare_output(branch):
     write_to_file(f"Mean perf val: {perf_vals.cpu().mean()}", save_output_file)
     
     
-def save_spa_mask(batch:int, x: torch.tensor, soft: torch.tensor, hard: torch.tensor):
+def save_spa_mask(batch:int, soft: torch.tensor, hard: torch.tensor):
     dir = "./image_masks"
     if not os.path.exists(dir):
         os.makedirs(dir)
-        
-    img = x[0, ...]
-    img_np = img.cpu().numpy().transpose(1,2,0)
-    cv2.imwrite(os.path.join(dir, f"im_{batch}.jpg"), img_np)
+
     soft_mask = soft[0, ...]
     hard_mask = hard[0, ...]
     
     soft_mask = soft_mask.cpu().numpy().transpose(1,2,0)
     hard_mask = hard_mask.cpu().numpy().transpose(1,2,0)
     
-    cv2.imwrite(os.path.join(dir, f"im_{batch}_soft.jpg"), soft_mask)
-    cv2.imwrite(os.path.join(dir, f"im_{batch}_hard.jpg"), hard_mask)
+    plt.imsave(os.path.join(dir, f"im_{batch}_soft.jpg"), soft_mask)
+    plt.imsave(os.path.join(dir, f"im_{batch}_hard.jpg"), hard_mask)
     
     
     
@@ -132,7 +130,7 @@ def compare_psnr_by_dense(branch):
         write_to_file(f"Mean difference: {torch.abs(yf_val - yf_train).mean()}", save_output_file)
 
         # Visualize spatial mask
-        save_spa_mask(batch_idx, x, soft_spa_mask, hard_spa_mask)
+        save_spa_mask(batch_idx, soft_spa_mask, hard_spa_mask)
 
     dense_channels = [int(ch_mask[0, :, 0].sum(0)) for ch_mask in ch_masks]
     sparse_channels = [int(ch_mask[0, :, 1].sum(0)) for ch_mask in ch_masks]
