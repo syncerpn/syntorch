@@ -308,7 +308,8 @@ class LargeModule(nn.Module):
 
         if self.training:
             spa_mask = self.spa_mask(z)
-            spa_mask = gumbel_softmax(spa_mask, 1, self.tau)           
+            spa_mask = gumbel_softmax(spa_mask, 1, self.tau)  
+            self.infer_spa_mask = spa_mask[:, 1:, ...]         
             for s in range(self.ns):
                 z, ch_mask = self.body[s]([z, spa_mask[:, 1:, ...]], masked)
                 ch_masks.append(ch_mask)
@@ -319,6 +320,7 @@ class LargeModule(nn.Module):
         if not self.training:
             spa_mask = self.spa_mask(z)
             _spa_mask = (spa_mask[:, 1:, ...] > spa_mask[:, :1, ...]).float()
+            self.infer_spa_mask = _spa_mask
             print(f"spa_mask: {_spa_mask.cpu().mean()}")
 
             for s in range(self.ns):
@@ -331,6 +333,7 @@ class LargeModule(nn.Module):
         self.ch_masks = ch_masks
         
         return z, sparsity, self.ch_masks
+    
 class SmallModule(nn.Module):
     def __init__(self, ns):
         super(SmallModule, self).__init__()
@@ -399,6 +402,9 @@ class FusionSM_7_4s_v2_test(nn.Module): #hardcode
         for i in range(len(self.tail)):
             self.tail[i].bias.data.fill_(0.01)
             nn.init.xavier_uniform_(self.tail[i].weight)
+            
+    def get_infer_spa_mask(self):
+        return self.branch[0].infer_spa_mask
 
     def forward(self, x, branch=0, masked=True):
         z = x

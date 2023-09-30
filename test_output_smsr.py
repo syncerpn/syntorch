@@ -5,6 +5,7 @@ import torch.utils.data as torchdata
 import torch.backends.cudnn as cudnn
 cudnn.benchmark = True
 import tqdm
+import cv2
 
 #custom modules
 import data
@@ -65,6 +66,22 @@ def compare_output(branch):
     write_to_file(f"Mean perf val: {perf_vals.cpu().mean()}", save_output_file)
     
     
+def save_spa_mask(batch:int, x: torch.tensor, soft: torch.tensor, hard: torch.tensor):
+    dir = "./image_masks"
+    img = x[0, ...]
+    img_np = img.cpu().numpy().transpose(1,2,0)
+    cv2.imwrite(os.path.join(dir, f"im_{batch}.jpg"), img_np)
+    soft_mask = soft[0, ...]
+    hard_mask = hard[0, ...]
+    
+    soft_mask = soft_mask.cpu().numpy().transpose(1,2,0)
+    hard_mask = hard_mask.cpu().numpy().transpose(1,2,0)
+    
+    cv2.imwrite(os.path.join(dir, f"im_{batch}_soft.jpg"), soft_mask)
+    cv2.imwrite(os.path.join(dir, f"im_{batch}_hard.jpg"), hard_mask)
+    
+    
+    
 def compare_psnr_by_dense(branch):
     ch_masks = []
     perf_trains = []
@@ -91,6 +108,7 @@ def compare_psnr_by_dense(branch):
             perf_train_soft = evaluation.calculate(args, yf_train_soft, yt)
         write_to_file(f"PSNR with soft mask: {perf_train_soft}", save_output_file)
         perf_train_softs.append(perf_train_soft)
+        soft_spa_mask = core.get_infer_spa_mask()
             
         # evaluation forward
         core.eval()
@@ -99,6 +117,8 @@ def compare_psnr_by_dense(branch):
             perf_val = evaluation.calculate(args, yf_val, yt)
         write_to_file(f"PSNR with hard mask: {perf_val}", save_output_file)
         perf_vals.append(perf_val)
+        hard_spa_mask = core.get_infer_spa_mask()
+        
         sparsities.append(sparsity_val.cpu().mean().item())
         
         ch_masks = core.ch_masks
@@ -107,6 +127,9 @@ def compare_psnr_by_dense(branch):
         write_to_file(f"Density: {sparsity_val.cpu().mean()}", save_output_file)
         write_to_file(f"Check similarity: {(torch.abs(yf_val - yf_train) <= 1e-1).float().mean()}", save_output_file)
         write_to_file(f"Mean difference: {torch.abs(yf_val - yf_train).mean()}", save_output_file)
+
+        # Visualize spatial mask
+        save_spa_mask(batch_idx, x, soft_spa_mask, hard_spa_mask)
 
     dense_channels = [int(ch_mask[0, :, 0].sum(0)) for ch_mask in ch_masks]
     sparse_channels = [int(ch_mask[0, :, 1].sum(0)) for ch_mask in ch_masks]
@@ -117,7 +140,7 @@ def compare_psnr_by_dense(branch):
     write_to_file(50*"=", save_output_file)
     for d, s in zip(dense_channels, sparse_channels):
         write_to_file(f"Dense {d} Sparse {s}", save_output_file)
-        
+    
     write_to_file(f"Mean density with hard mask: {sparsities}", save_output_file)
     write_to_file(f"Mean PSNR with mask removed: {perf_trains.cpu().mean()}", save_output_file)
     write_to_file(f"Mean PSNR with soft mask: {perf_train_softs.cpu().mean()}", save_output_file)
