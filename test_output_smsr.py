@@ -68,6 +68,9 @@ def compare_output(branch):
     
 def save_spa_mask(batch:int, x: torch.tensor, soft: torch.tensor, hard: torch.tensor):
     dir = "./image_masks"
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+        
     img = x[0, ...]
     img_np = img.cpu().numpy().transpose(1,2,0)
     cv2.imwrite(os.path.join(dir, f"im_{batch}.jpg"), img_np)
