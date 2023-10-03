@@ -26,6 +26,12 @@ def write_to_file(text, file, mode='a'):
 save_output_file = "test_output.txt"
 write_to_file("Test output\n", save_output_file, 'w')
 
+parser.add_argument(
+    "--sp",
+    type=float,
+    default=0.2
+)
+
 args = parser.parse_args()
 
 if args.template is not None:
