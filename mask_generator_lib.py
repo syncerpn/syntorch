@@ -1,5 +1,13 @@
 import torch
 import torch.nn as nn
+from scipy.optimize import root_scalar
+import numpy as np
+import cv2
+
+def objfun(x, b, k):
+    a = b*x
+    a = np.where(a<1, a, 1)
+    return sum(a) - k
 
 class GradientSobelFilter:
     def __init__(self):
@@ -35,3 +43,35 @@ class RandomFlatMasker:
 
         merge_map = merge_map.to('cuda')
         return merge_map
+    
+class SMSRMaskFuse:
+    def __init__(self, xC, xS, spa_mask, ch_mask):
+        self.xC = xC
+        self.xS = xS
+        self.spa_mask = spa_mask
+        self.ch_mask = ch_mask
+        
+    def optimal_sampling(x, sp):
+        """Guided sampling
+        
+        Args:
+            spa_mask (torch.tensor): Probability mask
+            sp (float): Sampling rate [0, 1]
+        Return sampled mask
+        """
+        if isinstance(x, torch.Tensor):
+            x = x.cpu().numpy()
+        rows, cols = x.shape
+        n = rows*cols
+        myfunc = lambda v: objfun(v, x.reshape(-1), round(n*sp))
+        
+        sol = root_scalar(myfunc, method='toms748', bracket=[0, 1e16])
+        tau = sol.root
+        tmp1 = np.where(x*tau < 1, x*tau, 1)
+        p = np.where(tmp1>1e-16, tmp1, 1e-16)
+        rand = np.random.rand(rows, cols)
+        out = np.where(rand <= p, 1, 0)
+        return torch.from_numpy(out).cuda()
+        
+
+
