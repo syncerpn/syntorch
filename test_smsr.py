@@ -25,6 +25,7 @@ if args.template is not None:
     template.set_template(args)
 
 def single_forward(branch):
+    print(f"Testing for branch {branch}")
     for psi in range(5):
         perf_fs = []
         for batch_idx, (x, yt) in tqdm.tqdm(enumerate(XYtest), total=len(XYtest)):
@@ -83,14 +84,12 @@ def pretrained_infer(branch):
     for batch_idx, (x, yt) in tqdm.tqdm(enumerate(XYtest), total= len(XYtest)):
         x = x.cuda()
         yt = yt.cuda()
-        try:
-            with torch.no_grad():
-         
-                yf, ch_mask = core.forward(x, branch)
-                perf = evaluation.calculate(args, yf, yt)
-                perfs.append(perf)
-
-        except: continue
+        with torch.no_grad():
+        
+            yf, ch_mask = core.forward(x, branch)
+            perf = evaluation.calculate(args, yf, yt)
+            print(f"Branch {batch_idx} - perf {perf}")
+            perfs.append(perf)
          
     if len(perfs) > 0:
         perfs = torch.stack(perfs, 0).mean()
@@ -107,7 +106,6 @@ core = model.config(args)
 core.cuda()
 core.eval()
 
-pretrained_infer(0)
 pretrained_infer(1)
 
 # print("Large\n")

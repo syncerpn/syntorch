@@ -9,6 +9,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from model.common import residual_stack
 import numpy as np
+from mask_generator_lib import SMSRMaskFuse
 
 def gumbel_softmax(x, dim, tau):
     gumbels = torch.rand_like(x)
@@ -262,6 +263,10 @@ class LargeModule(nn.Module):
         self.body = nn.ModuleList()
         for i in range(self.ns):
             self.body.append(MaskedConv2d(64, 64))
+            
+    def get_soft_spa_mask(self, x):
+        spa = self.spa_mask(x)
+        return gumbel_softmax(spa, 1, self.tau)
         
     def _update_tau(self, tau):
         self.tau = tau
@@ -436,11 +441,11 @@ class FusionSM_7_4s_v2_test(nn.Module): #hardcode
         y = residual_stack(z, x, self.scale)
 
         if fea_out:
-            return y, sparsity_or_feas
+            return y, sparsity_or_feas, ch_masks
 
-        return y
+        return y, ch_masks
 
-    def forward_merge_mask(self, x, masks: dict, fea_out=False):
+    def forward_merge_mask(self, x, sp, fea_out=False):
         # TODO: Convert merge mask to smsr-like forward
         
         # mask in masks are binary; 1.0 uses for C or branch 0, and vice versa
@@ -450,15 +455,13 @@ class FusionSM_7_4s_v2_test(nn.Module): #hardcode
 
         feas = []
 
-        for ii in range(self.ns):
-            branch_fea_0 = self.branch[0](z, stages=[ii])
-            branch_fea_1 = self.branch[1](z, stages=[ii])
+        for ii in range(self.ns):      
+            branch_fea_0, ch_mask = self.branch[0](z, stages=[ii])
+            branch_fea_1, _ = self.branch[1](z, stages=[ii])
+            spa_mask = self.branch[0].get_soft_spa_mask(z)
+            fuser = SMSRMaskFuse(branch_fea_0, branch_fea_1, spa_mask, ch_mask, sp=sp)
             
-            assert ii in masks, f"[ERRO]: missing mask for stage {ii}"
-
-            merge_map = masks[ii]
-            merge_fea = branch_fea_0 * merge_map + branch_fea_1 * (1.0 - merge_map)
-
+            merge_fea = fuser.fuse()
             z = merge_fea
             feas.append(merge_fea)
         

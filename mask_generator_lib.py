@@ -45,13 +45,15 @@ class RandomFlatMasker:
         return merge_map
     
 class SMSRMaskFuse:
-    def __init__(self, xC, xS, spa_mask, ch_mask):
+    def __init__(self, xC, xS, spa_mask, ch_mask, sp):
         self.xC = xC
         self.xS = xS
-        self.spa_mask = spa_mask
-        self.ch_mask = ch_mask
+        self.sp = sp
+        self.spa_mask = spa_mask # 2 layer
+        self.ch_mask = ch_mask # 2 layer
+        self.sampling_mask = self.optimal_sampling(self.spa_mask[:, 1:, ...], self.sp)
         
-    def optimal_sampling(x, sp):
+    def optimal_sampling(self, x, sp):
         """Guided sampling
         
         Args:
@@ -61,6 +63,7 @@ class SMSRMaskFuse:
         """
         if isinstance(x, torch.Tensor):
             x = x.cpu().numpy()
+            x = np.squeeze(x)
         rows, cols = x.shape
         n = rows*cols
         myfunc = lambda v: objfun(v, x.reshape(-1), round(n*sp))
@@ -71,7 +74,16 @@ class SMSRMaskFuse:
         p = np.where(tmp1>1e-16, tmp1, 1e-16)
         rand = np.random.rand(rows, cols)
         out = np.where(rand <= p, 1, 0)
-        return torch.from_numpy(out).cuda()
+        out = torch.from_numpy(out).reshape(1, 1, rows, cols).cuda()
+        return out
+    
+    def fuse(self):
+        dense_spa_mask = self.sampling_mask
+        sparse_spa_mask = 1 - self.sampling_mask
+        out = self.xC * self.ch_mask[..., :1] + self.xC * self.ch_mask[..., 1:] * dense_spa_mask + \
+            self.xS * self.ch_mask[..., 1:] * sparse_spa_mask
+        return out
+        
         
 
 
