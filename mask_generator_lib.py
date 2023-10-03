@@ -49,7 +49,7 @@ class SMSRMaskFuse:
         self.xC = xC
         self.xS = xS
         self.sp = sp
-        self.spa_mask = spa_mask # 2 layer
+        self.spa_mask = spa_mask # 1 layer
         self.ch_mask = ch_mask # 2 layer
         
     def optimal_sampling(self, x, sp):
@@ -78,9 +78,9 @@ class SMSRMaskFuse:
         return dense_spa, sparse_spa
     
     def fuse(self):
-        dense_spa_mask, sparse_spa_mask = self.optimal_sampling(self.spa_mask[:, 1:,...], sp=self.sp)
-        dense_ch_mask = self.ch_mask[:, :, :1].round()
-        sparse_ch_mask = self.ch_mask[:, :, 1:].round()
+        dense_spa_mask, sparse_spa_mask = self.optimal_sampling(self.spa_mask, sp=self.sp)
+        dense_ch_mask = self.ch_mask[:, :, :1]
+        sparse_ch_mask = self.ch_mask[:, :, 1:]
         
         out = self.xC * dense_ch_mask.view(1, -1, 1, 1) + self.xC * sparse_ch_mask.view(1, -1, 1, 1) * dense_spa_mask + \
             self.xS * sparse_ch_mask.view(1, -1, 1, 1) * sparse_spa_mask

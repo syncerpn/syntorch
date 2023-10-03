@@ -312,7 +312,6 @@ class LargeModule(nn.Module):
                 spa_mask = self.spa_mask(z)
                 spa_mask = gumbel_softmax(spa_mask, 1, self.tau)  
                 self.infer_spa_mask = spa_mask[:, 1:, ...]      
-                print(f"train spa_mask: {self.infer_spa_mask.cpu().mean()}")   
                 for s in range(self.ns):
                     z, ch_mask = self.body[s]([z, spa_mask[:, 1:, ...]], masked)
                     ch_masks.append(ch_mask)
@@ -458,7 +457,7 @@ class FusionSM_7_4s_v2_test(nn.Module): #hardcode
         for ii in range(self.ns):      
             branch_fea_0, sparsity, ch_masks = self.branch[0](z, stages=[ii], masked=False)
             branch_fea_1, _, _ = self.branch[1](z, stages=[ii])
-            spa_mask = self.branch[0].get_soft_spa_mask(z)
+            spa_mask = self.get_infer_spa_mask()
             fuser = SMSRMaskFuse(branch_fea_0, branch_fea_1, spa_mask, ch_masks[0], sp=sp)
             
             merge_fea = fuser.fuse()
