@@ -456,7 +456,7 @@ class FusionSM_7_4s_v2_test(nn.Module): #hardcode
         feas = []
 
         for ii in range(self.ns):      
-            branch_fea_0, sparsity, ch_masks = self.branch[0](z, stages=[ii])
+            branch_fea_0, sparsity, ch_masks = self.branch[0](z, stages=[ii], masked=False)
             branch_fea_1, _, _ = self.branch[1](z, stages=[ii])
             spa_mask = self.branch[0].get_soft_spa_mask(z)
             fuser = SMSRMaskFuse(branch_fea_0, branch_fea_1, spa_mask, ch_masks[0], sp=sp)
