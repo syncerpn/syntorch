@@ -130,7 +130,6 @@ def set_template(args):
 		args.cv_dir = "/kaggle/working/syntorch/model_checkpoints"
 		args.trainset_dir='/kaggle/input/fn-data-and-cktpt/data_ckpt/dataset/sr291_2x/2x/'
 		args.testset_dir='/kaggle/input/fn-data-and-cktpt/data_ckpt/dataset/set14_dnb/set14_dnb/2x/'
-		args.checkpoint='/kaggle/working/syntorch/trained_store/64/branch_0_ckpt_E_150_P_32.873.t7'
 
 	else:
 		print('[ERRO] Template not found')
