@@ -322,7 +322,6 @@ class LargeModule(nn.Module):
             spa_mask = self.spa_mask(z)
             _spa_mask = (spa_mask[:, 1:, ...] > spa_mask[:, :1, ...]).float()
             self.infer_spa_mask = _spa_mask
-            print(f"infer spa_mask: {_spa_mask.cpu().mean()}")
 
             for s in range(self.ns):
                 z, ch_mask = self.body[s]([z, _spa_mask], masked)

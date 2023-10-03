@@ -83,6 +83,7 @@ def train_kd(epoch, optim):
         
         with torch.no_grad():
             y_teacher, sparsity = core.forward(x, branch=0, fea_out=True)
+            
         y_student, feas = core.forward(x, branch=1, fea_out=True)
 
         perf = evaluation.calculate(args, y_student, yt)
@@ -161,19 +162,19 @@ if not args.skip_C:
 
         train_teacher(epoch, optim_phase_1)
 
-#train only the S branch
+# train only the S branch
 
-# sub_params = []
-# sub_params += core.branch[1].parameters()
+sub_params = []
+sub_params += core.branch[1].parameters()
 
-# optim_phase_2 = optimizer.create_optimizer(sub_params, args)
-# lr_scheduler_phase_2 = utils.LrScheduler(optim_phase_2, args.lr, args.lr_decay_ratio, args.epoch_step)
+optim_phase_2 = optimizer.create_optimizer(sub_params, args)
+lr_scheduler_phase_2 = utils.LrScheduler(optim_phase_2, args.lr, args.lr_decay_ratio, args.epoch_step)
 
-# print('[INFO] train small branch with KD')
-# for epoch in range(args.start_epoch, args.max_epochs+1):
-#     lr_scheduler_phase_2.adjust_learning_rate(epoch)
+print('[INFO] train small branch with KD')
+for epoch in range(args.start_epoch, args.max_epochs+1):
+    lr_scheduler_phase_2.adjust_learning_rate(epoch)
 
-#     if epoch % 10 == 0:
-#         test(epoch, [0, 1])
+    if epoch % 10 == 0:
+        test(epoch, [0, 1])
 
-#     train_kd(epoch, optim_phase_2)
+    train_kd(epoch, optim_phase_2)

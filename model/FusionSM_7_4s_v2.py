@@ -334,8 +334,8 @@ class SmallModule(nn.Module):
 
         self.conv = nn.ModuleList()
         for i in range(ns):
-            self.conv.append(nn.Conv2d(16, 4, 1, 1, 0))
-            self.conv.append(nn.Conv2d(4, 16, 3, 1, 1))
+            self.conv.append(nn.Conv2d(64, 16, 1, 1, 0))
+            self.conv.append(nn.Conv2d(16, 64, 3, 1, 1))
 
         for i in range(len(self.conv)):
             self.conv[i].bias.data.fill_(0.01)
