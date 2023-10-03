@@ -275,62 +275,59 @@ class LargeModule(nn.Module):
         for body in self.body:
             body._prepare()
             
-        # if stages:
-        #     if self.training:
-        #         spa_mask = self.spa_mask(z)
-        #         spa_mask = gumbel_softmax(spa_mask, 1, self.tau)                
-        #         for s in stages:
-        #             z, ch_mask = self.body[s]([z, spa_mask[:, 1:, ...]])
-        #             ch_masks.append(ch_mask.unsqueeze(2))
-        #             sparsity.append(spa_mask[:, 1:, :, :] * ch_mask[..., 1].view(1, -1, 1, 1) + \
-        #                     torch.ones_like(spa_mask[:, 1:, :, :]) * ch_mask[..., 0].view(1, -1, 1, 1))                   
-                    
-        #         sparsity = torch.cat(sparsity, 0)
-        #         return z, sparsity
-            
-        #     if not self.training:
-        #         print(f"x: {x.cpu().size()}")
-        #         spa_mask = self.spa_mask(x)
-        #         _spa_mask = (spa_mask[:, 1:, ...] > spa_mask[:, :1, ...]).float()
-        #         print(f"spa_mask: {spa_mask.cpu().mean()}")
+        if stages:
+            if self.training:
+                spa_mask = self.spa_mask(z)
+                spa_mask = gumbel_softmax(spa_mask, 1, self.tau)  
+                self.infer_spa_mask = spa_mask[:, 1:, ...]      
+                print(f"train spa_mask: {self.infer_spa_mask.cpu().mean()}")   
+                for s in stages:
+                    z, ch_mask = self.body[s]([z, spa_mask[:, 1:, ...]], masked)
+                    ch_masks.append(ch_mask)
+                    sparsity.append(spa_mask[:, 1:, ...] * ch_mask[..., 1].view(1, -1, 1, 1) + \
+                            torch.ones_like(spa_mask[:, 1:, ...]) * ch_mask[..., 0].view(1, -1, 1, 1))  
+                sparsity = torch.cat(sparsity, 0)            
 
-        #         for s in stages:
-        #             z, ch_mask = self.body[s]([z, spa_mask])
-        #             sparsity.append(_spa_mask * ch_mask[..., 1].view(1, -1, 1, 1) + \
-        #                     torch.ones_like(_spa_mask) * ch_mask[..., 0].view(1, -1, 1, 1))     
-        #             ch_masks.append(ch_mask.unsqueeze(2))
-        #         sparsity = torch.cat(sparsity, 0)
-        #         # ch_masks = torch.cat(ch_masks, 2)
-        #         # self.calc_sparsity(ch_masks, spa_mask)
-        #         return z, sparsity # ch_mask are not used in inference
-        
-        # else:
+            if not self.training:
+                spa_mask = self.spa_mask(z)
+                _spa_mask = (spa_mask[:, 1:, ...] > spa_mask[:, :1, ...]).float()
+                self.infer_spa_mask = _spa_mask
 
-        if self.training:
-            spa_mask = self.spa_mask(z)
-            spa_mask = gumbel_softmax(spa_mask, 1, self.tau)  
-            self.infer_spa_mask = spa_mask[:, 1:, ...]      
-            print(f"train spa_mask: {self.infer_spa_mask.cpu().mean()}")   
-            for s in range(self.ns):
-                z, ch_mask = self.body[s]([z, spa_mask[:, 1:, ...]], masked)
-                ch_masks.append(ch_mask)
-                sparsity.append(spa_mask[:, 1:, ...] * ch_mask[..., 1].view(1, -1, 1, 1) + \
-                        torch.ones_like(spa_mask[:, 1:, ...]) * ch_mask[..., 0].view(1, -1, 1, 1))  
-            sparsity = torch.cat(sparsity, 0)            
+                for s in stages:
+                    z, ch_mask = self.body[s]([z, _spa_mask], masked)
+                    ch_masks.append(ch_mask)
+                    _spa_mask = (spa_mask[:, 1:, ...] > spa_mask[:, :1, ...]).float()                
+                    sparsity.append(_spa_mask * ch_mask[..., 1].view(1, -1, 1, 1) + \
+                            torch.ones_like(_spa_mask) * ch_mask[..., 0].view(1, -1, 1, 1)) 
+                sparsity = torch.cat(sparsity, 0)
+            self.ch_masks = ch_masks
 
-        if not self.training:
-            spa_mask = self.spa_mask(z)
-            _spa_mask = (spa_mask[:, 1:, ...] > spa_mask[:, :1, ...]).float()
-            self.infer_spa_mask = _spa_mask
+        else:
+            if self.training:
+                spa_mask = self.spa_mask(z)
+                spa_mask = gumbel_softmax(spa_mask, 1, self.tau)  
+                self.infer_spa_mask = spa_mask[:, 1:, ...]      
+                print(f"train spa_mask: {self.infer_spa_mask.cpu().mean()}")   
+                for s in range(self.ns):
+                    z, ch_mask = self.body[s]([z, spa_mask[:, 1:, ...]], masked)
+                    ch_masks.append(ch_mask)
+                    sparsity.append(spa_mask[:, 1:, ...] * ch_mask[..., 1].view(1, -1, 1, 1) + \
+                            torch.ones_like(spa_mask[:, 1:, ...]) * ch_mask[..., 0].view(1, -1, 1, 1))  
+                sparsity = torch.cat(sparsity, 0)            
 
-            for s in range(self.ns):
-                z, ch_mask = self.body[s]([z, _spa_mask], masked)
-                ch_masks.append(ch_mask)
-                _spa_mask = (spa_mask[:, 1:, ...] > spa_mask[:, :1, ...]).float()                
-                sparsity.append(_spa_mask * ch_mask[..., 1].view(1, -1, 1, 1) + \
-                        torch.ones_like(_spa_mask) * ch_mask[..., 0].view(1, -1, 1, 1)) 
-            sparsity = torch.cat(sparsity, 0)
-        self.ch_masks = ch_masks
+            if not self.training:
+                spa_mask = self.spa_mask(z)
+                _spa_mask = (spa_mask[:, 1:, ...] > spa_mask[:, :1, ...]).float()
+                self.infer_spa_mask = _spa_mask
+
+                for s in range(self.ns):
+                    z, ch_mask = self.body[s]([z, _spa_mask], masked)
+                    ch_masks.append(ch_mask)
+                    _spa_mask = (spa_mask[:, 1:, ...] > spa_mask[:, :1, ...]).float()                
+                    sparsity.append(_spa_mask * ch_mask[..., 1].view(1, -1, 1, 1) + \
+                            torch.ones_like(_spa_mask) * ch_mask[..., 0].view(1, -1, 1, 1)) 
+                sparsity = torch.cat(sparsity, 0)
+            self.ch_masks = ch_masks
         
         return z, sparsity, self.ch_masks
     
@@ -342,8 +339,8 @@ class SmallModule(nn.Module):
 
         self.conv = nn.ModuleList()
         for i in range(ns):
-            self.conv.append(nn.Conv2d(16, 4, 1, 1, 0))
-            self.conv.append(nn.Conv2d(4, 16, 3, 1, 1))
+            self.conv.append(nn.Conv2d(64, 16, 1, 1, 0))
+            self.conv.append(nn.Conv2d(16, 64, 3, 1, 1))
 
         for i in range(len(self.conv)):
             self.conv[i].bias.data.fill_(0.01)
@@ -361,14 +358,14 @@ class SmallModule(nn.Module):
                     z = F.relu(self.conv[2*s](z))
                     z = F.relu(self.conv[2*s+1](z))
                     feas.append(z)
-            return z, feas
+            return z, feas, None
         else:
             feas = []
             for s in range(self.ns):
                 z = F.relu(self.conv[2*s](z))
                 z = F.relu(self.conv[2*s+1](z))
                 feas.append(z)
-            return z, feas
+            return z, feas, None
         
 
 class FusionSM_7_4s_v2_test(nn.Module): #hardcode
@@ -406,7 +403,7 @@ class FusionSM_7_4s_v2_test(nn.Module): #hardcode
     def get_infer_spa_mask(self):
         return self.branch[0].infer_spa_mask
 
-    def forward(self, x, branch=0, masked=True):
+    def forward_mask(self, x, branch=0, masked=True):
         z = x
         z = F.relu(self.head[0](z))
         z = F.relu(self.head[1](z))
@@ -424,6 +421,24 @@ class FusionSM_7_4s_v2_test(nn.Module): #hardcode
         #     return y, mask_or_feas
 
         return y, mask_or_feas
+    
+    def forward(self, x, branch=0, fea_out=False):
+        z = x
+        z = F.relu(self.head[0](z))
+        z = F.relu(self.head[1](z))
+
+        # print(f"fea map: {z.cpu().size()}")       
+        branch_fea, sparsity_or_feas, ch_masks = self.branch[branch](z, masked=True)
+        
+        z = F.relu(self.tail[0](branch_fea))
+        z = self.tail[1](z)
+
+        y = residual_stack(z, x, self.scale)
+
+        if fea_out:
+            return y, sparsity_or_feas
+
+        return y
 
     def forward_merge_mask(self, x, masks: dict, fea_out=False):
         # TODO: Convert merge mask to smsr-like forward

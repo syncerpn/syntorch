@@ -99,7 +99,7 @@ def compare_psnr_by_dense(branch):
         # training forward
         core.train()
         with torch.no_grad():
-            yf_train, _ = core.forward(x, branch, masked=False)
+            yf_train, _ = core.forward_mask(x, branch, masked=False)
             perf_train = evaluation.calculate(args, yf_train, yt)
         write_to_file(f"PSNR with mask removed: {perf_train}", save_output_file)
         perf_trains.append(perf_train)
@@ -107,7 +107,7 @@ def compare_psnr_by_dense(branch):
         # training forward - soft mask
         core.train()
         with torch.no_grad():
-            yf_train_soft, _ = core.forward(x, branch, masked=True)
+            yf_train_soft, _ = core.forward_mask(x, branch, masked=True)
             perf_train_soft = evaluation.calculate(args, yf_train_soft, yt)
         write_to_file(f"PSNR with soft mask: {perf_train_soft}", save_output_file)
         perf_train_softs.append(perf_train_soft)
@@ -116,7 +116,7 @@ def compare_psnr_by_dense(branch):
         # evaluation forward
         core.eval()
         with torch.no_grad():
-            yf_val, sparsity_val = core.forward(x, branch)
+            yf_val, sparsity_val = core.forward_mask(x, branch)
             perf_val = evaluation.calculate(args, yf_val, yt)
         write_to_file(f"PSNR with hard mask: {perf_val}", save_output_file)
         perf_vals.append(perf_val)
