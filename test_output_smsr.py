@@ -176,4 +176,4 @@ core = model.config(args)
 core.cuda()
 
 # compare_psnr_by_dense(0)
-test_merge(0.2)
+test_merge(args.sp)
