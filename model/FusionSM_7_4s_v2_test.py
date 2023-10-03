@@ -473,7 +473,7 @@ class FusionSM_7_4s_v2_test(nn.Module): #hardcode
         if fea_out:
             return y, feas
 
-        # return y, feas
+        return y
     
     def get_sparsity_inference(self):
         return self.branch[0].sparsities
