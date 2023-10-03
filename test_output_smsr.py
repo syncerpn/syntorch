@@ -148,6 +148,18 @@ def compare_psnr_by_dense(branch):
     write_to_file(f"Mean PSNR with mask removed: {perf_trains.cpu().mean()}", save_output_file)
     write_to_file(f"Mean PSNR with soft mask: {perf_train_softs.cpu().mean()}", save_output_file)
     write_to_file(f"Mean PSNR with hard mask: {perf_vals.cpu().mean()}", save_output_file)
+    
+    
+def test_merge(sp):
+    for batch_idx, (x, yt) in tqdm.tqdm(enumerate(XYtest), total= len(XYtest)):
+        core.train()
+        x = x.cuda()
+        yt = yt.cuda()
+        
+        with torch.no_grad():
+            yf = core.forward_merge_mask(x, sp)
+            perf = evaluation.calculate(args, yf, yt)
+        print(f"Batch {batch_idx}: {perf}")
        
 # load test data
 print('[INFO] load testset "%s" from %s' % (args.testset_tag, args.testset_dir))
@@ -157,4 +169,5 @@ XYtest = torchdata.DataLoader(testset, batch_size=batch_size_test, shuffle=False
 core = model.config(args)
 core.cuda()
 
-compare_psnr_by_dense(0)
+# compare_psnr_by_dense(0)
+test_merge(0.2)
