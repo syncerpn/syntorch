@@ -351,7 +351,7 @@ class SmallModule(nn.Module):
             self.conv[i].bias.data.fill_(0.01)
             nn.init.xavier_uniform_(self.conv[i].weight)
 
-    def forward(self, x, stages=[]):
+    def forward(self, x, stages=[], masked=False):
         for s in stages:
             assert (s < self.ns) and (s >= 0), f"[ERRO] invalid stage {s}"
 
