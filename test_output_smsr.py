@@ -157,6 +157,7 @@ def compare_psnr_by_dense(branch):
     
     
 def test_merge(sp):
+    perfs = []
     for batch_idx, (x, yt) in tqdm.tqdm(enumerate(XYtest), total= len(XYtest)):
         core.train()
         x = x.cuda()
@@ -165,7 +166,9 @@ def test_merge(sp):
         with torch.no_grad():
             yf = core.forward_merge_mask(x, sp)
             perf = evaluation.calculate(args, yf, yt)
+            perfs.append(perf)
         print(f"Batch {batch_idx}: {perf}")
+    print(f"Mean batch perf: {np.mean(np.array(perfs))}")
        
 # load test data
 print('[INFO] load testset "%s" from %s' % (args.testset_tag, args.testset_dir))
