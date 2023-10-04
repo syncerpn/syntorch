@@ -92,9 +92,9 @@ class SMSRMaskFuse:
         
         max_xs = torch.max(self.xS, 1, keepdim=True)[0]
         min_xs = torch.min(self.xS, 1, keepdim=True)[0]
-        xS_rescaled = (self.xS - min_xs) / (max_xs - min_xs)
-        dense_ch_mask = self.ch_mask[:, :, :1]
-        sparse_ch_mask = self.ch_mask[:, :, 1:]
+        xS_rescaled = self.xS / max_xs
+        dense_ch_mask = self.ch_mask[:, :, :1].round()
+        sparse_ch_mask = self.ch_mask[:, :, 1:].round()
 
         out = self.xC * dense_ch_mask.view(1, -1, 1, 1) + self.xC * sparse_ch_mask.view(1, -1, 1, 1) * dense_spa_mask \
             + xS_rescaled * sparse_ch_mask.view(1, -1, 1, 1) * sparse_spa_mask
