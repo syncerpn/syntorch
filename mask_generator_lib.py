@@ -94,7 +94,7 @@ class SMSRMaskFuse:
         sparse_ch_mask = self.ch_mask[:, :, 1].round()
 
         out = self.xC * dense_ch_mask.view(1, -1, 1, 1) + self.xC * sparse_ch_mask.view(1, -1, 1, 1) * dense_spa_mask \
-            + torch.zeros_like(self.xS) * sparse_ch_mask.view(1, -1, 1, 1) * sparse_spa_mask
+            + self.xS * sparse_ch_mask.view(1, -1, 1, 1) * sparse_spa_mask
         return out.cuda()
 
 
