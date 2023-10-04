@@ -90,11 +90,12 @@ class SMSRMaskFuse:
         dense_spa_mask = self.spa_mask.round()
         sparse_spa_mask = 1 - dense_spa_mask
         
+        xS_rescaled = (self.xS - min(self.xS)) / (max(self.xS) - min(self.xS))
         dense_ch_mask = self.ch_mask[:, :, :1]
         sparse_ch_mask = self.ch_mask[:, :, 1:]
 
         out = self.xC * dense_ch_mask.view(1, -1, 1, 1) + self.xC * sparse_ch_mask.view(1, -1, 1, 1) * dense_spa_mask \
-            + self.xS * sparse_ch_mask.view(1, -1, 1, 1) * sparse_spa_mask
+            + xS_rescaled * sparse_ch_mask.view(1, -1, 1, 1) * sparse_spa_mask
         return out.cuda()
 
 

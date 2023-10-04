@@ -285,7 +285,6 @@ class LargeModule(nn.Module):
                 spa_mask = self.spa_mask(z)
                 spa_mask = gumbel_softmax(spa_mask, 1, self.tau)  
                 self.infer_spa_mask = spa_mask[:, 1:, ...]      
-                print(f"train spa_mask: {self.infer_spa_mask.cpu().mean()}")   
                 for s in stages:
                     z, ch_mask = self.body[s]([z, spa_mask[:, 1:, ...]], masked)
                     ch_masks.append(ch_mask)
