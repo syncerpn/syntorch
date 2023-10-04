@@ -77,15 +77,24 @@ class SMSRMaskFuse:
         sparse_spa = torch.from_numpy(1 - out).reshape(1, 1, rows, cols).cuda()
         return dense_spa, sparse_spa
     
-    def fuse(self):
+    def sampling_fuse(self):
         dense_spa_mask, sparse_spa_mask = self.optimal_sampling(self.spa_mask, sp=self.sp)
         dense_ch_mask = self.ch_mask[:, :, :1]
         sparse_ch_mask = self.ch_mask[:, :, 1:]
         
-        out = self.xC * dense_ch_mask.view(1, -1, 1, 1) + self.xC * sparse_ch_mask.view(1, -1, 1, 1) * dense_spa_mask 
-            # + self.xS * sparse_ch_mask.view(1, -1, 1, 1) * sparse_spa_mask
+        out = self.xC * dense_ch_mask.view(1, -1, 1, 1) + self.xC * sparse_ch_mask.view(1, -1, 1, 1) * dense_spa_mask + \
+             self.xS * sparse_ch_mask.view(1, -1, 1, 1) * sparse_spa_mask
         return out.cuda()
+    
+    def normal_fuse(self):
+        dense_spa_mask = self.spa_mask
+        sparse_spa_mask = 1 - self.spa_mask
         
-        
+        dense_ch_mask = self.ch_mask[:, :, :1]
+        sparse_ch_mask = self.ch_mask[:, :, 1:]
+
+        out = self.xC * dense_ch_mask.view(1, -1, 1, 1) + self.xC * sparse_ch_mask.view(1, -1, 1, 1) * dense_spa_mask + \
+             self.xS * sparse_ch_mask.view(1, -1, 1, 1) * sparse_spa_mask
+        return out.cuda()
 
 
