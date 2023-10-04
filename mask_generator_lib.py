@@ -84,7 +84,7 @@ class SMSRMaskFuse:
         sparse_ch_mask = self.ch_mask[:, :, 1:]
         
         if spatial_only:
-            out =  self.xC * dense_spa_mask + self.xS * sparse_spa_mask
+            out =  self.xC * dense_spa_mask 
         else:
             out = self.xC * dense_ch_mask.view(1, -1, 1, 1) + self.xC * sparse_ch_mask.view(1, -1, 1, 1) * dense_spa_mask + \
                 self.xS * sparse_ch_mask.view(1, -1, 1, 1) * sparse_spa_mask
