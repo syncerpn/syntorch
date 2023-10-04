@@ -218,7 +218,7 @@ class MaskedConv2d(nn.Module):
             else:
                 # Remove mask
                 spa_mask = x[1]
-                ch_mask = self.ch_mask.softmax(2).round()
+                ch_mask = gumbel_softmax(self.ch_mask, 2, self.tau)
                 fea = x[0]
                 fea = self.conv(fea)
                 fea = self.relu(fea)

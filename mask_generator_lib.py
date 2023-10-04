@@ -90,8 +90,8 @@ class SMSRMaskFuse:
         dense_spa_mask = self.spa_mask.round()
         sparse_spa_mask = 1 - dense_spa_mask
         
-        dense_ch_mask = self.ch_mask[:, :, :1].round()
-        sparse_ch_mask = self.ch_mask[:, :, 1:].round()
+        dense_ch_mask = self.ch_mask[:, :, 0].round()
+        sparse_ch_mask = self.ch_mask[:, :, 1].round()
 
         out = self.xC * dense_ch_mask.view(1, -1, 1, 1) + self.xC * sparse_ch_mask.view(1, -1, 1, 1) * dense_spa_mask \
             + torch.zeros_like(self.xS) * sparse_ch_mask.view(1, -1, 1, 1) * sparse_spa_mask
