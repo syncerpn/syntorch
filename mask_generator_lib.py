@@ -87,8 +87,8 @@ class SMSRMaskFuse:
         return out.cuda()
     
     def normal_fuse(self):
-        dense_spa_mask = self.spa_mask
-        sparse_spa_mask = 1 - self.spa_mask
+        dense_spa_mask = self.spa_mask.round()
+        sparse_spa_mask = 1 - dense_spa_mask
         
         dense_ch_mask = self.ch_mask[:, :, :1]
         sparse_ch_mask = self.ch_mask[:, :, 1:]
