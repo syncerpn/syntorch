@@ -21,7 +21,6 @@ class GradientSobelFilter:
 
         if b > 0:
             border_mask = torch.zeros_like(grad)
-            print(border_mask.shape)
             border_mask[:,:,b:-b,b:-b] = 1.0
 
             grad = grad * border_mask
@@ -30,7 +29,7 @@ class GradientSobelFilter:
         grad_sorted_index = min(max(int(p * torch.numel(grad)), 0), torch.numel(grad)-1)
         grad_sorted_threshold = grad_sorted[grad_sorted_index]
         
-        merge_map = (grad > grad_sorted_threshold).type(torch.float32)
+        merge_map = (grad >= grad_sorted_threshold).type(torch.float32)
 
         return merge_map
 
