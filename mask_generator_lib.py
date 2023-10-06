@@ -21,7 +21,8 @@ class GradientSobelFilter:
 
         if b > 0:
             border_mask = torch.zeros_like(grad)
-            border_mask[b:-b,b:-b] = 1.0
+            print(border_mask.shape)
+            border_mask[:,b:-b,b:-b] = 1.0
 
             grad = grad * border_mask
 
