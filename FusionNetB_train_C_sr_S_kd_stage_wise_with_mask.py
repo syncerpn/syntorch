@@ -23,6 +23,7 @@ torch.multiprocessing.set_sharing_strategy('file_system')
 
 parser.add_argument("--skip-C", action="store_true", help="skip training C phase")
 parser.add_argument("--psi", type=float, default=0.2, help="psi merge prob factor")
+parser.add_argument("--mask-border", type=int, default=0, help="mask border removal")
 
 
 args = parser.parse_args()
@@ -70,7 +71,7 @@ def train_kd_stage(epoch, optim, target_stage):
         x  = x.cuda()
         yt = yt.cuda()
         
-        merge_map = gsf.generate_mask(x, args.psi)
+        merge_map = gsf.generate_mask(x, args.psi, b=mask_border)
         masks = {i: merge_map for i in range(target_stage)}
         
         fea_teacher, fea_student = core.forward_stage_wise_sequential_train(x, masks, target_stage)

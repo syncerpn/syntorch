@@ -19,6 +19,8 @@ import numpy as np
 
 from mask_generator_lib import GradientSobelFilter, RandomFlatMasker
 
+parser.add_argument("--mask-border", type=int, default=0, help="mask border removal")
+
 args = parser.parse_args()
 
 if args.template is not None:
@@ -53,7 +55,7 @@ def merge_gradient():
             yt = yt.cuda()
 
             with torch.no_grad():
-                merge_map = gsf.generate_mask(x, psi/10, b=3)
+                merge_map = gsf.generate_mask(x, psi/10, b=args.mask_border)
                 masks = {i: merge_map for i in range(core.ns)}
                 yf = core.forward_merge_mask(x, masks)
 
