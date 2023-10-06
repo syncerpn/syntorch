@@ -53,7 +53,7 @@ def merge_gradient():
             yt = yt.cuda()
 
             with torch.no_grad():
-                merge_map = gsf.generate_mask(x, psi/10)
+                merge_map = gsf.generate_mask(x, psi/10, b=3)
                 masks = {i: merge_map for i in range(core.ns)}
                 yf = core.forward_merge_mask(x, masks)
 
