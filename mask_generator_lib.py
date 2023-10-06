@@ -19,10 +19,11 @@ class GradientSobelFilter:
         grad_map_y = self.sfy.forward(x)
         grad = abs(grad_map_x) + abs(grad_map_y)
 
-        border_mask = torch.zeros_like(grad)
-        border_mask[b:-b,b:-b] = 1.0
+        if b > 0:
+            border_mask = torch.zeros_like(grad)
+            border_mask[b:-b,b:-b] = 1.0
 
-        grad = grad * border_mask
+            grad = grad * border_mask
 
         grad_sorted, _ = torch.sort(grad.view(-1), descending=True)
         grad_sorted_index = min(max(int(p * torch.numel(grad)), 0), torch.numel(grad)-1)
