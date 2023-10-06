@@ -454,14 +454,15 @@ class FusionSM_7_4s_v2_test(nn.Module): #hardcode
         feas = []
         spa_mask = None
         for ii in range(self.ns):      
-            branch_fea_0, sparsity, ch_masks = self.branch[0](z, stages=[ii], masked=False)
+            branch_fea_0, sparsity, ch_masks = self.branch[0](z, stages=[ii], masked=True)
             branch_fea_1, _, _ = self.branch[1](z, stages=[ii])
             if type(spa_mask) == type(None):
                 spa_mask = self.get_infer_spa_mask()
             fuser = SMSRMaskFuse(branch_fea_0, branch_fea_1, spa_mask, ch_masks[0], sp=sp)
             
             # merge_fea = fuser.sampling_fuse(spatial_only=True)
-            merge_fea = fuser.sampling_fuse(spatial_only=True)
+            merge_fea = fuser.normal_fuse()
+            # merge_fea = fuser.sampling_fuse(spatial_only=False)
             z = merge_fea
             feas.append(merge_fea)
         
