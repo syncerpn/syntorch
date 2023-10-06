@@ -14,10 +14,15 @@ class GradientSobelFilter:
         self.sfy.weight.data = torch.Tensor([[[[-1, -2, -1], [0, 0, 0], [1, 2, 1]]]]).expand([self.n_groups,1,3,3])
         self.sfy.to('cuda')
 
-    def generate_mask(self, x, p):
+    def generate_mask(self, x, p, b=0):
         grad_map_x = self.sfx.forward(x)
         grad_map_y = self.sfy.forward(x)
         grad = abs(grad_map_x) + abs(grad_map_y)
+
+        border_mask = torch.zeros_like(grad)
+        border_mask[b:-b,b:-b] = 1.0
+
+        grad = grad * border_mask
 
         grad_sorted, _ = torch.sort(grad.view(-1), descending=True)
         grad_sorted_index = min(max(int(p * torch.numel(grad)), 0), torch.numel(grad)-1)
