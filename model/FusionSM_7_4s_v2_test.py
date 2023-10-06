@@ -460,7 +460,8 @@ class FusionSM_7_4s_v2_test(nn.Module): #hardcode
                 spa_mask = self.get_infer_spa_mask()
             fuser = SMSRMaskFuse(branch_fea_0, branch_fea_1, spa_mask, ch_masks[0], sp=sp)
             
-            merge_fea = fuser.sampling_fuse(spatial_only=True)
+            # merge_fea = fuser.sampling_fuse(spatial_only=True)
+            merge_fea = fuser.normal_fuse()
             z = merge_fea
             feas.append(merge_fea)
         

@@ -31,6 +31,10 @@ parser.add_argument(
     type=float,
     default=0.2
 )
+parser.add_argument(
+    "--fuse-mode",
+    required=True
+)
 
 args = parser.parse_args()
 
@@ -158,6 +162,7 @@ def compare_psnr_by_dense(branch):
     
 def test_merge(sp):
     perfs = []
+    write_to_file(f"Fuse mode: {args.fuse_mode}", save_output_file)
     for batch_idx, (x, yt) in tqdm.tqdm(enumerate(XYtest), total= len(XYtest)):
         core.train()
         x = x.cuda()
@@ -167,8 +172,9 @@ def test_merge(sp):
             yf = core.forward_merge_mask(x, sp)
             perf = evaluation.calculate(args, yf, yt)
             perfs.append(perf)
-        print(f"Batch {batch_idx}: {perf}")
-    print(f"Mean batch perf: {np.mean(np.array(perfs))}")
+        write_to_file(f"Batch {batch_idx}: {perf}", save_output_file)
+    write_to_file("="*50, save_output_file)
+    write_to_file(f"Mean batch perf: {np.mean(np.array(perfs))}", save_output_file)
        
 # load test data
 print('[INFO] load testset "%s" from %s' % (args.testset_tag, args.testset_dir))
