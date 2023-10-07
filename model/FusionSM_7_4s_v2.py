@@ -191,7 +191,7 @@ class MaskedConv2d(nn.Module):
             
         return fea_d
     
-    def forward(self, x):
+    def forward(self, x, masked):
         '''
         :param x: [x[0], x[1]]
         x[0]: input feature [B, C, H, W]
@@ -211,9 +211,9 @@ class MaskedConv2d(nn.Module):
             # print(f"Channel mask layer 1: {ch_mask[:, :, 1:].view(1, -1, 1, 1).size()}")
             # print()            
             # fea = fea * ch_mask[:, :, :1] * spa_mask + fea * ch_mask[:, :, 1:]
-            fea = fea * ch_mask[:, :, 1:].view(1, -1, 1, 1) * spa_mask + \
-                  fea * ch_mask[:, :, :1].view(1, -1, 1, 1)
-
+            if masked:
+                fea = fea * ch_mask[:, :, 1:].view(1, -1, 1, 1) * spa_mask + \
+                    fea * ch_mask[:, :, :1].view(1, -1, 1, 1)
                     
             fea = self.relu(fea)
 
@@ -261,7 +261,7 @@ class LargeModule(nn.Module):
     def _update_tau(self, tau):
         self.tau = tau     
 
-    def forward(self, x, stages=[]):
+    def forward(self, x, stages=[], masked=True):
         # TODO: Write forward
         for s in stages:
             assert (s < self.ns) and (s >= 0), f"[ERROR] invalid stage {s}"
@@ -274,7 +274,7 @@ class LargeModule(nn.Module):
         if stages:
             if self.training:
                 spa_mask = self.spa_mask(z)
-                spa_mask = gumbel_softmax(spa_mask, 1, self.tau)                
+                spa_mask = gumbel_softmax(spa_mask, 1, self.tau, masked)                
                 for s in stages:
                     z, ch_mask = self.body[s]([z, spa_mask[:, 1:, ...]])
                     ch_masks.append(ch_mask.unsqueeze(2))
@@ -291,7 +291,7 @@ class LargeModule(nn.Module):
                 print(f"spa_mask: {spa_mask.cpu().mean()}")
 
                 for s in stages:
-                    z, ch_mask = self.body[s]([z, spa_mask])
+                    z, ch_mask = self.body[s]([z, spa_mask], masked)
                     sparsity.append(_spa_mask * ch_mask[..., 1].view(1, -1, 1, 1) + \
                             torch.ones_like(_spa_mask) * ch_mask[..., 0].view(1, -1, 1, 1))     
                     ch_masks.append(ch_mask.unsqueeze(2))
@@ -305,7 +305,7 @@ class LargeModule(nn.Module):
                 spa_mask = self.spa_mask(z)
                 spa_mask = gumbel_softmax(spa_mask, 1, self.tau)           
                 for s in range(self.ns):
-                    z, ch_mask = self.body[s]([z, spa_mask[:, 1:, ...]])
+                    z, ch_mask = self.body[s]([z, spa_mask[:, 1:, ...]], masked)
                     ch_masks.append(ch_mask.unsqueeze(2))
                     sparsity.append(spa_mask[:, 1:, ...] * ch_mask[..., 1].view(1, -1, 1, 1) + \
                             torch.ones_like(spa_mask[:, 1:, ...]) * ch_mask[..., 0].view(1, -1, 1, 1))  
@@ -320,7 +320,7 @@ class LargeModule(nn.Module):
                 print(f"spa_mask: {_spa_mask.cpu().mean()}")
 
                 for s in range(self.ns):
-                    z, ch_mask = self.body[s]([z, _spa_mask])
+                    z, ch_mask = self.body[s]([z, _spa_mask], masked)
                     sparsity.append(_spa_mask * ch_mask[..., 1].view(1, -1, 1, 1) + \
                             torch.ones_like(_spa_mask) * ch_mask[..., 0].view(1, -1, 1, 1)) 
                 sparsity = torch.cat(sparsity, 0)
