@@ -343,7 +343,7 @@ class SmallModule(nn.Module):
 
     def forward(self, x, stages=[]):
         for s in stages:
-            assert (s < self.ns) and (s >= 0), f"[ERRO] invalid stage {s}"
+            assert (s < self.ns) and (s >= 0), f"[ERROR] invalid stage {s}"
 
         z = x
         if stages:
@@ -430,7 +430,7 @@ class FusionSM_7_4s_v2(nn.Module): #hardcode
             branch_fea_0 = self.branch[0](z, stages=[ii])
             branch_fea_1 = self.branch[1](z, stages=[ii])
             
-            assert ii in masks, f"[ERRO]: missing mask for stage {ii}"
+            assert ii in masks, f"[ERROR]: missing mask for stage {ii}"
 
             merge_map = masks[ii]
             merge_fea = branch_fea_0 * merge_map + branch_fea_1 * (1.0 - merge_map)
