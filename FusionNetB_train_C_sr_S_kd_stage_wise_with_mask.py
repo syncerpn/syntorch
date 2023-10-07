@@ -71,7 +71,7 @@ def train_kd_stage(epoch, optim, target_stage):
         x  = x.cuda()
         yt = yt.cuda()
         
-        merge_map = gsf.generate_mask(x, args.psi, b=mask_border)
+        merge_map = gsf.generate_mask(x, args.psi, b=args.mask_border)
         masks = {i: merge_map for i in range(target_stage)}
         
         fea_teacher, fea_student = core.forward_stage_wise_sequential_train(x, masks, target_stage)
