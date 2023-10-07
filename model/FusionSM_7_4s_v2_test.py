@@ -270,7 +270,7 @@ class LargeModule(nn.Module):
         
     def _update_tau(self, tau):
         self.tau = tau
-    def forward(self, x, stages=[], masked=True):
+    def forward(self, x, masked, stages=[]):
         # TODO: Write forward
         for s in stages:
             assert (s < self.ns) and (s >= 0), f"[ERROR] invalid stage {s}"
