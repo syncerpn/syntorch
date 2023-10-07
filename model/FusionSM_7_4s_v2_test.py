@@ -454,7 +454,7 @@ class FusionSM_7_4s_v2_test(nn.Module): #hardcode
         feas = []
         spa_mask = None
         for ii in range(self.ns):      
-            branch_fea_0, sparsity, ch_masks = self.branch[0](z, stages=[ii], masked=True)
+            branch_fea_0, sparsity, ch_masks = self.branch[0](z, stages=[ii], masked=False)
             branch_fea_1, _, _ = self.branch[1](z, stages=[ii])
             if type(spa_mask) == type(None):
                 spa_mask = self.get_infer_spa_mask()
