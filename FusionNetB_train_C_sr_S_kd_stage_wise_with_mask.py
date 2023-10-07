@@ -21,6 +21,7 @@ from mask_generator_lib import GradientSobelFilter, RandomFlatMasker
 import torch.multiprocessing
 torch.multiprocessing.set_sharing_strategy('file_system')
 
+parser.add_argument("--cont-S", type=int, default=0, help="mask border removal")
 parser.add_argument("--skip-C", action="store_true", help="skip training C phase")
 parser.add_argument("--psi", type=float, default=0.2, help="psi merge prob factor")
 parser.add_argument("--mask-border", type=int, default=0, help="mask border removal")
@@ -147,7 +148,7 @@ if not args.skip_C:
 gsf = GradientSobelFilter()
 
 #train only the S branch
-for target_stage in range(core.ns):
+for target_stage in range(args.cont_S, core.ns):
     sub_params = core.branch[1].stages[target_stage].parameters()
 
     optim_phase_2 = optimizer.create_optimizer(sub_params, args)
