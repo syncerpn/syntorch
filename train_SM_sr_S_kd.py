@@ -46,7 +46,7 @@ def train_teacher(epoch, optim):
         x = x.cuda()
         yt = yt.cuda()
 
-        yf, sparsity = core.forward(x, branch=0)
+        yf, sparsity = core.forward(x, branch=0, masked=True)
         perf = evaluation.calculate(args, yf, yt)
 
         loss_func = loss.create_loss_func(args.loss)
@@ -82,7 +82,7 @@ def train_kd(epoch, optim):
         yt = yt.cuda()
         
         with torch.no_grad():
-            y_teacher, sparsity = core.forward(x, branch=0, fea_out=True)
+            y_teacher, sparsity = core.forward(x, branch=0, masked=False, fea_out=True)
             
         y_student, feas = core.forward(x, branch=1, fea_out=True)
 

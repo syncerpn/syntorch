@@ -261,7 +261,7 @@ class LargeModule(nn.Module):
     def _update_tau(self, tau):
         self.tau = tau     
 
-    def forward(self, x, stages=[], masked=False):
+    def forward(self, x, masked, stages=[]):
         # TODO: Write forward
         for s in stages:
             assert (s < self.ns) and (s >= 0), f"[ERROR] invalid stage {s}"
@@ -395,13 +395,16 @@ class FusionSM_7_4s_v2(nn.Module): #hardcode
             nn.init.xavier_uniform_(self.tail[i].weight)
                 
 
-    def forward(self, x, branch=0, fea_out=False):
+    def forward(self, x, branch=0, masked=True, fea_out=False):
         z = x
         z = F.relu(self.head[0](z))
         z = F.relu(self.head[1](z))
 
-        # print(f"fea map: {z.cpu().size()}")       
-        branch_fea, mask_or_feas = self.branch[branch](z)
+        # print(f"fea map: {z.cpu().size()}")     
+        if branch==0:  
+            branch_fea, mask_or_feas = self.branch[branch](z, masked=masked)
+        else:
+            branch_fea, mask_or_feas = self.branch[branch](z)
         
         z = F.relu(self.tail[0](branch_fea))
         z = self.tail[1](z)
