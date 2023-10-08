@@ -473,9 +473,6 @@ class FusionSM_7_4s_v2_test(nn.Module): #hardcode
 
         y = residual_stack(z, x, self.scale)
 
-        if fea_out:
-            return y, feas
-
         return y
     
     def get_sparsity_inference(self):
