@@ -405,10 +405,11 @@ class FusionSM_7_4s_v2(nn.Module): #hardcode
 
         # print(f"fea map: {z.cpu().size()}")     
         if branch==0:  
-            branch_fea, sparsity = self.branch[branch](z, masked=masked)
+            branch_fea, sparsity_or_feas = self.branch[branch](z, masked=masked)
             feas = self.branch[branch].feas
         else:
-            branch_fea, feas = self.branch[branch](z)
+            branch_fea, sparsity_or_feas = self.branch[branch](z)
+            feas = sparsity_or_feas
         
         z = F.relu(self.tail[0](branch_fea))
         z = self.tail[1](z)
