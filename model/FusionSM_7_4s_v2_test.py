@@ -458,7 +458,6 @@ class FusionSM_7_4s_v2_test(nn.Module): #hardcode
         for ii in range(self.ns):      
             branch_fea_0, sparsity, ch_masks = self.branch[0](z, stages=[ii], masked=False)
             branch_fea_1, _, _ = self.branch[1](z, stages=[ii])
-            print(torch.abs(branch_fea_0 - branch_fea_1).mean())
             if type(spa_mask) == type(None):
                 spa_mask = self.get_infer_spa_mask()
             fuser = SMSRMaskFuse(branch_fea_0, branch_fea_1, spa_mask, ch_masks[0], sp=sp)
