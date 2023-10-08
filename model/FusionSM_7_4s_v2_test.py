@@ -431,6 +431,8 @@ class FusionSM_7_4s_v2_test(nn.Module): #hardcode
         z = F.relu(self.head[1](z))
 
         # print(f"fea map: {z.cpu().size()}")       
+        # branch 0: sparsity
+        # branch 1: feas
         branch_fea, sparsity_or_feas, ch_masks = self.branch[branch](z, masked=True)
         
         z = F.relu(self.tail[0](branch_fea))
@@ -443,7 +445,7 @@ class FusionSM_7_4s_v2_test(nn.Module): #hardcode
 
         return y, ch_masks
 
-    def forward_merge_mask(self, x, sp, fea_out=False):
+    def forward_merge_mask(self, x, sp):
         # TODO: Convert merge mask to smsr-like forward
         
         # mask in masks are binary; 1.0 uses for C or branch 0, and vice versa

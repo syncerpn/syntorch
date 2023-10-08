@@ -268,19 +268,20 @@ class LargeModule(nn.Module):
         z = x
         ch_masks = []
         sparsity = []
+        self.feas = []
         for body in self.body:
             body._prepare()
             
         if stages:
             if self.training:
                 spa_mask = self.spa_mask(z)
-                spa_mask = gumbel_softmax(spa_mask, 1, self.tau, masked)                
+                spa_mask = gumbel_softmax(spa_mask, 1, self.tau)                
                 for s in stages:
-                    z, ch_mask = self.body[s]([z, spa_mask[:, 1:, ...]])
+                    z, ch_mask = self.body[s]([z, spa_mask[:, 1:, ...]], masked)
                     ch_masks.append(ch_mask.unsqueeze(2))
                     sparsity.append(spa_mask[:, 1:, :, :] * ch_mask[..., 1].view(1, -1, 1, 1) + \
                             torch.ones_like(spa_mask[:, 1:, :, :]) * ch_mask[..., 0].view(1, -1, 1, 1))                   
-                    
+                    self.feas.append(z)
                 sparsity = torch.cat(sparsity, 0)
                 return z, sparsity
             
@@ -295,9 +296,9 @@ class LargeModule(nn.Module):
                     sparsity.append(_spa_mask * ch_mask[..., 1].view(1, -1, 1, 1) + \
                             torch.ones_like(_spa_mask) * ch_mask[..., 0].view(1, -1, 1, 1))     
                     ch_masks.append(ch_mask.unsqueeze(2))
+                    self.feas.append(z)
+                    
                 sparsity = torch.cat(sparsity, 0)
-                # ch_masks = torch.cat(ch_masks, 2)
-                # self.calc_sparsity(ch_masks, spa_mask)
                 return z, sparsity # ch_mask are not used in inference
         
         else:
@@ -309,6 +310,7 @@ class LargeModule(nn.Module):
                     ch_masks.append(ch_mask.unsqueeze(2))
                     sparsity.append(spa_mask[:, 1:, ...] * ch_mask[..., 1].view(1, -1, 1, 1) + \
                             torch.ones_like(spa_mask[:, 1:, ...]) * ch_mask[..., 0].view(1, -1, 1, 1))  
+                    self.feas.append(z)
                 sparsity = torch.cat(sparsity, 0)            
                 
                 return z, sparsity
@@ -323,6 +325,7 @@ class LargeModule(nn.Module):
                     z, ch_mask = self.body[s]([z, _spa_mask], masked)
                     sparsity.append(_spa_mask * ch_mask[..., 1].view(1, -1, 1, 1) + \
                             torch.ones_like(_spa_mask) * ch_mask[..., 0].view(1, -1, 1, 1)) 
+                    self.feas.append(z)
                 sparsity = torch.cat(sparsity, 0)
                 return z, sparsity 
     
@@ -402,19 +405,20 @@ class FusionSM_7_4s_v2(nn.Module): #hardcode
 
         # print(f"fea map: {z.cpu().size()}")     
         if branch==0:  
-            branch_fea, mask_or_feas = self.branch[branch](z, masked=masked)
+            branch_fea, sparsity = self.branch[branch](z, masked=masked)
+            feas = self.branch[branch].feas
         else:
-            branch_fea, mask_or_feas = self.branch[branch](z)
+            branch_fea, feas = self.branch[branch](z)
         
         z = F.relu(self.tail[0](branch_fea))
         z = self.tail[1](z)
 
         y = residual_stack(z, x, self.scale)
 
-        # if fea_out:
-        #     return y, mask_or_feas
+        if fea_out:
+            return y, feas
 
-        return y, mask_or_feas
+        return y, sparsity
 
     def forward_merge_mask(self, x, masks: dict, fea_out=False):
         # TODO: Convert merge mask to smsr-like forward

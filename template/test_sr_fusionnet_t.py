@@ -73,7 +73,7 @@ def set_template(args):
 			args.scale=2
 			args.core="FusionSM_7_4s_v2_test"
 			# args.checkpoint='/kaggle/working/syntorch/model_checkpoints/_latest.t7'
-			args.checkpoint='/kaggle/working/syntorch/trained_store/64/_latest.t7'
+			args.checkpoint='/kaggle/working/syntorch/model_checkpoints/_latest.t7'
 
 		else:
 			assert 0, f"[ERRO] Template not found {args.template}"
