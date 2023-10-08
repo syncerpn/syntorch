@@ -419,7 +419,7 @@ class FusionSM_7_4s_v2(nn.Module): #hardcode
         if fea_out:
             return y, feas
 
-        return y, sparsity
+        return y, sparsity_or_feas
 
     def forward_merge_mask(self, x, masks: dict, fea_out=False):
         # TODO: Convert merge mask to smsr-like forward
