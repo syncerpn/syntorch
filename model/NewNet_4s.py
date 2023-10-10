@@ -18,7 +18,7 @@ def gumbel_softmax(x, dim, tau):
     x = gumbels.softmax(dim)
 
     return x
-
+    
 class ChannelAttentionBlock(nn.Module):
     def __init__(self):
         super(ChannelAttentionBlock, self).__init__()
@@ -102,11 +102,11 @@ class NewSResBlock(nn.Module):
         return z
 
 class _NewNet_ns(nn.Module): #hardcode
-    def __init__(self, ns, scale=2):
+    def __init__(self, scale=2):
         super(_NewNet_ns, self).__init__()
 
         self.scale = scale
-        self.ns = ns
+        self.ns = 4
 
         self.head = nn.ModuleList()
         self.body = nn.ModuleList()
