@@ -25,11 +25,11 @@ class ChannelAttentionBlock(nn.Module):
 
         self.tau = 1.0
         self.conv_du = nn.Sequential(
-                nn.AdaptiveAvgPool2d(1)
-                nn.Conv2d(32, 8, 1, 1, 0),
-                nn.ReLU(inplace=True),
-                nn.Conv2d(8, 32, 1, 1, 0),
-                nn.Sigmoid() #channel attention specifically use sigmoid instead of binary mask
+            nn.AdaptiveAvgPool2d(1),
+            nn.Conv2d(32, 8, 1, 1, 0),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(8, 32, 1, 1, 0),
+            nn.Sigmoid() #channel attention specifically use sigmoid instead of binary mask
         )
 
         self.conv_du[1].bias.data.fill_(0.01)
