@@ -103,9 +103,9 @@ class NewSResBlock(nn.Module):
 
         return z
 
-class _NewNet_ns(nn.Module): #hardcode
+class NewNet_4s(nn.Module): #hardcode
     def __init__(self, scale=2):
-        super(_NewNet_ns, self).__init__()
+        super(NewNet_4s, self).__init__()
 
         self.scale = scale
         self.ns = 4
