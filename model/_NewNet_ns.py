@@ -64,8 +64,8 @@ class SpatialAttentionBlock(nn.Module):
         self.spa_mask[3].bias.data.fill_(0.01)
         nn.init.xavier_uniform_(self.spa_mask[3].weight)
 
-        self.spa_mask[4].bias.data.fill_(0.01)
-        nn.init.xavier_uniform_(self.spa_mask[4].weight)
+        self.spa_mask[5].bias.data.fill_(0.01)
+        nn.init.xavier_uniform_(self.spa_mask[5].weight)
 
     def forward(self, x):
         sa_mask = self.spa_mask(x)
