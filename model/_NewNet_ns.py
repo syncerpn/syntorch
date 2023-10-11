@@ -23,12 +23,13 @@ class ChannelAttentionBlock(nn.Module):
     def __init__(self):
         super(ChannelAttentionBlock, self).__init__()
 
+        self.tau = 1.0
         self.conv_du = nn.Sequential(
                 nn.AdaptiveAvgPool2d(1)
                 nn.Conv2d(32, 8, 1, 1, 0),
                 nn.ReLU(inplace=True),
                 nn.Conv2d(8, 32, 1, 1, 0),
-                nn.Sigmoid()
+                nn.Sigmoid() #channel attention specifically use sigmoid instead of binary mask
         )
 
         self.conv_du[1].bias.data.fill_(0.01)
@@ -46,6 +47,7 @@ class SpatialAttentionBlock(nn.Module):
     def __init__(self):
         super(SpatialAttentionBlock, self).__init__()
 
+        self.tau = 1.0
         self.spa_mask = nn.Sequential(
             nn.Conv2d(32, 8, 3, 1, 1),
             nn.ReLU(True),
@@ -87,7 +89,8 @@ class NewSResBlock(nn.Module):
         self.tail.bias.data.fill_(0.01)
         nn.init.xavier_uniform_(self.tail.weight)
 
-    def forward(self, x):
+    def forward(self, x, is_training=False):
+
         ca_mask = self.cab(x)
         sa_mask = self.sab(x)
 
