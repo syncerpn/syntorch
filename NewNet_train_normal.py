@@ -36,7 +36,7 @@ def train(epoch, optim):
         x  = x.cuda()
         yt = yt.cuda()
         
-        yf = core.forward(x, branch=0)
+        yf = core.forward(x)
 
         perf = evaluation.calculate(args, yf, yt)
 
@@ -96,11 +96,11 @@ all_params = core.parameters()
 optim = optimizer.create_optimizer(all_params, args)
 lr_scheduler_phase_1 = utils.LrScheduler(optim, args.lr, args.lr_decay_ratio, args.epoch_step)
 
-print('[INFO] train large branch first')
+print('[INFO] newnet soft mask')
 for epoch in range(args.start_epoch, args.max_epochs+1):
     lr_scheduler_phase_1.adjust_learning_rate(epoch)
 
     if epoch % 10 == 0:
-        test(epoch, [0])
+        test(epoch)
 
     train(epoch, optim)
