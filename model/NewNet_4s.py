@@ -51,21 +51,22 @@ class SpatialAttentionBlock(nn.Module):
         self.spa_mask = nn.Sequential(
             nn.Conv2d(32, 8, 3, 1, 1),
             nn.ReLU(True),
-            nn.AvgPool2d(2),
+            # nn.AvgPool2d(2), #remove avg
             nn.Conv2d(8, 8, 3, 1, 1),
             nn.ReLU(True),
-            nn.ConvTranspose2d(8, 1, 3, 2, 1, output_padding=1),
+            # nn.ConvTranspose2d(8, 1, 3, 2, 1, output_padding=1), #dont use upsample with transpose
+            nn.Conv2d(8, 1, 3, 1, 1),
             nn.Sigmoid()
         )
 
         self.spa_mask[0].bias.data.fill_(0.01)
         nn.init.xavier_uniform_(self.spa_mask[0].weight)
 
-        self.spa_mask[3].bias.data.fill_(0.01)
-        nn.init.xavier_uniform_(self.spa_mask[3].weight)
+        self.spa_mask[2].bias.data.fill_(0.01)
+        nn.init.xavier_uniform_(self.spa_mask[2].weight)
 
-        self.spa_mask[5].bias.data.fill_(0.01)
-        nn.init.xavier_uniform_(self.spa_mask[5].weight)
+        self.spa_mask[4].bias.data.fill_(0.01)
+        nn.init.xavier_uniform_(self.spa_mask[4].weight)
 
     def forward(self, x):
         sa_mask = self.spa_mask(x)
