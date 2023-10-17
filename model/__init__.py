@@ -10,6 +10,7 @@ from model.FusionNet_7_4s import FusionNet_7_4s
 from model.FusionSM_7_4s import FusionSM_7_4s
 from model.FusionSM_7_4s_v2 import FusionSM_7_4s_v2
 from model.FusionSM_7_4s_v2_test import FusionSM_7_4s_v2_test
+from model.HourglassResidual import HourglassResidual
 
 def config(args):
     arch = args.core.split("-")
@@ -29,6 +30,8 @@ def config(args):
         core = FusionSM_7_4s_v2(scale=args.scale)
     elif (name == "FusionSM_7_4s_v2_test"):
         core = FusionSM_7_4s_v2_test(scale=args.scale)
+    elif (name == "HourglassResidual"):\
+        core = HourglassResidual(scale=args.scale)
     else:
         assert 0, f"[ERRO] unknown model tag {name}"
 
