@@ -73,27 +73,26 @@ def train(epoch, optim):
     log_str = '[INFO] E: %d | P: %.3f | LOSS: %.3f' % (epoch, perf, total_loss)
     print(log_str)
 
-def test(epoch, branches=[]):
-    for bri in branches:
+def test(epoch): # in train mode
 
-        perf_fs = []
-        #walk through the test set
-        for batch_idx, (x, yt) in tqdm.tqdm(enumerate(XYtest), total=len(XYtest)):
-            x  = x.cuda()
-            yt = yt.cuda()
+    perf_fs = []
+    #walk through the test set
+    for batch_idx, (x, yt) in tqdm.tqdm(enumerate(XYtest), total=len(XYtest)):
+        x  = x.cuda()
+        yt = yt.cuda()
 
-            with torch.no_grad():
-                yf, _ = core.forward(x, branch=bri)
-            
-            perf_f = evaluation.calculate(args, yf, yt)
-            perf_fs.append(perf_f.cpu())
+        with torch.no_grad():
+            yf, _ = core.forward(x)
+        
+        perf_f = evaluation.calculate(args, yf, yt)
+        perf_fs.append(perf_f.cpu())
 
-        mean_perf_f = torch.stack(perf_fs, 0).mean()
+    mean_perf_f = torch.stack(perf_fs, 0).mean()
 
-        log_str = f'[INFO] TS - BRANCH_ID: {bri} - P: {mean_perf_f:.3f}'
-        print(log_str)
+    log_str = f'[INFO] TEST - HourGlass - P: {mean_perf_f:.3f}'
+    print(log_str)
 
-        torch.save(core.state_dict(), args.cv_dir + '/hourglass_ckpt_E_%d_P_%.3f.t7' % (epoch, mean_perf_f))
+    torch.save(core.state_dict(), args.cv_dir + '/hourglass_ckpt_E_%d_P_%.3f.t7' % (epoch, mean_perf_f))
     torch.save(core.state_dict(), args.cv_dir + "/_latest.t7")
 
 
@@ -127,7 +126,7 @@ for epoch in range(args.start_epoch, args.max_epochs+1):
     lr_scheduler_phase_1.adjust_learning_rate(epoch)
 
     if epoch % 10 == 0:
-        test(epoch, [0])
+        test(epoch)
 
     train(epoch, optim_phase_1)
 
