@@ -292,12 +292,14 @@ class SMM(nn.Module):
 
         # spatial mask
         self.spa_mask = nn.Sequential(
-            nn.Conv2d(in_channels, in_channels//4, 3, 1, 1),
+            nn.Conv2d(in_channels, in_channels // 4, 3, 1, 1),
+            nn.BatchNorm2d(in_channels // 4),
             nn.ReLU(True),
-            nn.AvgPool2d(2),
-            nn.Conv2d(in_channels//4, in_channels//4, 3, 1, 1),
+            nn.Conv2d(in_channels//4, in_channels//8, 3, 1, 1),
+            nn.BatchNorm2d(in_channels//8),
             nn.ReLU(True),
-            nn.ConvTranspose2d(in_channels // 4, 2, 3, 2, 1, output_padding=1),
+            nn.Conv2d(in_channels//8, 2, 3, 1, 1),
+            nn.BatchNorm2d(2)
         )
 
         # body
