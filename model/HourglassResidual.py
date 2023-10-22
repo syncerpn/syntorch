@@ -404,7 +404,7 @@ class HourglassResidual(nn.Module):
             z = self.tail[1](z)
             y = residual_stack(z, x, self.scale)
 
-            return y
+            return [y, None]
 
     def get_spatial_masks(self):
         if hasattr(self, 'spatial_masks'):
