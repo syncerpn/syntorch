@@ -266,6 +266,8 @@ class SMB(nn.Module):
 
         if not self.training:
             self.spa_mask = x[1]
+            
+            self._prepare()
 
             # generate indices
             self._generate_indices()
@@ -308,7 +310,6 @@ class SMM(nn.Module):
 
         # body
         self.body = SMB(in_channels, out_channels, kernel_size, stride, padding, bias, n_layers=2)
-        self.body._prepare()
 
         # CA layer
         self.ca = CALayer(out_channels)
