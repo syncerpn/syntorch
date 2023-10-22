@@ -35,44 +35,42 @@ def save_all_spatial_masks(idx: int, spatial_masks: list):
         
     return
 
-def test_hourglass(branch):
-    for psi in range(5):
-        print(f"\nExp {psi}")
-        perf_fs_masked = []
-        perf_fs_nomask = []
-        perf_fs_val = []
+def test_hourglass():
+    perf_fs_masked = []
+    perf_fs_nomask = []
+    perf_fs_val = []
+    
+    for batch_idx, (x, yt) in tqdm.tqdm(enumerate(XYtest), total=len(XYtest)):
+        x = x.cuda()
+        yt = yt.cuda()
+
+        # masked train mode
+        with torch.no_grad():
+            yf, ch_mask = core.forward(x, masked=True)
+        perf_f_masked = evaluation.calculate(args, yf, yt)
+        perf_fs_masked.append(perf_f_masked.cpu())
         
-        for batch_idx, (x, yt) in tqdm.tqdm(enumerate(XYtest), total=len(XYtest)):
-            x = x.cuda()
-            yt = yt.cuda()
+        spatial_masks = core.get_spatial_masks()
+        save_all_spatial_masks(batch_idx, spatial_masks)
+        
+        with torch.no_grad():
+            yf, ch_mask = core.forward(x, masked=False)
+        perf_f_nomask = evaluation.calculate(args, yf, yt)
+        perf_fs_nomask.append(perf_f_nomask.cpu())
+        
+        core.eval()
+        with torch.no_grad():
+            yf, ch_mask = core.forward(x)
+        perf_f_val = evaluation.calculate(args, yf, yt)
+        perf_fs_val.append(perf_f_val.cpu())
+        
+    print(core.get_sparsity_inference())
 
-            # masked train mode
-            with torch.no_grad():
-                yf, ch_mask = core.forward(x, masked=True)
-            perf_f_masked = evaluation.calculate(args, yf, yt)
-            perf_fs_masked.append(perf_f_masked.cpu())
-            
-            spatial_masks = core.get_spatial_masks()
-            save_all_spatial_masks(batch_idx, spatial_masks)
-            
-            with torch.no_grad():
-                yf, ch_mask = core.forward(x, masked=False)
-            perf_f_nomask = evaluation.calculate(args, yf, yt)
-            perf_fs_nomask.append(perf_f_nomask.cpu())
-            
-            core.eval()
-            with torch.no_grad():
-                yf, ch_mask = core.forward(x)
-            perf_f_val = evaluation.calculate(args, yf, yt)
-            perf_fs_val.append(perf_f_val.cpu())
-           
-        print(core.get_sparsity_inference())
-
-        mean_masked = torch.stack(perf_fs_masked, 0).mean()
-        mean_nomask = torch.stack(perf_fs_nomask, 0).mean()
-        mean_val = torch.stack(perf_fs_val, 0).mean()
-        log_str = f"[INFO] Masked perf {mean_masked} | No-mask Perf {mean_nomask} | Val Perf {mean_val}"
-        print(log_str)
+    mean_masked = torch.stack(perf_fs_masked, 0).mean()
+    mean_nomask = torch.stack(perf_fs_nomask, 0).mean()
+    mean_val = torch.stack(perf_fs_val, 0).mean()
+    log_str = f"[INFO] Masked perf {mean_masked} | No-mask Perf {mean_nomask} | Val Perf {mean_val}"
+    print(log_str)
         
 # load test data
 print('[INFO] load testset "%s" from %s' % (args.testset_tag, args.testset_dir))
