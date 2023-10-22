@@ -401,7 +401,7 @@ class HourglassResidual(nn.Module):
                 fea = self.body[i](fea, masked)
                 out_fea.append(fea)
             z = F.relu(self.tail[0](fea))
-            z = self.tail[1](fea)
+            z = self.tail[1](z)
             y = residual_stack(z, x, self.scale)
 
             return y
