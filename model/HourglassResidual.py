@@ -308,6 +308,7 @@ class SMM(nn.Module):
 
         # body
         self.body = SMB(in_channels, out_channels, kernel_size, stride, padding, bias, n_layers=2)
+        self.body._prepare()
 
         # CA layer
         self.ca = CALayer(out_channels)
@@ -328,7 +329,6 @@ class SMM(nn.Module):
             return out, spa_mask[:, 1:, ...], ch_mask
 
         if not self.training:
-            self.body._prepare()
             spa_mask = self.spa_mask(x)
             spa_mask = (spa_mask[:, 1:, ...] > spa_mask[:, :1, ...]).float()
 
