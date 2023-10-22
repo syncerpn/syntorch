@@ -176,8 +176,6 @@ class SMB(nn.Module):
         :param k: kernel size
         :param index: layer index
         '''
-        
-        self._generate_indices()
         # dense input
         if self.d_in_num[index] > 0:
             if self.d_out_num[index] > 0:
