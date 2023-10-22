@@ -31,7 +31,7 @@ def save_all_spatial_masks(idx: int, spatial_masks: list):
         mask = mask[0, ...]
         mask = mask.cpu().numpy().transpose(1, 2, 0)
         mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2RGB)
-        plt.imsave(os.path.join(dir, f'mask_{idx}_layer_{i}.jpg'))
+        plt.imsave(os.path.join(dir, f'mask_{idx}_layer_{i}.jpg'), mask)
         
     return
 
