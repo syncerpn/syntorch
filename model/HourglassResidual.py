@@ -176,6 +176,8 @@ class SMB(nn.Module):
         :param k: kernel size
         :param index: layer index
         '''
+        
+        self._generate_indices()
         # dense input
         if self.d_in_num[index] > 0:
             if self.d_out_num[index] > 0:
@@ -328,6 +330,7 @@ class SMM(nn.Module):
             return out, spa_mask[:, 1:, ...], ch_mask
 
         if not self.training:
+            self.body._prepare()
             spa_mask = self.spa_mask(x)
             spa_mask = (spa_mask[:, 1:, ...] > spa_mask[:, :1, ...]).float()
 
