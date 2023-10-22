@@ -331,7 +331,7 @@ class SMM(nn.Module):
             spa_mask = self.spa_mask(x)
             spa_mask = (spa_mask[:, 1:, ...] > spa_mask[:, :1, ...]).float()
 
-            out = self.body([x, spa_mask])
+            out = self.body([x, spa_mask], masked)
             out = self.ca(out) + x
 
             return out
@@ -397,7 +397,7 @@ class HourglassResidual(nn.Module):
             out_fea = []
             fea = z
             for i in range(4):
-                fea = self.body[i](fea)
+                fea = self.body[i](fea, masked)
                 out_fea.append(fea)
             z = F.relu(self.tail[0](fea))
             z = self.tail[1](fea)
