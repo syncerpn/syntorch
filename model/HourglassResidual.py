@@ -232,7 +232,7 @@ class SMB(nn.Module):
 
         return fea_d, fea_s
 
-    def forward(self, x):
+    def forward(self, x, masked):
         '''
         :param x: [x[0], x[1]]
         x[0]: input feature (B, C ,H, W) ;
@@ -247,12 +247,16 @@ class SMB(nn.Module):
             for i in range(self.n_layers):
                 if i == 0:
                     fea = self.body[i](fea)
-                    fea = fea * ch_mask[:, :, i:i + 1, 1:] * spa_mask + fea * ch_mask[:, :, i:i + 1, :1]
+                    if masked:
+                        fea = fea * ch_mask[:, :, i:i + 1, 1:] * spa_mask + fea * ch_mask[:, :, i:i + 1, :1]
                 else:
-                    fea_d = self.body[i](fea * ch_mask[:, :, i - 1:i, :1])
-                    fea_s = self.body[i](fea * ch_mask[:, :, i - 1:i, 1:])
-                    fea = fea_d * ch_mask[:, :, i:i + 1, 1:] * spa_mask + fea_d * ch_mask[:, :, i:i + 1, :1] + \
-                          fea_s * ch_mask[:, :, i:i + 1, 1:] * spa_mask + fea_s * ch_mask[:, :, i:i + 1, :1] * spa_mask
+                    if masked:
+                        fea_d = self.body[i](fea * ch_mask[:, :, i - 1:i, :1])
+                        fea_s = self.body[i](fea * ch_mask[:, :, i - 1:i, 1:])
+                        fea = fea_d * ch_mask[:, :, i:i + 1, 1:] * spa_mask + fea_d * ch_mask[:, :, i:i + 1, :1] + \
+                            fea_s * ch_mask[:, :, i:i + 1, 1:] * spa_mask + fea_s * ch_mask[:, :, i:i + 1, :1] * spa_mask
+                    else:
+                        fea = self.body[i](fea)
                 fea = self.relu(fea)
                 out.append(fea)
 
@@ -313,12 +317,12 @@ class SMM(nn.Module):
     def _update_tau(self, tau):
         self.tau = tau
 
-    def forward(self, x):
+    def forward(self, x, masked):
         if self.training:
             spa_mask = self.spa_mask(x)
             spa_mask = gumbel_softmax(spa_mask, 1, self.tau)
 
-            out, ch_mask = self.body([x, spa_mask[:, 1:, ...]])
+            out, ch_mask = self.body([x, spa_mask[:, 1:, ...]], masked)
             out = self.ca(out) + x
 
             return out, spa_mask[:, 1:, ...], ch_mask
@@ -363,20 +367,23 @@ class HourglassResidual(nn.Module):
             self.tail[i].bias.data.fill_(0.01)
             nn.init.xavier_uniform_(self.tail[i].weight)
 
-    def forward(self, x):
+    def forward(self, x, masked=True):
         z = x
         z = F.relu(self.head[0](z))
         z = F.relu(self.head[1](z))
+        spatial_masks = []
 
         if self.training:
             sparsity = []
             out_fea = []
             fea = z
             for i in range(4):
-                fea, _spa_mask, _ch_mask = self.body[i](fea)
+                fea, _spa_mask, _ch_mask = self.body[i](fea, masked)
                 out_fea.append(fea)
+                spatial_masks.append(_spa_mask.cpu())
                 sparsity.append(_spa_mask * _ch_mask[..., 1].view(1, -1, 1, 1) + torch.ones_like(_spa_mask) * _ch_mask[..., 0].view(1, -1, 1, 1))
             
+            self.spatial_masks = spatial_masks
             sparsity = torch.cat(sparsity, 0)
 
             z = F.relu(self.tail[0](fea))
@@ -398,3 +405,6 @@ class HourglassResidual(nn.Module):
 
             return y
 
+    def get_spatial_masks(self):
+        if hasattr(self, 'spatial_masks'):
+            return self.spatial_masks
