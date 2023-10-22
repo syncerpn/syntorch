@@ -77,6 +77,7 @@ def set_template(args):
    
 		if args.template == "Hourglass_Kaggle":
 			print(f"[INFO] Template found: {args.template}")
+			print(f"[INFO] Load state dict from {args.checkpoint}")
 			args.style="Y"
 			args.testset_tag="Set14B"
 			args.testset_dir='/kaggle/input/fn-data-and-cktpt/data_ckpt/dataset/set14_dnb/set14_dnb/2x/'

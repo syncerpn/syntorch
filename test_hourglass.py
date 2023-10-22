@@ -43,6 +43,7 @@ def test_hourglass():
     for batch_idx, (x, yt) in tqdm.tqdm(enumerate(XYtest), total=len(XYtest)):
         x = x.cuda()
         yt = yt.cuda()
+        core.train()
 
         # masked train mode
         with torch.no_grad():
@@ -79,7 +80,6 @@ XYtest = torchdata.DataLoader(testset, batch_size=batch_size_test, shuffle=False
 
 core = model.config(args)
 core.cuda()
-core.eval()
 
 test_hourglass()
 
