@@ -84,7 +84,8 @@ def set_template(args):
 			args.rgb_range=1.0
 			args.scale=2
 			args.core="HourglassResidual"
-			args.checkpoint='/kaggle/working/syntorch/trained_store/hourglass/_latest.t7'
+			# args.checkpoint='/kaggle/working/syntorch/trained_store/hourglass/_latest.t7'
+			args.checkpoint='/kaggle/working/syntorch/model_checkpoints/_latest.t7'
 
 		else:
 			assert 0, f"[ERRO] Template not found {args.template}"
