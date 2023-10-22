@@ -64,8 +64,6 @@ def test_hourglass():
             yf, ch_mask = core.forward(x)
         perf_f_val = evaluation.calculate(args, yf, yt)
         perf_fs_val.append(perf_f_val.cpu())
-        
-    print(core.get_sparsity_inference())
 
     mean_masked = torch.stack(perf_fs_masked, 0).mean()
     mean_nomask = torch.stack(perf_fs_nomask, 0).mean()
