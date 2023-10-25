@@ -29,7 +29,7 @@ class ChannelAttentionBlock(nn.Module):
             nn.Conv2d(32, 8, 1, 1, 0),
             nn.ReLU(inplace=True),
             nn.Conv2d(8, 32, 1, 1, 0),
-            nn.Sigmoid()
+            nn.Sigmoid() 
         )
 
         self.conv_du[1].bias.data.fill_(0.01)
@@ -148,3 +148,91 @@ class NewNet_4s(nn.Module): #hardcode
         y = residual_stack(z, x, self.scale)
 
         return y
+    
+class ChannelAttentionBlock_2(nn.Module):
+    '''Gumbel softmax version of Channel Attention Block'''
+    def __init__(self):
+        super(ChannelAttentionBlock, self).__init__()
+
+        self.tau = 1.0
+        self.conv_du = nn.Sequential(
+            nn.AdaptiveAvgPool2d(1),
+            nn.Conv2d(32, 8, 1, 1, 0),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(8, 32*2, 1, 1, 0),  # 2 layer for logits -> gumbel_softmax
+        )
+
+        self.conv_du[1].bias.data.fill_(0.01)
+        nn.init.xavier_uniform_(self.conv_du[1].weight)
+
+        self.conv_du[3].bias.data.fill_(0.01)
+        nn.init.xavier_uniform_(self.conv_du[3].weight)
+
+    def forward(self, x):
+        ca_mask = self.conv_du(x)
+        B, _, H, W = ca_mask.size()
+        ca_mask.reshape(B, 2, -1, H, W)
+        ca_mask = gumbel_softmax(ca_mask, dim=1, tau=self.tau)
+        
+        return ca_mask[:, 0, ...]   # reduce dim to BxCxHxW
+
+class SpatialAttentionBlock_2(nn.Module):
+    '''Gumbel softmax version of Spatial Attention Block'''
+    def __init__(self):
+        super(SpatialAttentionBlock, self).__init__()
+
+        self.tau = 1.0
+        self.spa_mask = nn.Sequential(
+            nn.Conv2d(32, 8, 3, 1, 1),
+            nn.ReLU(True),
+            # nn.AvgPool2d(2), #remove avg
+            nn.Conv2d(8, 8, 3, 1, 1),
+            nn.ReLU(True),
+            nn.Conv2d(8, 2, 3, 1, 1),   # 2 for softmax: logits -> gumbel softmax
+        )
+
+        self.spa_mask[0].bias.data.fill_(0.01)
+        nn.init.xavier_uniform_(self.spa_mask[0].weight)
+
+        self.spa_mask[2].bias.data.fill_(0.01)
+        nn.init.xavier_uniform_(self.spa_mask[2].weight)
+
+        self.spa_mask[4].bias.data.fill_(0.01)
+        nn.init.xavier_uniform_(self.spa_mask[4].weight)
+
+    def forward(self, x):
+        sa_mask = self.spa_mask(x)
+        sa_mask = gumbel_softmax(sa_mask, dim=1, tau=self.tau)
+
+        return sa_mask[:, :1, ...]  # choose 1 dim for dense, keep dims
+
+class NewSResBlock(nn.Module):
+    def __init__(self):
+        super(NewSResBlock, self).__init__()
+
+        self.cab = ChannelAttentionBlock()
+        self.sab = SpatialAttentionBlock()
+
+        self.head = nn.Conv2d(32, 32, 3, 1, 1)
+
+        self.tail = nn.Conv2d(32, 32, 3, 1, 1)
+
+        self.head.bias.data.fill_(0.01)
+        nn.init.xavier_uniform_(self.head.weight)
+
+        self.tail.bias.data.fill_(0.01)
+        nn.init.xavier_uniform_(self.tail.weight)
+
+    def forward(self, x):
+        ca_mask = self.cab(x)
+        sa_mask = self.sab(x)
+
+        z = F.relu(self.head(x))
+        z = z * ca_mask
+
+        z = self.tail(x)
+        z = z * sa_mask
+
+        z = F.relu(z + x)
+
+        return z
