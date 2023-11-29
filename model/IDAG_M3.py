@@ -30,6 +30,12 @@ class IDAG_M3(nn.Module): #hardcode
             self.conv[i].bias.data.fill_(0.01)
             nn.init.xavier_uniform_(self.conv[i].weight)
 
+    def forward_log_mul(self, x):
+        for i in range(7):
+            w = self.conv[i].weight.data
+            print(w)
+            assert 0
+
     def forward(self, x, kd_train=False):
         if kd_train:
             feas = []
