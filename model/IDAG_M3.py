@@ -64,6 +64,8 @@ class IDAG_M3(nn.Module): #hardcode
             z = torch.zeros((w_mat.size(0), z_mat.size(1))).cuda()
 
             for ni in range(w_mat.size(0)):
+                print(w_mat[ni, :].shape)
+                print(z_mat.shape)
                 z_row_sum = torch.sum(2 ** (w_mat[ni, :] + z_mat))
                 print(z_row_sum.shape)
                 assert 0
