@@ -79,7 +79,7 @@ class IDAG_M3(nn.Module): #hardcode
             print(x_mat)
             print(x_mat.shape)
 
-            x = torch.mm(x_mat, w_mat)
+            x = torch.mm(w_mat, x_mat)
 
             print(x.shape)
             assert 0
