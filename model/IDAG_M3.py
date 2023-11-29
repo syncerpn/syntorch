@@ -33,7 +33,8 @@ class IDAG_M3(nn.Module): #hardcode
     def forward_log_mul(self, x):
         # out_shape = fea.shape
 
-        w_unfolder = nn.Unfold(3, stride=1, padding=0)
+        w_unfolder_3x3 = nn.Unfold(3, stride=1, padding=0)
+        w_unfolder_1x1 = nn.Unfold(1, stride=1, padding=0)
         x_unfolder = nn.Unfold(3, stride=1, padding=1)
         # x_folder = nn.Fold(output_size=(fea.shape[2], fea.shape[3]), kernel_size=(3,3))
 
@@ -60,8 +61,14 @@ class IDAG_M3(nn.Module): #hardcode
         #     out = self.collect(torch.cat(out, 1))
 
         for i in range(7):
-            w_mat = w_unfolder(self.conv[i].weight)
-            w_mat = w_mat.view(w_mat.size(0), -1)
+            w_mat = None
+            if self.conv[i].kernel_size == 3:
+                w_mat = w_unfolder_3x3(self.conv[i].weight)
+                w_mat = w_mat.view(w_mat.size(0), -1)
+                
+            elif self.conv[i].kernel_size == 1:
+                w_mat = w_unfolder_1x1(self.conv[i].weight)
+                w_mat = w_mat.view(w_mat.size(0), -1)
 
             print(w_mat)
             print(w_mat.shape)
