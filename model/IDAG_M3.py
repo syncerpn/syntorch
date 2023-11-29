@@ -1,7 +1,7 @@
 """
 @author: nghiant
 """
-
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from model.common import residual_stack
