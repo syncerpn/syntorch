@@ -84,7 +84,9 @@ class IDAG_M3(nn.Module): #hardcode
             x = torch.reshape(x, out_shape)
             print(x)
             print(x.shape)
-            x += self.conv[i].bias
+            print(self.conv[i].bias.shape)
+            for c in range(x.shape[1]):
+                x[:,c,:,:] += self.conv[i].bias[c]
 
             assert 0
 
