@@ -35,32 +35,9 @@ class IDAG_M3(nn.Module): #hardcode
 
         w_unfolder_3x3 = nn.Unfold(3, stride=1, padding=0)
         w_unfolder_1x1 = nn.Unfold(1, stride=1, padding=0)
-        x_unfolder = nn.Unfold(3, stride=1, padding=1)
-        x_folder_3x3 = nn.Fold(output_size=(x.shape[2], x.shape[3]), kernel_size=(3,3))
-        x_folder_1x1 = nn.Fold(output_size=(x.shape[2], x.shape[3]), kernel_size=(1,1))
+        z_unfolder = nn.Unfold(3, stride=1, padding=1)
 
-        # for i in range(self.n_layers):
-        #     print(f"layer: {i}")
-        #     fea = x_unfolder(fea)
-        #     fea = fea[0, :]
-
-        #     w_mat = w_unfolder(self.body[i].weight)
-        #     w_mat = w_mat.view(w_mat.size(0), -1)
-
-        #     y_sm = torch.zeros((w_mat.size(0), fea.size(1)))
-
-        #     for ni in range(w_mat.size(0)):
-        #         for mi in range(w_mat.size(1)):
-        #             if w_mat[ni, mi] != 0:
-        #                 # for j in range(fea.size(1)):
-        #                 y_sm[ni, :] += w_mat[ni, mi] * fea[mi, :]
-
-        #     fea = torch.reshape(y_sm, out_shape)
-        #     fea = self.relu(fea)
-        #     out.append(fea)
-
-        #     out = self.collect(torch.cat(out, 1))
-
+        z = x
         for i in range(7):
             w_mat = None
             if self.conv[i].kernel_size[0] == 3:
@@ -74,23 +51,26 @@ class IDAG_M3(nn.Module): #hardcode
             print(w_mat)
             print(w_mat.shape)
 
-            x_mat = x_unfolder(x)
-            x_mat = x_mat[0, :] 
+            z_mat = z_unfolder(z)
+            z_mat = z_mat[0, :] 
 
-            print(x_mat)
-            print(x_mat.shape)
+            print(z_mat)
+            print(z_mat.shape)
 
-            x = torch.mm(w_mat, x_mat)
-            x = torch.reshape(x, out_shape)
-            print(x)
-            print(x.shape)
+            z = torch.mm(w_mat, z_mat)
+            z = torch.reshape(z, out_shape)
+            print(z)
+            print(z.shape)
             print(self.conv[i].bias.shape)
-            for c in range(x.shape[1]):
-                x[:,c,:,:] += self.conv[i].bias[c]
+            for c in range(z.shape[1]):
+                z[:,c,:,:] += self.conv[i].bias[c]
 
-            assert 0
+            z = F.relu(z)
 
-        return 0
+        z = self.conv[7](z)
+
+        y = residual_stack(z, x, self.scale)
+        return y
 
     def forward(self, x, kd_train=False):
         if kd_train:
