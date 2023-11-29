@@ -35,33 +35,28 @@ class IDAG_M3(nn.Module): #hardcode
 
         w_unfolder_3x3 = nn.Unfold(3, stride=1, padding=0)
         w_unfolder_1x1 = nn.Unfold(1, stride=1, padding=0)
-        z_unfolder = nn.Unfold(3, stride=1, padding=1)
+        z_unfolder_3x3 = nn.Unfold(3, stride=1, padding=1)
+        z_unfolder_1x1 = nn.Unfold(1, stride=1, padding=0)
 
         z = x
         for i in range(7):
             w_mat = None
+            z_mat = None
             if self.conv[i].kernel_size[0] == 3:
                 w_mat = w_unfolder_3x3(self.conv[i].weight)
                 w_mat = w_mat.view(w_mat.size(0), -1)
+                z_mat = z_unfolder_3x3(z)
+                z_mat = z_mat[0, :] 
 
             elif self.conv[i].kernel_size[0] == 1:
                 w_mat = w_unfolder_1x1(self.conv[i].weight)
                 w_mat = w_mat.view(w_mat.size(0), -1)
+                z_mat = z_unfolder_1x1(z)
+                z_mat = z_mat[0, :] 
 
-            print(w_mat)
-            print(w_mat.shape)
-
-            z_mat = z_unfolder(z)
-            z_mat = z_mat[0, :] 
-
-            print(z_mat)
-            print(z_mat.shape)
 
             z = torch.mm(w_mat, z_mat)
             z = torch.reshape(z, out_shape)
-            print(z)
-            print(z.shape)
-            print(self.conv[i].bias.shape)
             for c in range(z.shape[1]):
                 z[:,c,:,:] += self.conv[i].bias[c]
 
