@@ -46,16 +46,28 @@ class IDAG_M3(nn.Module): #hardcode
                 w_mat = w_unfolder_3x3(self.conv[i].weight)
                 w_mat = w_mat.view(w_mat.size(0), -1)
                 z_mat = z_unfolder_3x3(z)
-                z_mat = z_mat[0, :] 
+                z_mat = z_mat[0, :]
 
             elif self.conv[i].kernel_size[0] == 1:
                 w_mat = w_unfolder_1x1(self.conv[i].weight)
                 w_mat = w_mat.view(w_mat.size(0), -1)
                 z_mat = z_unfolder_1x1(z)
-                z_mat = z_mat[0, :] 
+                z_mat = z_mat[0, :]
 
+            #normal case: mul
+            # z = torch.mm(w_mat, z_mat)
 
-            z = torch.mm(w_mat, z_mat)
+            #log-mul: log2 then add
+            w_mat = torch.log2(w_mat)
+            z_mat = torch.log2(z_mat)
+
+            z = torch.zeros((w_mat.size(0), z_mat.size(1)))
+
+            for ni in range(w_mat.size(1)):
+                z[ni, :] += w_mat[:, ni] * z_mat[ni, :]
+
+            z = 2 ** z
+
             z = torch.reshape(z, out_shape)
             for c in range(z.shape[1]):
                 z[:,c,:,:] += self.conv[i].bias[c]
