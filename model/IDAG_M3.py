@@ -64,11 +64,13 @@ class IDAG_M3(nn.Module): #hardcode
             w_mat = w_mat.view(w_mat.size(0), -1)
 
             print(w_mat)
+            print(w_mat.shape)
 
             x_mat = x_unfolder(x)
             x_mat = x_mat[0, :]
-            
+
             print(x_mat)
+            print(x_mat.shape)
 
         return 0
 
