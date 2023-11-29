@@ -59,6 +59,8 @@ class IDAG_M3(nn.Module): #hardcode
 
             #log-mul: log2 then add
             w_mat_sign = (w_mat > 0).float() - (w_mat < 0).float()
+            z_mat_sign = (z_mat > 0).float() - (z_mat < 0).float()
+            print(w_mat)
             print(w_mat_sign)
             assert 0
             w_mat = torch.log2(w_mat)
