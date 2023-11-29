@@ -61,7 +61,7 @@ class IDAG_M3(nn.Module): #hardcode
             w_mat = torch.log2(w_mat)
             z_mat = torch.log2(z_mat)
 
-            z = torch.zeros((w_mat.size(0), z_mat.size(1)))
+            z = torch.zeros((w_mat.size(0), z_mat.size(1))).cuda()
 
             for ni in range(w_mat.size(0)):
                 for mi in range(z_mat.size(1)):
