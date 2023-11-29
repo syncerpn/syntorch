@@ -63,7 +63,7 @@ class IDAG_M3(nn.Module): #hardcode
             w_mat = w_unfolder(self.conv[i].weight)
             w_mat = w_mat.view(w_mat.size(0), -1)
 
-            print(w)
+            print(w_mat)
             assert 0
 
     def forward(self, x, kd_train=False):
