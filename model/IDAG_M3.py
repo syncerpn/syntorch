@@ -74,10 +74,15 @@ class IDAG_M3(nn.Module): #hardcode
             print(w_mat.shape)
 
             x_mat = x_unfolder(x)
-            x_mat = x_mat[0, :]
+            x_mat = x_mat[0, :] 
 
             print(x_mat)
             print(x_mat.shape)
+
+            x = torch.mm(x_mat, w_mat)
+
+            print(x.shape)
+            assert 0
 
         return 0
 
