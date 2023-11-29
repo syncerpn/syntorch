@@ -31,8 +31,38 @@ class IDAG_M3(nn.Module): #hardcode
             nn.init.xavier_uniform_(self.conv[i].weight)
 
     def forward_log_mul(self, x):
+        # out_shape = fea.shape
+
+        w_unfolder = nn.Unfold(3, stride=1, padding=0)
+        x_unfolder = nn.Unfold(3, stride=1, padding=1)
+        # x_folder = nn.Fold(output_size=(fea.shape[2], fea.shape[3]), kernel_size=(3,3))
+
+        # for i in range(self.n_layers):
+        #     print(f"layer: {i}")
+        #     fea = x_unfolder(fea)
+        #     fea = fea[0, :]
+
+        #     w_mat = w_unfolder(self.body[i].weight)
+        #     w_mat = w_mat.view(w_mat.size(0), -1)
+
+        #     y_sm = torch.zeros((w_mat.size(0), fea.size(1)))
+
+        #     for ni in range(w_mat.size(0)):
+        #         for mi in range(w_mat.size(1)):
+        #             if w_mat[ni, mi] != 0:
+        #                 # for j in range(fea.size(1)):
+        #                 y_sm[ni, :] += w_mat[ni, mi] * fea[mi, :]
+
+        #     fea = torch.reshape(y_sm, out_shape)
+        #     fea = self.relu(fea)
+        #     out.append(fea)
+
+        #     out = self.collect(torch.cat(out, 1))
+
         for i in range(7):
-            w = self.conv[i].weight.data
+            w_mat = w_unfolder(self.conv[i].weight)
+            w_mat = w_mat.view(w_mat.size(0), -1)
+
             print(w)
             assert 0
 
