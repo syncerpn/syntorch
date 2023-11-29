@@ -27,7 +27,7 @@ def test():
         yt = yt.cuda()
 
         with torch.no_grad():
-            yf = core.forward(x)
+            yf = core.forward_log_mul(x)
     
         perf_f = evaluation.calculate(args, yf, yt)
         perf_fs.append(perf_f.cpu())
