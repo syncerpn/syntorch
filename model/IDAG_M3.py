@@ -65,6 +65,10 @@ class IDAG_M3(nn.Module): #hardcode
 
             for ni in range(w_mat.size(0)):
                 w_mat_col = torch.unsqueeze(w_mat[ni, :], 1).expand(z_mat.size(0), z_mat.size(1))
+                print(w_mat_col)
+                print(2 ** w_mat_col)
+                print(torch.sum(2 ** w_mat_col, dim=0))
+                assert 0
                 z[ni, :] = torch.sum(2 ** (w_mat_col + z_mat), dim=0)
 
             z = torch.reshape(z, out_shape)
