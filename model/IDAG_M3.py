@@ -64,7 +64,13 @@ class IDAG_M3(nn.Module): #hardcode
             w_mat = w_mat.view(w_mat.size(0), -1)
 
             print(w_mat)
-            assert 0
+
+            x_mat = x_unfolder(x)
+            x_mat = x_mat[0, :]
+            
+            print(x_mat)
+
+        return 0
 
     def forward(self, x, kd_train=False):
         if kd_train:
