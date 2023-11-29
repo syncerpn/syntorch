@@ -60,23 +60,16 @@ class IDAG_M3(nn.Module): #hardcode
             #log-mul: log2 then add
             w_mat_sign = (w_mat > 0).float() - (w_mat < 0).float()
             z_mat_sign = (z_mat > 0).float() - (z_mat < 0).float()
-            print(w_mat)
-            print(w_mat_sign)
-            assert 0
-            w_mat = torch.log2(w_mat)
-            z_mat = torch.log2(z_mat)
+            w_mat = torch.log2(torch.abs(w_mat))
+            z_mat = torch.log2(torch.abs(z_mat))
 
             z = torch.zeros((w_mat.size(0), z_mat.size(1))).cuda()
 
             for ni in range(w_mat.size(0)):
                 w_mat_col = torch.unsqueeze(w_mat[ni, :], 1).expand(z_mat.size(0), z_mat.size(1))
-                w_mat_col_log = torch.log2(torch.abs(w_mat))
+                w_mat_col_sign = torch.unsqueeze(w_mat_sign[ni, :], 1).expand(z_mat.size(0), z_mat.size(1))
 
-                print(w_mat_col)
-                print(2 ** w_mat_col)
-                print(torch.sum(2 ** w_mat_col, dim=0))
-                assert 0
-                z[ni, :] = torch.sum(2 ** (w_mat_col + z_mat), dim=0)
+                z[ni, :] = torch.sum(w_mat_col_sign * z_mat_sign * 2 ** (w_mat_col + z_mat), dim=0)
 
             z = torch.reshape(z, out_shape)
             for c in range(z.shape[1]):
