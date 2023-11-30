@@ -31,6 +31,10 @@ class IDAG_M3(nn.Module): #hardcode
             nn.init.xavier_uniform_(self.conv[i].weight)
 
     def forward_log_mul(self, x):
+        ##
+        nbit = 8
+        num_range = [(4.0,1.0),(4.0,4.0),(1.0,8.0),(1.0,8.0),(1.0,4.0),(0.5,2.0),(0.5,1.0)]
+        ##
         out_shape = [1, -1, x.shape[2], x.shape[3]]
 
         w_unfolder_3x3 = nn.Unfold(3, stride=1, padding=0)
@@ -58,8 +62,14 @@ class IDAG_M3(nn.Module): #hardcode
             # z = torch.mm(w_mat, z_mat)
 
             #log-mul: log2 then add
-            print(torch.max(torch.abs(w_mat)))
-            print(torch.max(torch.abs(z_mat)))
+            w_max, z_max = num_range[i]
+            log_pos_end = 2 ** (nbit - 1) - 1
+            log_neg_end = -2 ** (nbit - 1)
+            nth_root_factor = (w_max * z_max) ** (1/log_pos_end)
+            value_constrain_list = nth_root_factor ** np.arange(log_neg_end, log_pos_end + 1)
+            print(nth_root_factor)
+            print(value_constrain_list)
+
             w_mat_sign = (w_mat > 0).float() - (w_mat < 0).float()
             z_mat_sign = (z_mat > 0).float() - (z_mat < 0).float()
             w_mat = torch.log2(torch.abs(w_mat))
