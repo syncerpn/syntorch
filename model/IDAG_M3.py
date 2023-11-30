@@ -32,7 +32,7 @@ class IDAG_M3(nn.Module): #hardcode
 
     def forward_log_mul(self, x):
         ##
-        nbit = 16
+        nbit = 4
         num_range = [(4.0,1.0),(4.0,4.0),(1.0,8.0),(1.0,8.0),(1.0,4.0),(1.0,2.0),(2.0,1.0)]
         ##
         out_shape = [1, -1, x.shape[2], x.shape[3]]
