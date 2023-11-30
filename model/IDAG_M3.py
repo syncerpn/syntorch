@@ -32,7 +32,7 @@ class IDAG_M3(nn.Module): #hardcode
 
     def forward_log_mul(self, x):
         ##
-        nbit = 32
+        nbit = 8
         num_range = [(4.0,1.0),(4.0,4.0),(1.0,8.0),(1.0,8.0),(1.0,4.0),(1.0,2.0),(2.0,1.0)]
         ##
         out_shape = [1, -1, x.shape[2], x.shape[3]]
@@ -63,8 +63,8 @@ class IDAG_M3(nn.Module): #hardcode
 
             #log-mul: log2 then add
             # w_max, z_max = num_range[i]
-            w_max = torch.max(torch.abs(w_mat)).cuda()
-            z_max = torch.max(torch.abs(z_mat)).cuda()
+            w_max = torch.max(torch.abs(w_mat))
+            z_max = torch.max(torch.abs(z_mat))
 
             log_pos_end = 2 ** (nbit - 1) - 1
             log_neg_end = -2 ** (nbit - 1)
@@ -73,8 +73,8 @@ class IDAG_M3(nn.Module): #hardcode
 
             w_mat_sign = (w_mat > 0).float() - (w_mat < 0).float()
             z_mat_sign = (z_mat > 0).float() - (z_mat < 0).float()
-            w_mat = torch.round(torch.log2(torch.abs(w_mat)) / np.log2(nth_root_factor))
-            z_mat = torch.round(torch.log2(torch.abs(z_mat)) / np.log2(nth_root_factor))
+            w_mat = torch.round(torch.log2(torch.abs(w_mat)) / torch.log2(torch.Tensor(nth_root_factor)).cuda())
+            z_mat = torch.round(torch.log2(torch.abs(z_mat)) / torch.log2(torch.Tensor(nth_root_factor)).cuda())
 
             z = torch.zeros((w_mat.size(0), z_mat.size(1))).cuda()
 
