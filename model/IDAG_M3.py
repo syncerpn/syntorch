@@ -73,8 +73,8 @@ class IDAG_M3(nn.Module): #hardcode
 
             w_mat_sign = (w_mat > 0).float() - (w_mat < 0).float()
             z_mat_sign = (z_mat > 0).float() - (z_mat < 0).float()
-            w_mat = torch.round(torch.log2(torch.abs(w_mat)) / np.log2(nth_root_factor))
-            z_mat = torch.round(torch.log2(torch.abs(z_mat)) / np.log2(nth_root_factor))
+            w_mat = torch.round(torch.log2(torch.abs(w_mat)) / torch.log2(nth_root_factor))
+            z_mat = torch.round(torch.log2(torch.abs(z_mat)) / torch.log2(nth_root_factor))
 
             z = torch.zeros((w_mat.size(0), z_mat.size(1))).cuda()
 
