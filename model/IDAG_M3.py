@@ -62,10 +62,14 @@ class IDAG_M3(nn.Module): #hardcode
             # z = torch.mm(w_mat, z_mat)
 
             #log-mul: log2 then add
-            w_max, z_max = num_range[i]
+            # w_max, z_max = num_range[i]
+            w_max = torch.max(torch.abs(w_max))
+            z_max = torch.max(torch.abs(z_max))
+
             log_pos_end = 2 ** (nbit - 1) - 1
             log_neg_end = -2 ** (nbit - 1)
             nth_root_factor = (w_max * z_max) ** (1/log_pos_end)
+            print(w_max, z_max, nth_root_factor)
 
             w_mat_sign = (w_mat > 0).float() - (w_mat < 0).float()
             z_mat_sign = (z_mat > 0).float() - (z_mat < 0).float()
