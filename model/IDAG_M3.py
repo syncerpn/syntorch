@@ -63,8 +63,8 @@ class IDAG_M3(nn.Module): #hardcode
 
             #log-mul: log2 then add
             # w_max, z_max = num_range[i]
-            w_max = torch.max(torch.abs(w_mat))
-            z_max = torch.max(torch.abs(z_mat))
+            w_max = torch.max(torch.abs(w_mat)).cuda()
+            z_max = torch.max(torch.abs(z_mat)).cuda()
 
             log_pos_end = 2 ** (nbit - 1) - 1
             log_neg_end = -2 ** (nbit - 1)
