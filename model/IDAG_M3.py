@@ -32,7 +32,7 @@ class IDAG_M3(nn.Module): #hardcode
 
     def forward_log_mul(self, x):
         ##
-        nbit = 9
+        nbit = 10
         num_range = [(4.0,1.0),(4.0,4.0),(1.0,8.0),(1.0,8.0),(1.0,4.0),(1.0,2.0),(2.0,1.0)]
         ##
         out_shape = [1, -1, x.shape[2], x.shape[3]]
@@ -69,7 +69,6 @@ class IDAG_M3(nn.Module): #hardcode
             log_pos_end = 2 ** (nbit - 1) - 1
             log_neg_end = -2 ** (nbit - 1)
             nth_root_factor = ((w_max * z_max) ** (1/log_pos_end)).float()
-            print(w_max, z_max, nth_root_factor)
 
             w_mat_sign = (w_mat > 0).float() - (w_mat < 0).float()
             z_mat_sign = (z_mat > 0).float() - (z_mat < 0).float()
