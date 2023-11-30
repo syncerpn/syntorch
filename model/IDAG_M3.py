@@ -68,13 +68,13 @@ class IDAG_M3(nn.Module): #hardcode
 
             log_pos_end = 2 ** (nbit - 1) - 1
             log_neg_end = -2 ** (nbit - 1)
-            nth_root_factor = (w_max * z_max) ** (1/log_pos_end)
+            nth_root_factor = ((w_max * z_max) ** (1/log_pos_end)).float()
             print(w_max, z_max, nth_root_factor)
 
             w_mat_sign = (w_mat > 0).float() - (w_mat < 0).float()
             z_mat_sign = (z_mat > 0).float() - (z_mat < 0).float()
-            w_mat = torch.round(torch.log2(torch.abs(w_mat)) / torch.log2(torch.Tensor(nth_root_factor)).cuda())
-            z_mat = torch.round(torch.log2(torch.abs(z_mat)) / torch.log2(torch.Tensor(nth_root_factor)).cuda())
+            w_mat = torch.round(torch.log2(torch.abs(w_mat)) / np.log2(nth_root_factor))
+            z_mat = torch.round(torch.log2(torch.abs(z_mat)) / np.log2(nth_root_factor))
 
             z = torch.zeros((w_mat.size(0), z_mat.size(1))).cuda()
 
