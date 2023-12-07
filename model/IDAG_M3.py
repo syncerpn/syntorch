@@ -152,10 +152,6 @@ class IDAG_M3(nn.Module): #hardcode
             w_mat[w_mat < log_neg_end] = log_neg_end
             z_mat[z_mat > log_pos_end] = log_pos_end
             z_mat[z_mat < log_neg_end] = log_neg_end
-            print(torch.max(w_mat))
-            print(torch.min(w_mat))
-            print(torch.max(z_mat))
-            print(torch.min(z_mat))
 
             z = torch.zeros((w_mat.size(0), z_mat.size(1))).cuda()
 
@@ -167,11 +163,10 @@ class IDAG_M3(nn.Module): #hardcode
 
             z = torch.reshape(z, out_shape)
 
-            # print(z_float)
-            # print(z)
-            # print(torch.max(torch.abs(z_float - z)))
-            # print(torch.min(torch.abs(z_float - z)))
-            # assert 0
+            print(z_float)
+            print(z)
+            print(torch.max(torch.abs(z_float - z)))
+            print(torch.min(torch.abs(z_float - z)))
 
             for c in range(z.shape[1]):
                 z[:,c,:,:] += self.conv[i].bias[c]
