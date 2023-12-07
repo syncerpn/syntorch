@@ -165,8 +165,9 @@ class IDAG_M3(nn.Module): #hardcode
 
             # print(z_float)
             # print(z)
-            print(torch.max(torch.abs(z_float - z)))
-            print(torch.min(torch.abs(z_float - z)))
+            # print(torch.max(torch.abs(z_float - z)))
+            # print(torch.min(torch.abs(z_float - z)))
+            print(torch.mean(torch.abs(z_float - z)))
 
             for c in range(z.shape[1]):
                 z[:,c,:,:] += self.conv[i].bias[c]
