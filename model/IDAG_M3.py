@@ -69,6 +69,7 @@ class IDAG_M3(nn.Module): #hardcode
             log_pos_end = 2 ** (nbit - 1) - 1
             log_neg_end = -2 ** (nbit - 1)
             nth_root_factor = ((w_max * z_max) ** (1/log_pos_end)).float()
+            print(nth_root_factor)
 
             w_mat_sign = (w_mat > 0).float() - (w_mat < 0).float()
             z_mat_sign = (z_mat > 0).float() - (z_mat < 0).float()
@@ -87,8 +88,8 @@ class IDAG_M3(nn.Module): #hardcode
 
             # print(z_float)
             # print(z)
-            print(torch.max(torch.abs(z_float - z)))
-            print(torch.min(torch.abs(z_float - z)))
+            # print(torch.max(torch.abs(z_float - z)))
+            # print(torch.min(torch.abs(z_float - z)))
             # assert 0
 
             for c in range(z.shape[1]):
