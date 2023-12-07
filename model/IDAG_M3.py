@@ -163,8 +163,8 @@ class IDAG_M3(nn.Module): #hardcode
 
             z = torch.reshape(z, out_shape)
 
-            print(z_float)
-            print(z)
+            # print(z_float)
+            # print(z)
             print(torch.max(torch.abs(z_float - z)))
             print(torch.min(torch.abs(z_float - z)))
 
