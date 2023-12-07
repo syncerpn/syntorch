@@ -87,8 +87,8 @@ class IDAG_M3(nn.Module): #hardcode
             for c in range(z.shape[1]):
                 z[:,c,:,:] += self.conv[i].bias[c]
 
-            print(z_float.shape)
-            print(z.shape)
+            print(z_float)
+            print(z)
             assert 0
 
             z = F.relu(z)
