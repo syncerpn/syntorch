@@ -102,6 +102,75 @@ class IDAG_M3(nn.Module): #hardcode
         y = residual_stack(z, x, self.scale)
         return y
 
+    def forward_log_mul_realistic(self, x):
+        ##
+        nbit = 8
+        nth_root_factors = [1.00913,1.0153,1.00717,1.00556,0.999693,0.993657,0.991564]
+        ##
+        out_shape = [1, -1, x.shape[2], x.shape[3]]
+
+        w_unfolder_3x3 = nn.Unfold(3, stride=1, padding=0)
+        w_unfolder_1x1 = nn.Unfold(1, stride=1, padding=0)
+        z_unfolder_3x3 = nn.Unfold(3, stride=1, padding=1)
+        z_unfolder_1x1 = nn.Unfold(1, stride=1, padding=0)
+
+        z = x
+        for i in range(7):
+            w_mat = None
+            z_mat = None
+            if self.conv[i].kernel_size[0] == 3:
+                w_mat = w_unfolder_3x3(self.conv[i].weight)
+                w_mat = w_mat.view(w_mat.size(0), -1)
+                z_mat = z_unfolder_3x3(z)
+                z_mat = z_mat[0, :]
+
+            elif self.conv[i].kernel_size[0] == 1:
+                w_mat = w_unfolder_1x1(self.conv[i].weight)
+                w_mat = w_mat.view(w_mat.size(0), -1)
+                z_mat = z_unfolder_1x1(z)
+                z_mat = z_mat[0, :]
+
+            #normal case: mul
+            z_float = torch.reshape(torch.mm(w_mat, z_mat), out_shape)
+
+            #log-mul: log2 then add
+            # w_max, z_max = num_range[i]
+            w_max = torch.max(torch.abs(w_mat))
+            z_max = torch.max(torch.abs(z_mat))
+
+            nth_root_factor = nth_root_factors[i]
+
+            w_mat_sign = (w_mat > 0).float() - (w_mat < 0).float()
+            z_mat_sign = (z_mat > 0).float() - (z_mat < 0).float()
+            w_mat = torch.round(torch.log2(torch.abs(w_mat)) / torch.log2(nth_root_factor))
+            z_mat = torch.round(torch.log2(torch.abs(z_mat)) / torch.log2(nth_root_factor))
+
+            z = torch.zeros((w_mat.size(0), z_mat.size(1))).cuda()
+
+            for ni in range(w_mat.size(0)):
+                w_mat_col = torch.unsqueeze(w_mat[ni, :], 1).expand(z_mat.size(0), z_mat.size(1))
+                w_mat_col_sign = torch.unsqueeze(w_mat_sign[ni, :], 1).expand(z_mat.size(0), z_mat.size(1))
+
+                z[ni, :] = torch.sum(w_mat_col_sign * z_mat_sign * nth_root_factor ** (w_mat_col + z_mat), dim=0)
+
+            z = torch.reshape(z, out_shape)
+
+            # print(z_float)
+            # print(z)
+            # print(torch.max(torch.abs(z_float - z)))
+            # print(torch.min(torch.abs(z_float - z)))
+            # assert 0
+
+            for c in range(z.shape[1]):
+                z[:,c,:,:] += self.conv[i].bias[c]
+
+            z = F.relu(z)
+
+        z = self.conv[7](z)
+
+        y = residual_stack(z, x, self.scale)
+        return y
+
     def forward(self, x, kd_train=False):
         if kd_train:
             feas = []
