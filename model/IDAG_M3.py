@@ -59,7 +59,7 @@ class IDAG_M3(nn.Module): #hardcode
                 z_mat = z_mat[0, :]
 
             #normal case: mul
-            z_float = torch.mm(w_mat, z_mat)
+            z_float = torch.reshape(torch.mm(w_mat, z_mat), out_shape)
 
             #log-mul: log2 then add
             # w_max, z_max = num_range[i]
