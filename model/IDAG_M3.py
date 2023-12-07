@@ -107,6 +107,7 @@ class IDAG_M3(nn.Module): #hardcode
         nbit = 8
         nth_root_factors = torch.Tensor([1.00913,1.0153,1.00717,1.00556,0.999693,0.993657,0.991564]).cuda()
         nth_root_factors = torch.Tensor([1.00913,1.00913,1.00913,1.00913,1.00913,1.00913,1.00913]).cuda()
+        nth_root_factors = torch.Tensor([2,2,2,2,2,2,2]).cuda()
         ##
         out_shape = [1, -1, x.shape[2], x.shape[3]]
 
