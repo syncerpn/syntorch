@@ -60,8 +60,6 @@ class IDAG_M3(nn.Module): #hardcode
 
             #normal case: mul
             z_float = torch.reshape(torch.mm(w_mat, z_mat), out_shape)
-            z = F.relu(z_float)
-            continue
 
             #log-mul: log2 then add
             # w_max, z_max = num_range[i]
@@ -86,12 +84,13 @@ class IDAG_M3(nn.Module): #hardcode
                 z[ni, :] = torch.sum(w_mat_col_sign * z_mat_sign * nth_root_factor ** (w_mat_col + z_mat), dim=0)
 
             z = torch.reshape(z, out_shape)
-            for c in range(z.shape[1]):
-                z[:,c,:,:] += self.conv[i].bias[c]
 
             print(z_float)
             print(z)
             assert 0
+            
+            for c in range(z.shape[1]):
+                z[:,c,:,:] += self.conv[i].bias[c]
 
             z = F.relu(z)
 
