@@ -59,7 +59,7 @@ class IDAG_M3(nn.Module): #hardcode
                 z_mat = z_mat[0, :]
 
             #normal case: mul
-            # z = torch.mm(w_mat, z_mat)
+            z_float = torch.mm(w_mat, z_mat)
 
             #log-mul: log2 then add
             # w_max, z_max = num_range[i]
@@ -86,6 +86,10 @@ class IDAG_M3(nn.Module): #hardcode
             z = torch.reshape(z, out_shape)
             for c in range(z.shape[1]):
                 z[:,c,:,:] += self.conv[i].bias[c]
+
+            print(z_float)
+            print(z)
+            assert 0
 
             z = F.relu(z)
 
