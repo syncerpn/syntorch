@@ -43,7 +43,6 @@ testset, batch_size_test = data.load_testset(args)
 XYtest = torchdata.DataLoader(testset, batch_size=batch_size_test, shuffle=False, num_workers=16)
 
 core = model.config(args)
-core.save_dn_module('layer_')
 core.cuda()
 
 test()
