@@ -184,6 +184,7 @@ class IDAG_M3(nn.Module): #hardcode
         nbit = 12
         nth_root_factors = torch.Tensor([1.00913,1.0153,1.00717,1.00556,0.999693,0.993657,0.991564]).cuda()
         nth_root_factors = torch.Tensor([1.00913,1.00913,1.00913,1.00913,1.00913,1.00913,1.00913]).cuda()
+        nth_root_factors = torch.Tensor([0.9,0.9,0.9,0.9,0.9,0.9,0.9]).cuda()
         # nth_root_factors = torch.Tensor([1.0101,1.0163,1.0091,1.0078,1.0023,0.9977,0.9949]).cuda()
         # nth_root_factors = torch.Tensor([0.5,0.5,0.5,0.5,0.5,0.5,0.5]).cuda()
         # nth_root_factors = torch.Tensor([1.5,1.5,1.5,1.5,1.5,1.5,1.5]).cuda()
@@ -238,10 +239,10 @@ class IDAG_M3(nn.Module): #hardcode
                 z_ni_v = (w_mat_col + z_mat - log_neg_end) % (2 ** 8)
                 z_ni_e = (w_mat_col + z_mat - log_neg_end) // (2 ** 8)
 
-                z[ni, :] = torch.sum(w_mat_col_sign * z_mat_sign * (z_ni_v * 10 ** (z_ni_e - 9)), dim=0)
-                print(z[ni, :])
+                # z[ni, :] = torch.sum(w_mat_col_sign * z_mat_sign * (z_ni_v * 10 ** (z_ni_e - 9)), dim=0)
+                # print(z[ni, :])
 
-                # z[ni, :] = torch.sum(w_mat_col_sign * z_mat_sign * nth_root_factor ** (w_mat_col + z_mat), dim=0)
+                z[ni, :] = torch.sum(w_mat_col_sign * z_mat_sign * nth_root_factor ** (w_mat_col + z_mat), dim=0)
                 # print(z[ni, :])
                 # assert 0
 
