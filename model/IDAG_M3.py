@@ -238,7 +238,7 @@ class IDAG_M3(nn.Module): #hardcode
                 z_ni_v = (w_mat_col + z_mat - log_neg_end) % (2 ** 8)
                 z_ni_e = (w_mat_col + z_mat - log_neg_end) // (2 ** 8)
 
-                z[ni, :] = torch.sum(w_mat_col_sign * z_mat_sign * (z_ni_v * 10 ** (z_ni_e - 9)))
+                z[ni, :] = torch.sum(w_mat_col_sign * z_mat_sign * (z_ni_v * 10 ** (z_ni_e - 9)), dim=0)
                 print(z[ni, :])
 
                 z[ni, :] = torch.sum(w_mat_col_sign * z_mat_sign * nth_root_factor ** (w_mat_col + z_mat), dim=0)
