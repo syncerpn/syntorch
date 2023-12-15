@@ -235,8 +235,8 @@ class IDAG_M3(nn.Module): #hardcode
             for ni in range(w_mat.size(0)):
                 w_mat_col = torch.unsqueeze(w_mat[ni, :], 1).expand(z_mat.size(0), z_mat.size(1))
                 w_mat_col_sign = torch.unsqueeze(w_mat_sign[ni, :], 1).expand(z_mat.size(0), z_mat.size(1))
-                z_ni_v = (w_mat_col + z_mat - log_neg_end) // (2 ** 4)
-                z_ni_e = (w_mat_col + z_mat - log_neg_end) % (2 ** 4)
+                z_ni_v = (w_mat_col + z_mat - log_neg_end) % (2 ** 8)
+                z_ni_e = (w_mat_col + z_mat - log_neg_end) // (2 ** 8)
 
                 z[ni, :] = torch.sum(w_mat_col_sign * z_mat_sign * (z_ni_v * 10 ** (z_ni_e - 9)))
 
