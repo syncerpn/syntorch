@@ -185,6 +185,7 @@ class IDAG_M3(nn.Module): #hardcode
         nth_root_factors = torch.Tensor([1.00913,1.0153,1.00717,1.00556,0.999693,0.993657,0.991564]).cuda()
         nth_root_factors = torch.Tensor([1.00913,1.00913,1.00913,1.00913,1.00913,1.00913,1.00913]).cuda()
         nth_root_factors = torch.Tensor([0.9,0.9,0.9,0.9,0.9,0.9,0.9]).cuda()
+        nth_root_factors = torch.Tensor([0.95,0.95,0.95,0.95,0.95,0.95,0.95]).cuda()
         # nth_root_factors = torch.Tensor([1.0101,1.0163,1.0091,1.0078,1.0023,0.9977,0.9949]).cuda()
         # nth_root_factors = torch.Tensor([0.5,0.5,0.5,0.5,0.5,0.5,0.5]).cuda()
         # nth_root_factors = torch.Tensor([1.5,1.5,1.5,1.5,1.5,1.5,1.5]).cuda()
